@@ -1,0 +1,129 @@
+#include"TupleDesc.h"
+namespace Simpledb {
+	long TupleDesc::TDItem::_serialVersionUID = 1l;
+	long TupleDesc::_serialVersionUID = 1l;
+	//const Iterator<TupleDesc::TDItem>& TupleDesc::iterator()
+	//{
+	//	// TODO: insert return statement here
+	//}
+	TupleDesc::TupleDesc(const vector<shared_ptr<Type>>& typeVec, const vector<string>& fieldVec)
+		:_tdIter(this)
+	{
+		int tSz = typeVec.size();
+		int fSz = fieldVec.size();
+		for (int i = 0; i < tSz; ++i)
+		{
+			string fieldName = i < fSz ? fieldVec[i] : "";
+			_tdItems.push_back(TDItem(typeVec[i], fieldName));
+		}
+	}
+	TupleDesc::TupleDesc(const vector<shared_ptr<Type>>& typeVec)
+		:_tdIter(this)
+	{
+		for (auto& t : typeVec) {
+			_tdItems.push_back(TDItem(t,""));
+		}
+	}
+	int TupleDesc::numFields()const
+	{
+		return _tdItems.size();
+	}
+	string TupleDesc::getFieldName(int i)const
+	{
+		if (i < 0 || i >= _tdItems.size())
+			return string();
+		return _tdItems[i]._fieldName;
+	}
+	shared_ptr<Type> TupleDesc::getFieldType(int i)const
+	{
+		if (i < 0 || i >= _tdItems.size())
+			return nullptr;
+		return _tdItems[i]._fieldType;
+	}
+	int TupleDesc::fieldNameToIndex(const string& name)const
+	{
+		int sz = _tdItems.size();
+		for (int i = 0; i < sz; ++i)
+		{
+			if (name == _tdItems[i]._fieldName)
+				return i;
+		}
+		return -1;
+	}
+	int TupleDesc::getSize()const
+	{
+		return _tdItems.size();
+	}
+	shared_ptr<TupleDesc> TupleDesc::merge(const TupleDesc& td1, const TupleDesc& td2)
+	{
+		vector<shared_ptr<Type>> tVec;
+		vector<string> fVec;
+		int sz1 = td1.getSize(), sz2 = td2.getSize();
+		for (int i = 0; i < sz1; ++i) {
+			tVec.push_back(td1.getFieldType(i));
+			fVec.push_back(td1.getFieldName(i));
+		}
+		for (int i = 0; i < sz2; ++i) {
+			tVec.push_back(td2.getFieldType(i));
+			fVec.push_back(td2.getFieldName(i));
+		}
+		return shared_ptr<TupleDesc>(new TupleDesc(tVec,fVec));
+	}
+	bool TupleDesc::equals(const TupleDesc& td)const
+	{
+		int sz1 = _tdItems.size();
+		int sz2 = td.getSize();
+		if (sz1 != sz2)
+			return false;
+		for (int i = 0; i < sz1; ++i)
+		{
+			string t1 = _tdItems[i]._fieldType->toString();
+			string t2 = td.getFieldType(i)->toString();
+			if (t1 != t2)
+				return false;
+		}
+		return true;
+	}
+	size_t TupleDesc::hashCode()const
+	{
+		return size_t();
+	}
+	string TupleDesc::toString()const
+	{
+		int sz = _tdItems.size();
+		string result = "";
+		for (int i = 0; i < sz; ++i) {
+			result += _tdItems[i]._fieldType->toString() + "(" + _tdItems[i]._fieldName + ")";
+			if (i != sz - 1) {
+				result += ",";
+			}
+		}
+		return result;
+	}
+	TupleDesc::TupleDescIter::TupleDescIter(TupleDesc* p)
+	{
+		_pTd = p;
+		_position = 0;
+	}
+	bool TupleDesc::TupleDescIter::hasNext()
+	{
+		if (_pTd != nullptr && _pTd->_tdItems.size() < _position)
+			return true;
+		return false;
+	}
+	TupleDesc::TDItem* TupleDesc::TupleDescIter::next()
+	{
+		if (_pTd != nullptr && _position < _pTd->_tdItems.size()) {
+			TDItem* p = &_pTd->_tdItems[_position];
+			_position++;
+			return p;
+		}
+		return nullptr;
+	}
+	void TupleDesc::TupleDescIter::remove()
+	{
+		if (_pTd != nullptr && _pTd->_tdItems.size() > 0) {
+			_pTd->_tdItems.erase(_pTd->_tdItems.begin() + _pTd->_tdItems.size() - 1);
+		}
+	}
+}

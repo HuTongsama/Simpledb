@@ -1,0 +1,197 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{bccb96cd-26e6-454d-a4f7-d6190e581385}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{823552cf-a65b-43a2-a09d-b9140ea4ad0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="storage">
+      <UniqueIdentifier>{e370555c-b889-47de-86c0-34009c355606}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="execution">
+      <UniqueIdentifier>{7101e59e-89a2-49a4-ae38-aca0ca1a0c17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="index">
+      <UniqueIdentifier>{221ce4ab-180c-45fe-a9b3-84302cfc230e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="optimizer">
+      <UniqueIdentifier>{e67677a7-29f0-494e-a875-9da50121f34a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="transaction">
+      <UniqueIdentifier>{48e547f1-5ee8-419a-9152-97ada872de71}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Field.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\IntField.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Type.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Predicate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Database.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Noncopyable.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PageId.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Permissions.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TransactionId.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringField.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TupleDesc.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Iterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Collection.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\RecordId.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Tuple.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Page.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BufferPool.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DbFileIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AbstractDbFileIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\DbFile.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeapFile.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeapFileEncoder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Common.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeapPageId.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HeapPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Catalog.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogFile.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PageIdFactory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PageFactory.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\File.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Utility.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Common\Type.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\IntField.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\StringField.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\TupleDesc.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\RecordId.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\Tuple.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\BufferPool.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\AbstractDbFileIterator.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\HeapFile.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\HeapFileEncoder.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="transaction\TransactionId.cpp">
+      <Filter>transaction</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Common.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\HeapPageId.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\HeapPage.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Catalog.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Database.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="include\LogFile.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="common\PageFactory.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\PageIdFactory.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\File.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\Utility.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

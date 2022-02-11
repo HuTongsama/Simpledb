@@ -1,0 +1,67 @@
+#include"IntField.h"
+
+namespace Simpledb 
+{
+	long IntField::_serialVersionUID = 1l;
+	void IntField::serialize(ostream& outStream)const
+	{
+		outStream << _value;
+	}
+	bool IntField::compare(Predicate::Op op, const Field& value)const
+	{
+		try
+		{
+			const IntField& iVal = dynamic_cast<const IntField&>(value);
+			switch (op)
+			{
+			case Simpledb::Predicate::EQUALS:
+				return _value == iVal._value;
+			case Simpledb::Predicate::GREATER_THAN:
+				return _value > iVal._value;
+			case Simpledb::Predicate::LESS_THAN:
+				return _value < iVal._value;
+			case Simpledb::Predicate::LESS_THAN_OR_EQ:
+				return _value <= iVal._value;
+			case Simpledb::Predicate::GREATER_THAN_OR_EQ:
+				return _value >= iVal._value;
+			case Simpledb::Predicate::LIKE:
+				return _value == iVal._value;
+			case Simpledb::Predicate::NOT_EQUALS:
+				return _value != iVal._value;
+			default:
+				return false;
+			}
+			return false;
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
+		
+	}
+	shared_ptr<Type> IntField::getType()const
+	{
+		return Int_Type::INT_TYPE;
+	}
+	int64_t IntField::hashCode()const
+	{
+		return _value;
+	}
+	bool IntField::equals(const Field& feild)const
+	{
+		try
+		{
+			const IntField& iVal = dynamic_cast<const IntField&>(feild);
+			return iVal._value == _value;
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
+		
+	}
+	string IntField::toString()const
+	{
+		return to_string(_value);
+	}
+}
