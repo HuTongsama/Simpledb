@@ -7,14 +7,14 @@ namespace Simpledb {
 		} 
 		return _next != nullptr;
 	}
-	Tuple* AbstractDbFileIterator::next()
+	Tuple& AbstractDbFileIterator::next()
 	{
 		if (_next == nullptr) {
 			_next = readNext();
 		}
 		Tuple* result = _next;
 		_next = nullptr;
-		return result;
+		return *result;
 	}
 	void AbstractDbFileIterator::close()
 	{

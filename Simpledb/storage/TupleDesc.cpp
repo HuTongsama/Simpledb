@@ -52,13 +52,17 @@ namespace Simpledb {
 	}
 	int TupleDesc::getSize()const
 	{
-		return _tdItems.size();
+		size_t sz = 0;
+		for (auto& item : _tdItems) {
+			sz += item._fieldType->getLen();
+		}
+		return sz;
 	}
 	shared_ptr<TupleDesc> TupleDesc::merge(const TupleDesc& td1, const TupleDesc& td2)
 	{
 		vector<shared_ptr<Type>> tVec;
 		vector<string> fVec;
-		int sz1 = td1.getSize(), sz2 = td2.getSize();
+		int sz1 = td1.numFields(), sz2 = td2.numFields();
 		for (int i = 0; i < sz1; ++i) {
 			tVec.push_back(td1.getFieldType(i));
 			fVec.push_back(td1.getFieldName(i));
@@ -72,7 +76,7 @@ namespace Simpledb {
 	bool TupleDesc::equals(const TupleDesc& td)const
 	{
 		int sz1 = _tdItems.size();
-		int sz2 = td.getSize();
+		int sz2 = td.numFields();
 		if (sz1 != sz2)
 			return false;
 		for (int i = 0; i < sz1; ++i)
@@ -103,22 +107,21 @@ namespace Simpledb {
 	TupleDesc::TupleDescIter::TupleDescIter(TupleDesc* p)
 	{
 		_pTd = p;
-		_position = 0;
 	}
 	bool TupleDesc::TupleDescIter::hasNext()
 	{
-		if (_pTd != nullptr && _pTd->_tdItems.size() < _position)
+		if (_pTd != nullptr && _pTd->_tdItems.size() > _position)
 			return true;
 		return false;
 	}
-	TupleDesc::TDItem* TupleDesc::TupleDescIter::next()
+	TupleDesc::TDItem& TupleDesc::TupleDescIter::next()
 	{
 		if (_pTd != nullptr && _position < _pTd->_tdItems.size()) {
-			TDItem* p = &_pTd->_tdItems[_position];
+			TDItem& p = _pTd->_tdItems[_position];
 			_position++;
 			return p;
 		}
-		return nullptr;
+		throw "no such element";
 	}
 	void TupleDesc::TupleDescIter::remove()
 	{

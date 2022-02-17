@@ -5,7 +5,7 @@ namespace Simpledb {
 	class AbstractDbFileIterator : public DbFileIterator {
 	public:
 		bool hasNext()override;
-		Tuple* next()override;
+		Tuple& next()override;
 		/** If subclasses override this, they should call AbstractDbFileIterator::close(). */
 		void close()override;
 	protected:

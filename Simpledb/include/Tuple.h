@@ -4,8 +4,17 @@
 #include"Field.h"
 namespace Simpledb {
 	
-	class Tuple {
+	class Tuple : public Noncopyable {
 	public:
+		class TupleIter :public Iterator<shared_ptr<Field>> {
+		public:
+			TupleIter(Tuple* pTuple);
+			bool hasNext()override;
+			shared_ptr<Field>& next()override;
+			void remove()override;
+		private:
+			Tuple* _pTuple;
+		};
 		/**
 		* Create a new tuple with the specified schema (type).
 		*
@@ -17,12 +26,12 @@ namespace Simpledb {
 		/**
 		* @return The TupleDesc representing the schema of this tuple.
 		*/
-		const TupleDesc* getTupleDesc();
+		shared_ptr<TupleDesc> getTupleDesc();
 		/**
 		* @return The RecordId representing the location of this tuple on disk. May
 		*         be null.
 		*/
-		const RecordId* getRecordId();
+		shared_ptr<RecordId> getRecordId();
 		/**
 		* Set the RecordId information for this tuple.
 		*
@@ -45,9 +54,9 @@ namespace Simpledb {
 		* @param i
 		*         field index to return. Must be a valid index.
 		*/
-		const Field* getField(int i);
+		shared_ptr<Field> getField(int i);
 		/**
-		* Returns the contents of this Tuple as a string. Note that to pass the
+		* Returns the contents of this Tuple as a string. Note that to pass the 
 		* system tests, the format needs to be as follows:
 		*
 		* column1\tcolumn2\tcolumn3\t...\tcolumnN
@@ -59,7 +68,9 @@ namespace Simpledb {
 		* @return
 		*        An iterator which iterates over all the fields of this tuple
 		* */
-		Iterator<shared_ptr<Field>> fields();
+		const TupleIter& fields() {
+			return _iter;
+		};
 		/**
 		* reset the TupleDesc of this tuple (only affecting the TupleDesc)
 		* */
@@ -67,5 +78,9 @@ namespace Simpledb {
 
 	private:
 		static long _serialVersionUID;
+		shared_ptr<TupleDesc> _pTd;
+		shared_ptr<RecordId> _pRId;
+		vector<shared_ptr<Field>> _fields;
+		TupleIter _iter;
 	};
 }

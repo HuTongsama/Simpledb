@@ -3,7 +3,7 @@ namespace Simpledb {
 	template<typename T>
 	class Iterator {
 	public:
-		Iterator() {}
+		Iterator() :_position(0) {}
 		virtual ~Iterator() {}
 		/*
 		* return true if there is next element
@@ -11,12 +11,14 @@ namespace Simpledb {
 		virtual bool hasNext() = 0;
 		/*
 		* return the pointer to next element,
-		* return null if there is not next element
+		* throw exception if there is not next element
 		*/
-		virtual T* next() = 0;
+		virtual T& next() = 0;
 		/*
 		* removes from the underlying collection the last element returned by this iterator 
 		*/
 		virtual void remove() = 0;
+	protected:
+		size_t _position;
 	};
 }

@@ -25,18 +25,17 @@ namespace Simpledb {
 		public:
 			TupleDescIter(TupleDesc* p);
 			bool hasNext()override;
-			TDItem* next()override;
+			TDItem& next()override;
 			void remove()override;
 		private:
 			TupleDesc* _pTd;
-			size_t _position;
 		};
 		/*
 		* @return
 		*        An iterator which iterates over all the field TDItems
 		*        that are included in this TupleDesc
 		*/
-		const TupleDescIter& iterator() { return _tdIter; }
+		TupleDescIter& iterator() { return _tdIter; }
 		TupleDesc():_tdIter(this) {}
 		/**
 		* Create a new TupleDesc with typeAr.length fields with fields of the
