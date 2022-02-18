@@ -6,14 +6,14 @@ namespace Simpledb {
 	public:
 		HeapFile(File& f, shared_ptr<TupleDesc> td);
 		File& getFile();
-		int getId()override;
-		const TupleDesc* getTupleDesc()override;
-		const Page* readPage(const PageId& pid)override;
+		size_t getId()override;
+		shared_ptr<TupleDesc> getTupleDesc()override;
+		shared_ptr<Page> readPage(const PageId& pid)override;
 		bool writePage(const Page& page)override;
 		int numPages();
-		list<const Page*> insertTuple(const TransactionId& tid, const Tuple& t)override;
-		list<const Page*> deleteTuple(const TransactionId& tid, const Tuple& t)override;
-		DbFileIterator* iterator(const TransactionId& tid)override;
+		list<shared_ptr<Page>> insertTuple(const TransactionId& tid, const Tuple& t)override;
+		list<shared_ptr<Page>> deleteTuple(const TransactionId& tid, const Tuple& t)override;
+		DbFileIterator& iterator(const TransactionId& tid)override {};
 	private:
 
 	};

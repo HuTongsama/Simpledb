@@ -6,39 +6,66 @@
 namespace Simpledb {
 	void Catalog::addTable(shared_ptr<DbFile> file, const string& name, const string& pkeyField)
 	{
+        if (file == nullptr)
+            return;
+        Table table(file, name, pkeyField);
+        _nameToTable[file->getId()] = table;
 	}
 	void Catalog::addTable(shared_ptr<DbFile> file, const string& name)
 	{
+        addTable(file, name, "");
 	}
 	void Catalog::addTable(shared_ptr<DbFile> file)
 	{
+        addTable(file, "", "");
 	}
-	int Catalog::getTableId(const string& name)
+    size_t Catalog::getTableId(const string& name)
 	{
-		return 0;
+        Table* pTable = getTable(name);
+        if (pTable != nullptr) {
+            return pTable->_file->getId();
+        }
+        throw runtime_error("no such element");
 	}
-	unique_ptr<TupleDesc> Catalog::getTupleDesc(int tableid)
+	shared_ptr<TupleDesc> Catalog::getTupleDesc(size_t tableid)
 	{
-		return unique_ptr<TupleDesc>();
+        Table* pTable = getTable(tableid);
+        if (pTable != nullptr) {
+            return pTable->_file->getTupleDesc();
+        }
+        throw runtime_error("no such element");
 	}
-	unique_ptr<DbFile> Catalog::getDatabaseFile(int tableid)
+	shared_ptr<DbFile> Catalog::getDatabaseFile(size_t tableid)
 	{
-		return unique_ptr<DbFile>();
+        Table* pTable = getTable(tableid);
+        if (pTable != nullptr) {
+            return pTable->_file;
+        }
+        throw runtime_error("no such element");
 	}
-	string Catalog::getPrimaryKey(int tableid)
+	string Catalog::getPrimaryKey(size_t tableid)
 	{
-		return string();
+        Table* pTable = getTable(tableid);
+        if (pTable != nullptr) {
+            return pTable->_pkeyField;
+        }
+        throw runtime_error("no such element");
 	}
 	Iterator<int>* Catalog::tableIdIterator()
 	{
 		return nullptr;
 	}
-	string Catalog::getTableName(int id)
+	string Catalog::getTableName(size_t tableid)
 	{
+        Table* pTable = getTable(tableid);
+        if (pTable) {
+            return pTable->_name;
+        }
 		return string();
 	}
 	void Catalog::clear()
 	{
+        _nameToTable.clear();
 	}
 	bool Catalog::loadSchema(const string& catalogFile)
 	{
@@ -99,4 +126,22 @@ namespace Simpledb {
             return false;
         }       
 	}
+    
+    Catalog::Table* Catalog::getTable(const string& name)
+    {
+        for (auto& iter : _nameToTable) {
+            if (iter.second._name == name) {
+                return &iter.second;
+            }
+        }
+        return nullptr;
+    }
+
+    Catalog::Table* Catalog::getTable(size_t tableid)
+    {
+        if (_nameToTable.find(tableid) != _nameToTable.end()) {
+            return &(_nameToTable[tableid]);
+        }
+        return nullptr;
+    }
 }

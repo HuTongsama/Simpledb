@@ -1,5 +1,7 @@
 #pragma once
 #include"DbFile.h"
+#include<map>
+using namespace std;
 namespace Simpledb {
 	/**
 	* The Catalog keeps track of all available tables in the database and their
@@ -12,6 +14,15 @@ namespace Simpledb {
 	*/
 	class Catalog {
 	public:
+		struct Table
+		{
+			Table() {}
+			Table(shared_ptr<DbFile> file, const string& name, const string& pkeyField)
+				: _file(file), _name(name), _pkeyField(pkeyField) {}
+			shared_ptr<DbFile> _file;
+			string _name;
+			string _pkeyField;
+		};
 		/**
 		* Constructor.
 		* Creates a new, empty catalog.
@@ -38,16 +49,16 @@ namespace Simpledb {
 		void addTable(shared_ptr<DbFile> file);
 		/**
 		* Return the id of the table with a specified name,
-		* @throws -1 if the table doesn't exist
+		* @throws Exception if the table doesn't exist
 		*/
-		int getTableId(const string& name);
+		size_t getTableId(const string& name);
 		/**
 		* Returns the tuple descriptor (schema) of the specified table
 		* @param tableid The id of the table, as specified by the DbFile.getId()
 		*     function passed to addTable
 		* @returns nullptr if the table doesn't exist
 		*/
-		unique_ptr<TupleDesc> getTupleDesc(int tableid);
+		shared_ptr<TupleDesc> getTupleDesc(size_t tableid);
 		/**
 		* Returns the DbFile that can be used to read the contents of the
 		* specified table.
@@ -55,15 +66,21 @@ namespace Simpledb {
 		*     function passed to addTable
 		* @returns nullptr if the table doesn't exist
 		*/
-		unique_ptr<DbFile> getDatabaseFile(int tableid);
-		string getPrimaryKey(int tableid);
+		shared_ptr<DbFile> getDatabaseFile(size_t tableid);
+		string getPrimaryKey(size_t tableid);
 		Iterator<int>* tableIdIterator();
-		string getTableName(int id);
+		string getTableName(size_t tableid);
 		void clear();
 		/**
 		* Reads the schema from a file and creates the appropriate tables in the database.
 		* @param catalogFile
 		*/
 		bool loadSchema(const string& catalogFile);
+	private:
+		Table* getTable(const string& name);
+		Table* getTable(size_t tableid);
+
+
+		map<size_t, Table> _nameToTable;
 	};
 }

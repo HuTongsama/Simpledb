@@ -24,7 +24,7 @@ namespace Simpledb {
 		*
 		* @returns null if the page does not exist in this file.
 		*/
-		virtual const Page* readPage(const PageId& id) = 0;
+		virtual shared_ptr<Page> readPage(const PageId& id) = 0;
 		/**
 		* Push the specified page to disk.
 		*
@@ -45,7 +45,7 @@ namespace Simpledb {
 		*		  empty list if the tuple cannot be added,
 		*         empty if the needed file can't be read/written
 		*/
-		virtual list<const Page*> insertTuple(const TransactionId& tid,const Tuple& t) = 0;
+		virtual list<shared_ptr<Page>> insertTuple(const TransactionId& tid,const Tuple& t) = 0;
 		/**
 		* Removes the specified tuple from the file on behalf of the specified
 		* transaction.
@@ -59,7 +59,7 @@ namespace Simpledb {
 		*		  empty list if the tuple cannot be deleted or is not a member
 		*   of the file
 		*/
-		virtual list<const Page*> deleteTuple(const TransactionId& tid, const Tuple& t) = 0;
+		virtual list<shared_ptr<Page>> deleteTuple(const TransactionId& tid, const Tuple& t) = 0;
 		/**
 		* Returns an iterator over all the tuples stored in this DbFile. The
 		* iterator must use {@link BufferPool#getPage}, rather than
@@ -67,9 +67,9 @@ namespace Simpledb {
 		*
 		* @return an iterator over all the tuples stored in this DbFile.
 		*/
-		virtual DbFileIterator* iterator(const TransactionId& tid) = 0;
+		virtual DbFileIterator& iterator(const TransactionId& tid) = 0;
 		/**
-		* Returns a unique ID used to identify this DbFile in the Catalog. This id
+		* Returns a unique ID used to identify this DbFile in the Catalog. This id 
 		* can be used to look up the table via {@link Catalog#getDatabaseFile} and
 		* {@link Catalog#getTupleDesc}.
 		* <p>
@@ -81,11 +81,11 @@ namespace Simpledb {
 		*
 		* @return an ID uniquely identifying this HeapFile.
 		*/
-		virtual int getId() = 0;
+		virtual size_t getId() = 0;
 		/**
 		* Returns the TupleDesc of the table stored in this DbFile.
 		* @return TupleDesc of this DbFile.
 		*/
-		virtual const TupleDesc* getTupleDesc() = 0;
+		virtual shared_ptr<TupleDesc> getTupleDesc() = 0;
 	};
 }

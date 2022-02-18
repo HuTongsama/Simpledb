@@ -9,15 +9,15 @@ namespace Simpledb {
 		static File f(tmpfile());
 		return f;
 	}
-	int HeapFile::getId()
+	size_t HeapFile::getId()
 	{
 		return 0;
 	}
-	const TupleDesc* HeapFile::getTupleDesc()
+	shared_ptr<TupleDesc> HeapFile::getTupleDesc()
 	{
 		return nullptr;
 	}
-	const Page* HeapFile::readPage(const PageId& pid)
+	shared_ptr<Page> HeapFile::readPage(const PageId& pid)
 	{
 		return nullptr;
 	}
@@ -29,16 +29,16 @@ namespace Simpledb {
 	{
 		return 0;
 	}
-	list<const Page*> HeapFile::insertTuple(const TransactionId& tid, const Tuple& t)
+	list<shared_ptr<Page>> HeapFile::insertTuple(const TransactionId& tid, const Tuple& t)
 	{
-		return list<const Page*>();
+		return list<shared_ptr<Page>>();
 	}
-	list<const Page*> HeapFile::deleteTuple(const TransactionId& tid, const Tuple& t)
+	list<shared_ptr<Page>> HeapFile::deleteTuple(const TransactionId& tid, const Tuple& t)
 	{
-		return list<const Page*>();
+		return list<shared_ptr<Page>>();
 	}
-	DbFileIterator* HeapFile::iterator(const TransactionId& tid)
+	/*DbFileIterator& HeapFile::iterator(const TransactionId& tid)
 	{
-		return nullptr;
-	}
+		
+	}*/
 }
