@@ -3,8 +3,8 @@
 
 default_random_engine CatalogTest::_r(time(0));
 string CatalogTest::_name = SystemTestUtil::getUUID();
-int CatalogTest::_id1 = CatalogTest::_r();
-int CatalogTest::_id2 = CatalogTest::_r();
+size_t CatalogTest::_id1 = CatalogTest::_r();
+size_t CatalogTest::_id2 = CatalogTest::_r();
 
 void CatalogTest::SetUp()
 {

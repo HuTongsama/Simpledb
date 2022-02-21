@@ -8,8 +8,12 @@ namespace Simpledb {
 	{
         if (file == nullptr)
             return;
+        Table* pOld = getTable(file->getId());
+        if (pOld != nullptr) {
+            _nameToTable.erase(pOld->_name);
+        }
         Table table(file, name, pkeyField);
-        _nameToTable[file->getId()] = table;
+        _nameToTable[name] = table;
 	}
 	void Catalog::addTable(shared_ptr<DbFile> file, const string& name)
 	{
@@ -129,18 +133,18 @@ namespace Simpledb {
     
     Catalog::Table* Catalog::getTable(const string& name)
     {
-        for (auto& iter : _nameToTable) {
-            if (iter.second._name == name) {
-                return &iter.second;
-            }
+        if (_nameToTable.find(name) != _nameToTable.end()) {
+            return &(_nameToTable[name]);
         }
         return nullptr;
     }
 
     Catalog::Table* Catalog::getTable(size_t tableid)
     {
-        if (_nameToTable.find(tableid) != _nameToTable.end()) {
-            return &(_nameToTable[tableid]);
+        for (auto& iter : _nameToTable) {
+            if (iter.second._file->getId() == tableid) {
+                return &iter.second;
+            }
         }
         return nullptr;
     }

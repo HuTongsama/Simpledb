@@ -37,6 +37,12 @@ namespace Simpledb {
 	{
 		return list<shared_ptr<Page>>();
 	}
+	Tuple& HeapFile::HeapFileIterator::next()
+	{
+		shared_ptr<TupleDesc> td;
+		static Tuple t(td);
+		return t;
+	}
 	/*DbFileIterator& HeapFile::iterator(const TransactionId& tid)
 	{
 		

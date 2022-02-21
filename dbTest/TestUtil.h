@@ -6,7 +6,7 @@ public:
 
 	class SkeletonFile :public DbFile {
 	public:
-        SkeletonFile(int tableId, shared_ptr<TupleDesc> td)
+        SkeletonFile(size_t tableId, shared_ptr<TupleDesc> td)
             :_tableId(tableId), _td(td)
         {};
         
@@ -46,7 +46,7 @@ public:
             return _td;
         }
 	private:
-		int _tableId;
+		size_t _tableId;
 		shared_ptr<TupleDesc> _td;
 	};
 };

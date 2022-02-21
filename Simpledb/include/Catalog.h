@@ -81,6 +81,6 @@ namespace Simpledb {
 		Table* getTable(size_t tableid);
 
 
-		map<size_t, Table> _nameToTable;
+		map<string, Table> _nameToTable;
 	};
 }
