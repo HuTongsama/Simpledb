@@ -17,15 +17,15 @@ namespace Simpledb
 		*/
 		virtual vector<int> serialize()const = 0;
 		/** @return the unique tableid hashcode with this PageId */
-		virtual int getTableId()const = 0;
-		virtual int getPageNumber()const = 0;
+		virtual size_t getTableId()const = 0;
+		virtual size_t getPageNumber()const = 0;
 		/**
 		* @return a hash code for this page, represented by the concatenation of
 		*   the table number and the page number (needed if a PageId is used as a
 		*   key in a hash table in the BufferPool, for example.)
 		* @see BufferPool
 		*/
-		virtual int64_t hashCode()const = 0;
+		virtual size_t hashCode()const = 0;
 		/**
 		* Compares one PageId to another.
 		*

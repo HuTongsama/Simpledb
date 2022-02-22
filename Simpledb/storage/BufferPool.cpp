@@ -1,4 +1,5 @@
 #include"BufferPool.h"
+#include"Database.h"
 namespace Simpledb 
 {
 	int BufferPool::DEFAULT_PAGE_SIZE = 4096;
@@ -6,10 +7,26 @@ namespace Simpledb
 	int BufferPool::_pageSize = BufferPool::DEFAULT_PAGE_SIZE;
 	BufferPool::BufferPool(int numPages)
 	{
+		_numPages = numPages;
+		_curPages = 0;
 	}
-	const Page* BufferPool::getPage(const TransactionId& tid, const PageId& pid, Permissions perm)
+	BufferPool::~BufferPool()
 	{
-		return nullptr;
+	}
+	shared_ptr<Page> BufferPool::getPage(const TransactionId& tid, const PageId& pid, Permissions perm)
+	{
+		lock_guard<mutex> lock(_mutex);
+		
+		size_t pidHashCode = pid.hashCode();
+		if (_idToPage.find(pidHashCode) == _idToPage.end()) {
+			if (_curPages == _numPages) {
+				throw runtime_error("too many pages in bufferPool");
+			}
+			size_t tableId = pid.getTableId();
+			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
+			_idToPage[pidHashCode] = dbFile->readPage(pid);
+		}
+		return _idToPage[pidHashCode];
 	}
 	void BufferPool::unsafeReleasePage(const TransactionId& tid, const PageId& pid)
 	{

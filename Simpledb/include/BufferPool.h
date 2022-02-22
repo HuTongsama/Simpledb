@@ -2,6 +2,9 @@
 #include"Page.h"
 #include"Permissions.h"
 #include"Tuple.h"
+#include<mutex>
+#include<map>
+using namespace std;
 namespace Simpledb {
 	/**
 	* BufferPool manages the reading and writing of pages into memory from
@@ -28,6 +31,7 @@ namespace Simpledb {
 		* @param numPages maximum number of pages in this buffer pool.
 		*/
 		BufferPool(int numPages);
+		~BufferPool();
 		static int getPageSize() {
 			return _pageSize;
 		}
@@ -44,20 +48,20 @@ namespace Simpledb {
 		void unlockBufferPool() {}
 		/**
 		* Retrieve the specified page with the associated permissions.
-		* Will acquire a lock and may block if that lock is held by another
+		* Will acquire a lock and may block if that lock is held by another 
 		* transaction.
 		* <p>
-		* The retrieved page should be looked up in the buffer pool.  If it
-		* is present, it should be returned.  If it is not present, it should
-		* be added to the buffer pool and returned.  If there is insufficient
-		* space in the buffer pool, a page should be evicted and the new page
+		* The retrieved page should be looked up in the buffer pool.  If it 
+		* is present, it should be returned.  If it is not present, it should 
+		* be added to the buffer pool and returned.  If there is insufficient 
+		* space in the buffer pool, a page should be evicted and the new page 
 		* should be added in its place.
 		*
 		* @param tid the ID of the transaction requesting the page
 		* @param pid the ID of the requested page
 		* @param perm the requested permissions on the page
 		*/
-		const Page* getPage(const TransactionId& tid,const PageId& pid, Permissions perm);
+		shared_ptr<Page> getPage(const TransactionId& tid,const PageId& pid, Permissions perm);
 		/**
 		* Releases the lock on a page.
 		* Calling this is very risky, and may result in wrong behavior. Think hard
@@ -142,8 +146,11 @@ namespace Simpledb {
 		*/
 		void evictPage();//synchronized , not necessary for lab1
 
-	private:	
+	private:
 		static int _pageSize;
-
+		size_t _numPages;
+		size_t _curPages;
+		map<size_t, shared_ptr<Page>> _idToPage;
+		mutex _mutex;
 	};
 }

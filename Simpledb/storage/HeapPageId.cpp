@@ -1,6 +1,6 @@
 #include"HeapPageId.h"
 namespace Simpledb {
-	HeapPageId::HeapPageId(int tableId, int pgNo)
+	HeapPageId::HeapPageId(size_t tableId, size_t pgNo)
 	{
 	}
 	vector<int> HeapPageId::serialize()const
@@ -10,15 +10,15 @@ namespace Simpledb {
 		result[1] = getPageNumber();
 		return result;
 	}
-	int HeapPageId::getTableId()const
+	size_t HeapPageId::getTableId()const
 	{
 		return 0;
 	}
-	int HeapPageId::getPageNumber()const
+	size_t HeapPageId::getPageNumber()const
 	{
 		return 0;
 	}
-	int64_t HeapPageId::hashCode()const
+	size_t HeapPageId::hashCode()const
 	{
 		return int64_t();
 	}

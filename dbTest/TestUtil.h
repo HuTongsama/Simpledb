@@ -18,7 +18,7 @@ public:
             throw runtime_error("not implemented");
         }
 
-        bool writePage(const Page& p)override {
+        void writePage(const Page& p)override {
             throw runtime_error("not implemented");
         }
 
@@ -49,4 +49,6 @@ public:
 		size_t _tableId;
 		shared_ptr<TupleDesc> _td;
 	};
+
+    static vector<unsigned char> readFileBytes(const string& path);
 };

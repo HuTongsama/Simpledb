@@ -21,9 +21,9 @@ namespace Simpledb {
 	{
 		return nullptr;
 	}
-	bool HeapFile::writePage(const Page& page)
+	void HeapFile::writePage(const Page& page)
 	{
-		return false;
+		return;
 	}
 	int HeapFile::numPages()
 	{

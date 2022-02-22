@@ -25,13 +25,13 @@ namespace Simpledb
 		*
 		* @return the id of this page
 		*/
-		virtual const PageId* getId()const = 0;
+		virtual shared_ptr<PageId> getId()const = 0;
 		/**
 		* Get the id of the transaction that last dirtied this page, or null if the page is clean..
 		*
 		* @return The id of the transaction that last dirtied this page, or null
 		*/
-		virtual const TransactionId* isDirty()const = 0;
+		virtual shared_ptr<TransactionId> isDirty()const = 0;
 		/**
 		* Set the dirty state of this page as dirtied by a particular transaction
 		*/
@@ -51,7 +51,7 @@ namespace Simpledb
 		* Provide a representation of this page before any modifications were made
 		* to it.  Used by recovery.
 		*/
-		virtual const Page* getBeforeImage()const = 0;
+		virtual shared_ptr<Page> getBeforeImage()const = 0;
 		/*
 		* a transaction that wrote this page just committed it.
 		* copy current content to the before image.

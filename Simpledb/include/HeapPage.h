@@ -28,11 +28,11 @@ namespace Simpledb {
         /**
          * @return the PageId associated with this page.
          */
-        const PageId* getId()const override;
+        shared_ptr<PageId> getId()const override;
         /**
         * Returns the tid of the transaction that last dirtied this page, or null if the page is not dirty
         */
-        const TransactionId* isDirty()const override;
+        shared_ptr<TransactionId> isDirty()const override;
         /**
         * Marks this page as dirty/not dirty and record that transaction
         * that did the dirtying
@@ -52,7 +52,7 @@ namespace Simpledb {
         vector<unsigned char> getPageData()const override;
         /** Return a view of this page before it was modified
             -- used by recovery */
-        const Page* getBeforeImage()const override;
+        shared_ptr<Page> getBeforeImage()const override;
         void setBeforeImage()override;
         /**
          * Static method to generate a byte array corresponding to an empty

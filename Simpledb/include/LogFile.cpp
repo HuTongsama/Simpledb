@@ -365,7 +365,7 @@ namespace Simpledb {
     }
     void LogFile::writePageData(File& f, const Page& p)
     {
-        const PageId* pid = p.getId();
+        shared_ptr<PageId> pid = p.getId();
         vector<int> pageInfo = pid->serialize();
         //page data is:
         // page class name

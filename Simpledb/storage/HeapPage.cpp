@@ -4,11 +4,11 @@ namespace Simpledb {
 		:_pid(id)
 	{
 	}
-	const PageId* HeapPage::getId()const
+	shared_ptr<PageId> HeapPage::getId()const
 	{
 		return nullptr;
 	}
-	const TransactionId* HeapPage::isDirty()const
+	shared_ptr<TransactionId> HeapPage::isDirty()const
 	{
 		return nullptr;
 	}
@@ -19,7 +19,7 @@ namespace Simpledb {
 	{
 		return vector<unsigned char>();
 	}
-	const Page* HeapPage::getBeforeImage()const
+	shared_ptr<Page> HeapPage::getBeforeImage()const
 	{
 		return nullptr;
 	}

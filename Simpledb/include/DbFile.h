@@ -29,10 +29,10 @@ namespace Simpledb {
 		* Push the specified page to disk.
 		*
 		* @param p The page to write.  page.getId().pageno() specifies the offset into the file where the page should be written.
-		* @returns false if the write fails
+		* @throws exception if the write fails
 		*
 		*/
-		virtual bool writePage(const Page& p) = 0;
+		virtual void writePage(const Page& p) = 0;
 		/**
 		* Inserts the specified tuple to the file on behalf of transaction.
 		* This method will acquire a lock on the affected pages of the file, and

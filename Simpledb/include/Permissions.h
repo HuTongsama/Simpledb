@@ -3,7 +3,7 @@
 using namespace std;
 namespace Simpledb 
 {
-	enum Permissions
+	enum class Permissions
 	{
 		READ_ONLY, READ_WRITE
 	};

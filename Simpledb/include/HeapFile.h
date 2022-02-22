@@ -17,7 +17,7 @@ namespace Simpledb {
 		size_t getId()override;
 		shared_ptr<TupleDesc> getTupleDesc()override;
 		shared_ptr<Page> readPage(const PageId& pid)override;
-		bool writePage(const Page& page)override;
+		void writePage(const Page& page)override;
 		int numPages();
 		list<shared_ptr<Page>> insertTuple(const TransactionId& tid, const Tuple& t)override;
 		list<shared_ptr<Page>> deleteTuple(const TransactionId& tid, const Tuple& t)override;

@@ -11,7 +11,7 @@ namespace Simpledb {
 		* @param tableId The table that is being referenced
 		* @param pgNo The page number in that table.
 		*/
-		HeapPageId(int tableId, int pgNo);
+		HeapPageId(size_t tableId, size_t pgNo);
 		/**
 		*  Return a representation of this object as an array of
 		*  integers, for writing to disk.  Size of returned array must contain
@@ -20,19 +20,19 @@ namespace Simpledb {
 		*/
 		vector<int> serialize()const override;
 		/** @return the table associated with this PageId */
-		int getTableId()const override;
+		size_t getTableId()const override;
 		/**
 		* @return the page number in the table getTableId() associated with
 		*   this PageId
 		*/
-		int getPageNumber()const override;
+		size_t getPageNumber()const override;
 		/**
 		* @return a hash code for this page, represented by a combination of
 		*   the table number and the page number (needed if a PageId is used as a
 		*   key in a hash table in the BufferPool, for example.)
 		* @see BufferPool
 		*/
-		int64_t hashCode()const override;
+		size_t hashCode()const override;
 		/**
 		* Compares one PageId to another.
 		*
