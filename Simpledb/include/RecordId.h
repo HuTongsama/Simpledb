@@ -1,6 +1,7 @@
 #pragma once
 #include"PageId.h"
 #include<memory>
+#include<string>
 using namespace std;
 namespace Simpledb 
 {
@@ -34,7 +35,7 @@ namespace Simpledb
 		*
 		* @return True if this and o represent the same tuple
 		*/
-		bool equals(const RecordId& rid);
+		bool equals(RecordId& rid);
 		/**
 		* You should implement the hashCode() so that two equal RecordId instances
 		* (with respect to equals()) have the same hashCode().
@@ -44,5 +45,9 @@ namespace Simpledb
 		size_t hashCode();
 	private:
 		static long _serialVersionUID;
+		shared_ptr<PageId> _pid;
+		int _tupleNo;
+		string _combineStr;
+		size_t _hashcode;
 	};
 }

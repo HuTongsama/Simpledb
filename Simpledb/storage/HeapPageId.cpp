@@ -1,6 +1,10 @@
 #include"HeapPageId.h"
+#include"Common.h"
+#include<functional>
+#include<sstream>
 namespace Simpledb {
 	HeapPageId::HeapPageId(size_t tableId, size_t pgNo)
+		:_tableId(tableId), _pgNo(pgNo), _hashcode(0)
 	{
 	}
 	vector<int> HeapPageId::serialize()const
@@ -12,18 +16,33 @@ namespace Simpledb {
 	}
 	size_t HeapPageId::getTableId()const
 	{
-		return 0;
+		return _tableId;
 	}
 	size_t HeapPageId::getPageNumber()const
 	{
-		return 0;
+		return _pgNo;
 	}
-	size_t HeapPageId::hashCode()const
+	size_t HeapPageId::hashCode()
 	{
-		return int64_t();
+		if (_combineStr == "") {
+			stringstream ss;
+			_combineStr = combineArgs(ss, "_", _tableId, _pgNo);
+			std::hash<string> hashFunc;
+			_hashcode = hashFunc(_combineStr);
+		}
+		return _hashcode;
 	}
-	bool HeapPageId::equals(const PageId& pId)const
+	bool HeapPageId::equals(PageId& pId)
 	{
-		return false;
+		try
+		{
+			HeapPageId& hid = dynamic_cast<HeapPageId&>(pId);
+			return hashCode() == hid.hashCode();
+		}
+		catch (const std::exception&)
+		{
+			return false;
+		}
 	}
+
 }

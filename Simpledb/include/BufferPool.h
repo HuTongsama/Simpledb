@@ -61,7 +61,7 @@ namespace Simpledb {
 		* @param pid the ID of the requested page
 		* @param perm the requested permissions on the page
 		*/
-		shared_ptr<Page> getPage(const TransactionId& tid,const PageId& pid, Permissions perm);
+		shared_ptr<Page> getPage(TransactionId& tid,PageId& pid, Permissions perm);
 		/**
 		* Releases the lock on a page.
 		* Calling this is very risky, and may result in wrong behavior. Think hard

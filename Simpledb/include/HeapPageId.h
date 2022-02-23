@@ -1,5 +1,7 @@
 #pragma once
 #include"PageId.h"
+#include<string>
+using namespace std;
 namespace Simpledb {
 	/** Unique identifier for HeapPage objects. */
 	class HeapPageId : public PageId {
@@ -32,7 +34,7 @@ namespace Simpledb {
 		*   key in a hash table in the BufferPool, for example.)
 		* @see BufferPool
 		*/
-		size_t hashCode()const override;
+		size_t hashCode() override;
 		/**
 		* Compares one PageId to another.
 		*
@@ -40,6 +42,11 @@ namespace Simpledb {
 		* @return true if the objects are equal (e.g., page numbers and table
 		*   ids are the same)
 		*/
-		bool equals(const PageId& pId)const override;
+		bool equals(PageId& pId) override;
+	private:
+		size_t _tableId;
+		size_t _pgNo;
+		string _combineStr;
+		size_t _hashcode;
 	};
 }

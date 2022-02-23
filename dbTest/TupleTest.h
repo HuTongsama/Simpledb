@@ -30,5 +30,5 @@ TEST_F(TupleTest, ModifyRecordId) {
     shared_ptr<HeapPageId> pid1 = make_shared<HeapPageId>(0, 0);
     shared_ptr<RecordId> rid1 = make_shared<RecordId>(pid1, 0);
     tup1->setRecordId(rid1);
-    EXPECT_FALSE(rid1->equals(*tup1->getRecordId()));
+    EXPECT_TRUE(rid1->equals(*tup1->getRecordId()));
 }

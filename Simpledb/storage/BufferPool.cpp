@@ -13,7 +13,7 @@ namespace Simpledb
 	BufferPool::~BufferPool()
 	{
 	}
-	shared_ptr<Page> BufferPool::getPage(const TransactionId& tid, const PageId& pid, Permissions perm)
+	shared_ptr<Page> BufferPool::getPage(TransactionId& tid, PageId& pid, Permissions perm)
 	{
 		lock_guard<mutex> lock(_mutex);
 		
