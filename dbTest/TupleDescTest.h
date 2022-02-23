@@ -6,7 +6,20 @@ using namespace Simpledb;
 class TupleDescTest :public::SimpleDbTestBase {
 	
 protected:
-	bool combinedStringArrays(shared_ptr<TupleDesc> td1, shared_ptr<TupleDesc> td2, shared_ptr<TupleDesc> combined);
+    bool combinedStringArrays(shared_ptr<TupleDesc> td1, shared_ptr<TupleDesc> td2, shared_ptr<TupleDesc> combined) {
+        for (int i = 0; i < td1->numFields(); i++) {
+            if (!(td1->getFieldName(i) == combined->getFieldName(i))) {
+                return false;
+            }
+        }
+
+        for (int i = td1->numFields(); i < td1->numFields() + td2->numFields(); i++) {
+            if (!(td2->getFieldName(i - td1->numFields()) == combined->getFieldName(i))) {
+                return false;
+            }
+        }
+        return true;
+    }
 };
 TEST_F(TupleDescTest, Combine) {
     shared_ptr<TupleDesc> td1, td2, td3;

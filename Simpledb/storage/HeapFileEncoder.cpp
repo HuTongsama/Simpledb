@@ -2,7 +2,7 @@
 #include"Common.h"
 #pragma warning(disable:4996)
 namespace Simpledb {
-    bool HeapFileEncoder::convert(list<list<int>> tuples, File& outFile, int npagebytes, int numFields)
+    bool HeapFileEncoder::convert(const vector<vector<int>>& tuples, File& outFile, int npagebytes, int numFields)
     {
         File inFile(tmpfile());
         const int bufSize = 128;

@@ -26,7 +26,7 @@ namespace Simpledb {
 		* @param numFields the number of fields in each input tuple
 		* @returns false if failed
 		*/
-		static bool convert(list<list<int>> tuples, File& outFile, int npagebytes, int numFields);
+		static bool convert(const vector<vector<int>>& tuples, File& outFile, int npagebytes, int numFields);
 		static bool convert(File& inFile, File& outFile, int npagebytes, int numFields);
 		static bool convert(File& inFile, File& outFile, int npagebytes, int numFields,
 			const vector<shared_ptr<Type>>& typeVec);

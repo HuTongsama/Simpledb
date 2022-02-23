@@ -1,7 +1,7 @@
 #include"HeapPage.h"
 namespace Simpledb {
 	HeapPage::HeapPage(shared_ptr<HeapPageId> id, const vector<unsigned char>& data)
-		:_pid(id)
+		:_pid(id), _iter(this)
 	{
 	}
 	shared_ptr<PageId> HeapPage::getId()const
@@ -44,9 +44,9 @@ namespace Simpledb {
 	{
 		return false;
 	}
-	const Iterator<Tuple>* HeapPage::iterator()
+	HeapPage::HeapPageIter& HeapPage::iterator()
 	{
-		return nullptr;
+		return _iter;
 	}
 	int HeapPage::getNumTuples()
 	{

@@ -1,18 +1,21 @@
 #pragma once
+#include "Noncopyable.h"
 #include<string>
 #include<vector>
 using namespace std;
 namespace Simpledb {
 
-	class File {
+	class File : public Noncopyable {
 	public:
 		File(const string& fileName,const string& mode = "ab+");
 		//construct from tmpfile
 		File(FILE* tmpFile);
 		~File();
 		FILE* originPtr() { return _pFile; }
+		string fileName() { return _fileName; }
 		int64_t length();
 		int64_t position();
+		void deleteOnExit() { _deleteOnExit = true; }
 		void flush();
 		void seek(int64_t pos);
 		void writeChar(char c);
@@ -31,8 +34,6 @@ namespace Simpledb {
 		void reset();
 		void close();
 	private:
-		File(const File&) = delete;
-		File& operator=(const File&) = delete;
 		template<typename T>
 		T readBaseType();
 		template<typename T>
@@ -41,6 +42,7 @@ namespace Simpledb {
 		string _fileName;
 		string _mode;
 		FILE* _pFile = nullptr;
+		bool _deleteOnExit = false;
 	};
 	template<typename T>
 	inline T File::readBaseType()

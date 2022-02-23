@@ -11,12 +11,24 @@ using namespace std;
 using namespace Simpledb;
 class CatalogTest :public::SimpleDbTestBase {
 protected:
-	void SetUp()override;
+	void SetUp()override {
+		SimpleDbTestBase::SetUp();
 
-	static default_random_engine _r;
-	static string _name;
-	static size_t _id1;
-	static size_t _id2;
+		_r = default_random_engine(time(0));
+		_name = SystemTestUtil::getUUID();
+		_id1 = CatalogTest::_r();
+		_id2 = CatalogTest::_r();
+
+		Database::getCatalog()->clear();
+		_nameThisTestRun = SystemTestUtil::getUUID();
+		Database::getCatalog()->addTable(make_shared<TestUtil::SkeletonFile>(_id1, Utility::getTupleDesc(2)), _nameThisTestRun);
+		Database::getCatalog()->addTable(make_shared<TestUtil::SkeletonFile>(_id2, Utility::getTupleDesc(2)), _name);
+	}
+
+	default_random_engine _r;
+	string _name;
+	size_t _id1;
+	size_t _id2;
 	string _nameThisTestRun;
 };
 

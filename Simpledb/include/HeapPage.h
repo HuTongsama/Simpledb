@@ -7,7 +7,18 @@
 namespace Simpledb {
 	class HeapPage : public Page {
 	public:
-
+        class HeapPageIter : public Iterator<Tuple> {
+        public:
+            HeapPageIter(HeapPage* page) :_page(page) {}
+            bool hasNext()override { return false; }
+            Tuple& next() {
+                static Tuple t(make_shared<TupleDesc>());
+                return t;
+            }
+            void remove()override{}
+        private:
+            HeapPage* _page;
+        };
         /**
          * Create a HeapPage from a set of bytes of data read from disk.
          * The format of a HeapPage is a set of header bytes indicating
@@ -92,7 +103,7 @@ namespace Simpledb {
          * @return an iterator over all tuples on this page (calling remove on this iterator is invalid)
          * (note that this iterator shouldn't return tuples in empty slots!)
          */
-        const Iterator<Tuple>* iterator();
+        HeapPageIter& iterator();
     private:
             /** Retrieve the number of tuples on this page.
                 @return the number of tuples on this page
@@ -112,7 +123,7 @@ namespace Simpledb {
             */
         void markSlotUsed(int i, bool value);
 
-
+        HeapPageIter _iter;
         shared_ptr<HeapPageId> _pid;
         TupleDesc _td;
         unique_ptr<unsigned char[]> _header;
