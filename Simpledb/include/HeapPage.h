@@ -3,6 +3,7 @@
 #include"HeapPageId.h"
 #include"Tuple.h"
 #include"Common.h"
+#include"DataStream.h"
 #include<mutex>
 namespace Simpledb {
 	class HeapPage : public Page {
@@ -62,10 +63,10 @@ namespace Simpledb {
          * @see #HeapPage
          * @return A byte array correspond to the bytes of this page.
          */
-        vector<unsigned char> getPageData()const override;
+        vector<unsigned char> getPageData()override;
         /** Return a view of this page before it was modified
             -- used by recovery */
-        shared_ptr<Page> getBeforeImage()const override;
+        shared_ptr<Page> getBeforeImage()override;
         void setBeforeImage()override;
         /**
          * Static method to generate a byte array corresponding to an empty
@@ -86,8 +87,8 @@ namespace Simpledb {
          */
         void deleteTuple(const Tuple& t);
         /**
-         * Adds the specified tuple to the page;  the tuple should be updated to reflect
-         *  that it is now stored on this page.
+         * Adds the specified tuple to the page;  the tuple should be updated to reflect 
+         * that it is now stored on this page.
          * @throws DbException if the page is full (no empty slots) or tupledesc
          *         is mismatch.
          * @param t The tuple to add.
@@ -105,33 +106,32 @@ namespace Simpledb {
          * @return an iterator over all tuples on this page (calling remove on this iterator is invalid)
          * (note that this iterator shouldn't return tuples in empty slots!)
          */
-        HeapPageIter& iterator();
+        shared_ptr<HeapPageIter> iterator();
     private:
-            /** Retrieve the number of tuples on this page.
-                @return the number of tuples on this page
-            */
+        /** Retrieve the number of tuples on this page.
+            @return the number of tuples on this page
+        */
         int getNumTuples();
-            /**
-             * Computes the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
-             * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
-             */
+        /**
+           * Computes the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
+           * @return the number of bytes in the header of a page in a HeapFile with each tuple occupying tupleSize bytes
+        */
         int getHeaderSize();
-            /**
-            * Suck up tuples from the source file.
-            */
-        unique_ptr<Tuple> readNextTuple(const Unique_File& inFile, int slotId);          
-            /**
-            * Abstraction to fill or clear a slot on this page.
-            */
+        /**
+        * Suck up tuples from the source file.
+        */
+        shared_ptr<Tuple> readNextTuple(DataStream& ds, int slotId);          
+        /**
+         * Abstraction to fill or clear a slot on this page.
+         */
         void markSlotUsed(int i, bool value);
 
-        HeapPageIter _iter;
         shared_ptr<HeapPageId> _pid;
-        TupleDesc _td;
-        unique_ptr<unsigned char[]> _header;
-        vector<unique_ptr<Tuple>> _tuples;
+        shared_ptr<TupleDesc> _td;
+        vector<unsigned char> _header;
+        vector<shared_ptr<Tuple>> _tuples;
         int _numSlots;
-        unique_ptr<unsigned char[]> _oldData;
+        vector<unsigned char> _oldData;
         mutex _oldDataLock;
 	};
 }

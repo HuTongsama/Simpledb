@@ -125,6 +125,9 @@
     <ClInclude Include="include\Utility.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\DataStream.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -191,6 +194,9 @@
       <Filter>common</Filter>
     </ClCompile>
     <ClCompile Include="common\Utility.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="include\DataStream.cpp">
       <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>

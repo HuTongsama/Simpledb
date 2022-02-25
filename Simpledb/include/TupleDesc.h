@@ -35,8 +35,10 @@ namespace Simpledb {
 		*        An iterator which iterates over all the field TDItems
 		*        that are included in this TupleDesc
 		*/
-		TupleDescIter& iterator() { return _tdIter; }
-		TupleDesc():_tdIter(this) {}
+		shared_ptr<TupleDescIter> iterator() {
+			return make_shared<TupleDescIter>(this); 
+		}
+		TupleDesc() {}
 		/**
 		* Create a new TupleDesc with typeAr.length fields with fields of the
 		* specified types, with associated named fields.
@@ -129,6 +131,5 @@ namespace Simpledb {
 	private:
 		static long _serialVersionUID;
 		vector<TDItem> _tdItems;
-		TupleDescIter _tdIter;
 	};
 }

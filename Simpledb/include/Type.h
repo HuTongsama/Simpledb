@@ -2,6 +2,7 @@
 #include<memory>
 #include<iostream>
 #include"Noncopyable.h"
+#include"DataStream.h"
 using namespace std;
 namespace Simpledb
 {
@@ -22,7 +23,7 @@ namespace Simpledb
 		* read from the specified DataInputStream.
 		* @param instream The input stream to read from
 		*/
-		virtual shared_ptr<Field> parse(istream& instream) = 0;
+		virtual shared_ptr<Field> parse(DataStream& ds) = 0;
 		virtual string toString() = 0;
 		static int STRING_LEN;
 	};
@@ -31,7 +32,7 @@ namespace Simpledb
 	{
 	public:
 		int getLen()override { return 4; }
-		shared_ptr<Field> parse(istream& instream)override;
+		shared_ptr<Field> parse(DataStream& ds)override;
 		string toString()override {
 			return "INT_TYPE";
 		}
@@ -44,7 +45,7 @@ namespace Simpledb
 	{
 	public:
 		int getLen()override { return STRING_LEN + 4; }
-		shared_ptr<Field> parse(istream& instream)override;
+		shared_ptr<Field> parse(DataStream& ds)override;
 		string toString()override {
 			return "STRING_TYPE";
 		}

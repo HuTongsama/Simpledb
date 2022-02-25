@@ -46,12 +46,12 @@ namespace Simpledb
 		*
 		* @return A byte array correspond to the bytes of this page.
 		*/
-		virtual vector<unsigned char> getPageData()const = 0;
+		virtual vector<unsigned char> getPageData() = 0;
 		/** 
 		* Provide a representation of this page before any modifications were made
 		* to it.  Used by recovery.
 		*/
-		virtual shared_ptr<Page> getBeforeImage()const = 0;
+		virtual shared_ptr<Page> getBeforeImage() = 0;
 		/*
 		* a transaction that wrote this page just committed it.
 		* copy current content to the before image.

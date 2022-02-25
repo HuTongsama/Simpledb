@@ -152,6 +152,7 @@
     <ClInclude Include="include\Collection.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\Database.h" />
+    <ClInclude Include="include\DataStream.h" />
     <ClInclude Include="include\DbFile.h" />
     <ClInclude Include="include\DbFileIterator.h" />
     <ClInclude Include="Include\Field.h" />
@@ -188,6 +189,7 @@
     <ClCompile Include="common\PageIdFactory.cpp" />
     <ClCompile Include="Common\Type.cpp" />
     <ClCompile Include="common\Utility.cpp" />
+    <ClCompile Include="include\DataStream.cpp" />
     <ClCompile Include="include\LogFile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />

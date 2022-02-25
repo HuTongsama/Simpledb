@@ -7,7 +7,6 @@ namespace Simpledb {
 	//	// TODO: insert return statement here
 	//}
 	TupleDesc::TupleDesc(const vector<shared_ptr<Type>>& typeVec, const vector<string>& fieldVec)
-		:_tdIter(this)
 	{
 		int tSz = typeVec.size();
 		int fSz = fieldVec.size();
@@ -18,7 +17,6 @@ namespace Simpledb {
 		}
 	}
 	TupleDesc::TupleDesc(const vector<shared_ptr<Type>>& typeVec)
-		:_tdIter(this)
 	{
 		for (auto& t : typeVec) {
 			_tdItems.push_back(TDItem(t,""));
