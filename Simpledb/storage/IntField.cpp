@@ -1,11 +1,12 @@
 #include"IntField.h"
-
+#include"Common.h"
 namespace Simpledb 
 {
 	long IntField::_serialVersionUID = 1l;
-	void IntField::serialize(ostream& outStream)const
+	vector<unsigned char> IntField::serialize()const
 	{
-		outStream << _value;
+		vector<unsigned char> result = serializeCommonType(_value);
+		return result;
 	}
 	bool IntField::compare(Predicate::Op op, const Field& value)const
 	{

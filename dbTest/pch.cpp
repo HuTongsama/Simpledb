@@ -8,4 +8,4 @@
 #include "CatalogTest.h"
 #include "HeapPageIdTest.h"
 #include "RecordIdTest.h"
-//#include "HeapPageReadTest.h"
+#include "HeapPageReadTest.h"

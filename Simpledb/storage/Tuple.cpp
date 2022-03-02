@@ -6,9 +6,9 @@ namespace Simpledb
 	long Tuple::_serialVersionUID = 1l;
 	Tuple::Tuple(shared_ptr<TupleDesc> td)
 		:_pTd(td) , _iter(this) {
-		auto& iter = _pTd->iterator();
-		while(iter.hasNext()){
-			auto& item = iter.next();
+		auto iter = _pTd->iterator();
+		while(iter->hasNext()){
+			auto& item = iter->next();
 			string type = item._fieldType->toString();
 			if (type == Int_Type::INT_TYPE->toString()){
 				_fields.push_back(make_shared<IntField>(0));

@@ -97,7 +97,7 @@ namespace Simpledb {
         /**
          * Returns the number of empty slots on this page.
          */
-        int getNumEmptySlots();
+        size_t getNumEmptySlots();
         /**
          * Returns true if associated slot on this page is filled.
          */

@@ -37,13 +37,13 @@ namespace Simpledb {
 	{
 		T t;
 		static size_t sz = sizeof(T);
-		readBytes(&T, sz);
+		readBytes((char *) &t, sz);
 		return t;
 	}
 	template<typename T>
 	inline void DataStream::writeCommonType(T value)
 	{
 		static size_t sz = sizeof(T);
-		writeBytes(&T, sz);
+		writeBytes((char*) &value, sz);
 	}
 }

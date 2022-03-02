@@ -15,7 +15,7 @@ namespace Simpledb
 		* @param i The value of this field.
 		*/
 		IntField(int i) :_value(i) {}
-		void serialize(ostream& outStream)const override;
+		vector<unsigned char> serialize()const override;
 		/**
 		* Compare the specified field to the value of this Field.
 		* Return semantics are as specified by Field.compare

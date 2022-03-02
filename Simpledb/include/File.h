@@ -2,6 +2,7 @@
 #include "Noncopyable.h"
 #include<string>
 #include<vector>
+#include<stdexcept>
 using namespace std;
 namespace Simpledb {
 
@@ -13,11 +14,11 @@ namespace Simpledb {
 		~File();
 		FILE* originPtr() { return _pFile; }
 		string fileName() { return _fileName; }
-		int64_t length();
-		int64_t position();
+		size_t length();
+		size_t position();
 		void deleteOnExit() { _deleteOnExit = true; }
 		void flush();
-		void seek(int64_t pos);
+		void seek(size_t pos);
 		void writeChar(char c);
 		void writeInt(int value);
 		void writeInt64(int64_t value);
@@ -51,13 +52,10 @@ namespace Simpledb {
 		char typeArr[sz] = { 0 };
 		size_t rSz = fread(typeArr, 1, sz, _pFile);
 		if (rSz != sz){
-			throw "read data failed";
+			return T();
 		}
 		T result;
 		errno_t err = memcpy_s(&result, sz, typeArr, sz);
-		if (err != 0) {
-			throw "read data failed";
-		}
 		return result;
 	}
 	template<typename T>
@@ -67,12 +65,8 @@ namespace Simpledb {
 		char typeArr[sz] = { 0 };
 		errno_t err = memcpy_s(typeArr, sz, &value, sz);
 		if (err != 0) {
-			throw "write data failed";
+			return;
 		}
-
 		size_t w = fwrite(typeArr, 1, sz, _pFile);
-		if (w != sz) {
-			throw "write data failed";
-		}
 	}
 }

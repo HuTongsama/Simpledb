@@ -3,6 +3,7 @@
 #include<vector>
 #include<memory>
 #include<sstream>
+#include<type_traits>
 using namespace std;
 namespace Simpledb {
 	using Unique_File = unique_ptr<FILE, decltype(&fclose)>;
@@ -19,5 +20,22 @@ namespace Simpledb {
 		ss << arg1 << delim;
 		return combineArgs(ss, delim, rest...);
 	}
-
+	
+	template<typename T ,
+		typename = typename enable_if<
+		is_same<T,int>::value ||
+		is_same<T,float>::value ||
+		is_same<T,double>::value
+		,T>::type>
+	vector<unsigned char> serializeCommonType(T value) {
+		/*static_assert(
+			is_same<T, int>::value ||
+			is_same<T, float>::value ||
+			is_same<T, double>::value,
+			"error serializeCommonType");*/
+		static size_t sz = sizeof(value);
+		unsigned char buffer[128];
+		memcpy_s(buffer, sz, &value, sz);
+		return vector<unsigned char>(buffer, buffer + sz);
+	}
 }

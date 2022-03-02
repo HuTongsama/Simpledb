@@ -48,7 +48,7 @@ namespace Simpledb {
 		}
 		return -1;
 	}
-	int TupleDesc::getSize()const
+	size_t TupleDesc::getSize()const
 	{
 		size_t sz = 0;
 		for (auto& item : _tdItems) {

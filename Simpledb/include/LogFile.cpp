@@ -65,7 +65,7 @@ namespace Simpledb {
         force();
         _tidToFirstLogRecord.erase(tid.getId());
     }
-    void LogFile::logWrite(const TransactionId tid, const Page& before, const Page& after)
+    void LogFile::logWrite(const TransactionId tid, shared_ptr<Page> before, shared_ptr<Page> after)
     {
         lock_guard<mutex> lock(_logFileMutex);
         //Debug.log("WRITE, offset = " + raf.getFilePointer());
@@ -201,8 +201,8 @@ namespace Simpledb {
                 {
                     auto before = readPageData(_logFile);
                     auto after = readPageData(_logFile);
-                    writePageData(logNew, *before);
-                    writePageData(logNew, *after); 
+                    writePageData(logNew, before);
+                    writePageData(logNew, after); 
                 }
                 break;
                 case CHECKPOINT_RECORD:
@@ -363,9 +363,9 @@ namespace Simpledb {
             _currentOffset = _logFile.position();
         }
     }
-    void LogFile::writePageData(File& f, const Page& p)
+    void LogFile::writePageData(File& f, shared_ptr<Page> p)
     {
-        shared_ptr<PageId> pid = p.getId();
+        shared_ptr<PageId> pid = p->getId();
         vector<int> pageInfo = pid->serialize();
         //page data is:
         // page class name
@@ -374,7 +374,7 @@ namespace Simpledb {
         // id class data
         // page class bytes
         // page class data
-        string pageClassName(typeid(p).name());
+        string pageClassName(typeid(*p).name());
         string idClassName(typeid(*pid).name());
         
         f.writeUTF8(pageClassName);
@@ -383,7 +383,7 @@ namespace Simpledb {
         for (int j : pageInfo) {
             f.writeInt(j);
         }
-        vector<unsigned char> pageData = p.getPageData();
+        vector<unsigned char> pageData = p->getPageData();
         f.writeInt64(pageData.size());
         f.writeBytes(pageData.data(), pageData.size());
         //Debug.log ("WROTE PAGE DATA, CLASS = " + pageClassName + ", table = " +  pid.getTableId() + ", page = " + pid.pageno());

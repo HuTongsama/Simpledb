@@ -39,7 +39,7 @@ namespace Simpledb {
         @param after The after image of the page
         @see Page#getBeforeImage
         */
-        void logWrite(const TransactionId tid, const Page& before, const Page& after);
+        void logWrite(const TransactionId tid, shared_ptr<Page> before, shared_ptr<Page> after);
         /** Write a BEGIN record for the specified transaction
         @param tid The transaction that is beginning
 
@@ -77,7 +77,7 @@ namespace Simpledb {
         // DB wants to do recovery, we're sure now -- it didn't. So truncate
         // the log.
         void preAppend();
-        void writePageData(File& f, const Page& p);
+        void writePageData(File& f, shared_ptr<Page> p);
         shared_ptr<Page> readPageData(File& f);
         
 

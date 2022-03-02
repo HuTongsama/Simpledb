@@ -94,7 +94,7 @@ namespace Simpledb {
 		* @return The size (in bytes) of tuples corresponding to this TupleDesc.
 		*         Note that tuples from a given TupleDesc are of a fixed size.
 		*/
-		int getSize()const;
+		size_t getSize()const;
 		/**
 		* Merge two TupleDescs into one, with td1.numFields + td2.numFields fields,
 		* with the first td1.numFields coming from td1 and the remaining from td2.

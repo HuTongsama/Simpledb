@@ -1,6 +1,7 @@
 #pragma once
 #include<iostream>
 #include<string>
+#include<vector>
 #include<functional>
 #include"Predicate.h"
 #include"Type.h"
@@ -16,10 +17,10 @@ namespace Simpledb
 	public:
 		virtual ~Field() {}
 		/**
-		* Write the bytes representing this field to the specified		
-		* @param outStream The ostream to write to.
+		* Write the bytes representing this field to the vector
+		* @return The vector of unsigned char
 		*/
-		virtual void serialize(ostream& outStream)const = 0;
+		virtual vector<unsigned char> serialize()const = 0;
 		/**
 		* Compare the value of this field object to the passed in value.
 		* @param op The operator

@@ -1,5 +1,5 @@
 #include"StringField.h"
-
+#include"Common.h"
 namespace Simpledb 
 {
 	long StringField::_serialVersionUID = 1l;
@@ -13,20 +13,21 @@ namespace Simpledb
 			_value = s;
 		}
 	}
-	void StringField::serialize(ostream& outStream)const
+	vector<unsigned char> StringField::serialize()const
 	{
 		string str = _value;
 		int overflow = _maxSize - (int)str.size();
 		if (overflow < 0) {
 			str = str.substr(0, _maxSize);
 		}
-		outStream << str.size();
-		outStream << str;
+		vector<unsigned char> result = serializeCommonType((int)str.size());
+		result.insert(result.end(), str.begin(), str.end());
 		while (overflow > 0)
 		{
-			outStream << '\0';
+			result.push_back(0);
 			overflow--;
 		}
+		return result;
 	}
 	bool StringField::compare(Predicate::Op op, const Field& value)const
 	{

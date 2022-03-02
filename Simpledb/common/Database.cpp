@@ -1,7 +1,7 @@
 #include"Database.h"
 namespace Simpledb {
-	Database* Database::_instance = new Database();
 	string Database::LOGFILENAME = "log";
+	Database* Database::_instance = new Database();
 	BufferPool* Database::resetBufferPool(int pages)
 	{
 		BufferPool* p = _instance->_pBufferPool;

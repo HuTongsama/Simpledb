@@ -1,4 +1,5 @@
 #include "File.h"
+#include<stdexcept>
 #pragma warning(disable:4996)
 namespace Simpledb {
 	File::File(const string& fileName, const string& mode)
@@ -6,8 +7,8 @@ namespace Simpledb {
 		_fileName = fileName;
 		_mode = mode;
 		_pFile = fopen(fileName.c_str(), mode.c_str());
-		if (_pFile = nullptr) {
-			throw "failed to open file";
+		if (_pFile == nullptr) {
+			throw runtime_error("failed to open file");
 		}
 	}
 	File::File(FILE* tmpFile)
@@ -22,7 +23,7 @@ namespace Simpledb {
 			fclose(_pFile);
 		}
 	}
-	int64_t File::length()
+	size_t File::length()
 	{
 		size_t oldPos = ftell(_pFile);
 		fseek(_pFile, 0, SEEK_END);
@@ -30,7 +31,7 @@ namespace Simpledb {
 		fseek(_pFile, oldPos, SEEK_SET);
 		return len;
 	}
-	int64_t File::position()
+	size_t File::position()
 	{
 		return ftell(_pFile);
 	}
@@ -38,7 +39,7 @@ namespace Simpledb {
 	{
 		fflush(_pFile);
 	}
-	void File::seek(int64_t pos)
+	void File::seek(size_t pos)
 	{
 		fseek(_pFile, pos, SEEK_SET);
 	}
@@ -62,11 +63,7 @@ namespace Simpledb {
 	}
 	void File::writeBytes(const unsigned char* bytes, size_t byteCount)
 	{
-		size_t w = fwrite(bytes, 1, byteCount, _pFile);
-		if (w != byteCount) {
-			throw "write bytes failed";
-		}
-			
+		size_t w = fwrite(bytes, 1, byteCount, _pFile);		
 	}
 	char File::readChar()
 	{
@@ -91,13 +88,13 @@ namespace Simpledb {
 	{
 		unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char) * readLen);
 		if (buffer == nullptr) {
-			throw "failed to readBytes";
+			return vector<unsigned char>();
 		}
 		size_t result = fread(buffer, 1, readLen, _pFile);
 		if (result != readLen)
 		{
 			free(buffer);
-			throw "failed to readBytes";
+			return vector<unsigned char>();
 		}
 		vector<unsigned char> ret = vector<unsigned char>(buffer, buffer + readLen);
 		free(buffer);

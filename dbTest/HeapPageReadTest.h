@@ -7,7 +7,9 @@
 #include "IntField.h"
 #include "TestUtil.h"
 #include "SystemTestUtil.h"
+#include "boost/filesystem.hpp"
 using namespace Simpledb;
+namespace fs = boost::filesystem;
 class HeapPageReadTest : public SimpleDbTestBase {
 protected:
 	void SetUp()override {
@@ -22,7 +24,9 @@ protected:
         }
 
         // Convert it to a HeapFile and read in the bytes
-        File temp("table.dat");
+        fs::path p = fs::current_path();
+        string filename = p.string() + "\\" + "table.dat";
+        File temp(filename.c_str(), "wb+");
         temp.deleteOnExit();
         HeapFileEncoder::convert(table, temp, BufferPool::getPageSize(), 2);
         EXAMPLE_DATA = TestUtil::readFileBytes(temp.fileName());
@@ -67,8 +71,8 @@ TEST_F(HeapPageReadTest, TestIterator) {
     auto& it = page.iterator();
 
     int row = 0;
-    while (it.hasNext()) {
-        Tuple& tup = it.next();
+    while (it->hasNext()) {
+        Tuple& tup = it->next();
         shared_ptr<IntField> f0 = dynamic_pointer_cast<IntField>(tup.getField(0));
         shared_ptr<IntField> f1 = dynamic_pointer_cast<IntField>(tup.getField(1));
         EXPECT_EQ(EXAMPLE_VALUES[row][0], f0->getValue());

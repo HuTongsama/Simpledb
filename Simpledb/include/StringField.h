@@ -15,14 +15,12 @@ namespace Simpledb {
 		*/
 		StringField(const string& s, int maxSize);
 		/**
-		* Write this string to dos. Always writes maxSize + 4 bytes to the passed
-		* in dos. First four bytes are string length, next bytes are string, with
+		* Write this string to vector. Always writes maxSize + 4 bytes to the vector
+		* First four bytes are string length, next bytes are string, with
 		* remainder padded with 0 to maxSize.
-		*
-		* @param dos
-		*            Where the string is written
+		* @return the vector Where the string is written
 		*/
-		void serialize(ostream& outStream)const override;
+		vector<unsigned char> serialize()const override;
 		/**
 		* Compare the specified field to the value of this Field. Return semantics
 		* are as specified by Field.compare
