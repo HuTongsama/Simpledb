@@ -1,13 +1,12 @@
 #include"HeapFile.h"
 #pragma warning(disable:4996)
 namespace Simpledb {
-	HeapFile::HeapFile(File& f, shared_ptr<TupleDesc> td)
+	HeapFile::HeapFile(shared_ptr<File> f, shared_ptr<TupleDesc> td)
 	{
 	}
-	File& HeapFile::getFile()
+	shared_ptr<File> HeapFile::getFile()
 	{
-		static File f(tmpfile());
-		return f;
+		return nullptr;
 	}
 	size_t HeapFile::getId()
 	{
@@ -21,7 +20,7 @@ namespace Simpledb {
 	{
 		return nullptr;
 	}
-	void HeapFile::writePage(const Page& page)
+	void HeapFile::writePage(shared_ptr<Page> page)
 	{
 		return;
 	}

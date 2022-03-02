@@ -62,9 +62,9 @@ namespace Simpledb {
 		* @param f location of the file storing the table.
 		* @return the opened table.
 		*/
-		static shared_ptr<HeapFile> openHeapFile(int cols, File& f);
-		static shared_ptr<HeapFile> openHeapFile(int cols, const string& colPrefix, File& f, shared_ptr<TupleDesc> td);
-		static shared_ptr<HeapFile> openHeapFile(int cols, const string& colPrefix, File f);
+		static shared_ptr<HeapFile> openHeapFile(int cols, shared_ptr<File> f);
+		static shared_ptr<HeapFile> openHeapFile(int cols, const string& colPrefix,shared_ptr<File> f, shared_ptr<TupleDesc> td);
+		static shared_ptr<HeapFile> openHeapFile(int cols, const string& colPrefix, shared_ptr<File> f);
 		static string listToString(const list<int>& list);
 	};
 }

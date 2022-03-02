@@ -18,7 +18,7 @@ public:
             throw runtime_error("not implemented");
         }
 
-        void writePage(const Page& p)override {
+        void writePage(shared_ptr<Page> p)override {
             throw runtime_error("not implemented");
         }
 
@@ -38,7 +38,7 @@ public:
             return _tableId;
         }
 
-        DbFileIterator& iterator(const TransactionId& tid)override {
+        shared_ptr<DbFileIterator> iterator(const TransactionId& tid)override {
             throw runtime_error("not implemented");
         }
 

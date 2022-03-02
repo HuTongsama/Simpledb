@@ -32,7 +32,7 @@ namespace Simpledb {
 		* @throws exception if the write fails
 		*
 		*/
-		virtual void writePage(const Page& p) = 0;
+		virtual void writePage(shared_ptr<Page> p) = 0;
 		/**
 		* Inserts the specified tuple to the file on behalf of transaction.
 		* This method will acquire a lock on the affected pages of the file, and
@@ -67,7 +67,7 @@ namespace Simpledb {
 		*
 		* @return an iterator over all the tuples stored in this DbFile.
 		*/
-		virtual DbFileIterator& iterator(const TransactionId& tid) = 0;
+		virtual shared_ptr<DbFileIterator> iterator(const TransactionId& tid) = 0;
 		/**
 		* Returns a unique ID used to identify this DbFile in the Catalog. This id 
 		* can be used to look up the table via {@link Catalog#getDatabaseFile} and

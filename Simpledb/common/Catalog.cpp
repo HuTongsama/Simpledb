@@ -117,7 +117,7 @@ namespace Simpledb {
 
                 shared_ptr<TupleDesc> t = make_shared<TupleDesc>(types, names);
                 string fileName = baseFolder + "/" + name + ".dat";
-                File inFile(fileName, "ab+");
+                shared_ptr<File> inFile = make_shared<File>(fileName, "ab+");
                 shared_ptr<DbFile> tabHf(new HeapFile(inFile, t));
                 addTable(tabHf, name, primaryKey);
                 cout << "Added table : " << name << " with schema " << t->toString() << endl;

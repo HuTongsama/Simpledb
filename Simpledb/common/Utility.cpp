@@ -71,7 +71,7 @@ namespace Simpledb {
 	}
 	shared_ptr<HeapFile> Utility::createEmptyHeapFile(const string& path, int cols)
 	{
-		File f(path);
+		shared_ptr<File> f = make_shared<File>(path);
 		shared_ptr<HeapFile> hf = openHeapFile(cols, f);
 		shared_ptr<HeapPageId> pid(new HeapPageId(hf->getId(), 0));
 
@@ -84,10 +84,10 @@ namespace Simpledb {
 		{
 			throw runtime_error("failed to create empty page in HeapFile");
 		}
-		hf->writePage(*page);
+		hf->writePage(page);
 		return hf;
 	}
-	shared_ptr<HeapFile> Utility::openHeapFile(int cols, File& f)
+	shared_ptr<HeapFile> Utility::openHeapFile(int cols, shared_ptr<File> f)
 	{
 		// create the HeapFile and add it to the catalog
 		shared_ptr<TupleDesc> td = getTupleDesc(cols);
@@ -96,7 +96,7 @@ namespace Simpledb {
 			boost::lexical_cast<std::string>(boost::uuids::random_generator()()));		
 		return hf;
 	}
-	shared_ptr<HeapFile> Utility::openHeapFile(int cols, const string& colPrefix, File& f, shared_ptr<TupleDesc> td)
+	shared_ptr<HeapFile> Utility::openHeapFile(int cols, const string& colPrefix, shared_ptr<File> f, shared_ptr<TupleDesc> td)
 	{
 		// create the HeapFile and add it to the catalog
 		shared_ptr<HeapFile> hf(new HeapFile(f, td));
@@ -104,7 +104,7 @@ namespace Simpledb {
 			boost::lexical_cast<std::string>(boost::uuids::random_generator()()));
 		return hf;
 	}
-	shared_ptr<HeapFile> Utility::openHeapFile(int cols, const string& colPrefix, File f)
+	shared_ptr<HeapFile> Utility::openHeapFile(int cols, const string& colPrefix, shared_ptr<File> f)
 	{
 		// create the HeapFile and add it to the catalog
 		shared_ptr<TupleDesc> td = getTupleDesc(cols, colPrefix);

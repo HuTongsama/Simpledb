@@ -34,6 +34,7 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClInclude Include="CatalogTest.h" />
+    <ClInclude Include="HeapFileReadTest.h" />
     <ClInclude Include="HeapPageIdTest.h" />
     <ClInclude Include="HeapPageReadTest.h" />
     <ClInclude Include="pch.h" />
@@ -51,6 +52,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SystemTestUtil.cpp" />
     <ClCompile Include="TestUtil.cpp" />
   </ItemGroup>
   <ItemGroup>

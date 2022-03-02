@@ -9,3 +9,4 @@
 #include "HeapPageIdTest.h"
 #include "RecordIdTest.h"
 #include "HeapPageReadTest.h"
+#include "HeapFileReadTest.h"
