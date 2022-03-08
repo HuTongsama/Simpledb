@@ -80,10 +80,4 @@ namespace Simpledb
 		}
 		throw "no such element";
 	}
-	void Tuple::TupleIter::remove()
-	{
-		if (_pTuple != nullptr && _pTuple->_fields.size() > 0) {
-			_pTuple->_fields.erase(_pTuple->_fields.begin() + _pTuple->_fields.size() - 1);
-		}
-	}
 }

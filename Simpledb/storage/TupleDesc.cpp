@@ -121,10 +121,5 @@ namespace Simpledb {
 		}
 		throw "no such element";
 	}
-	void TupleDesc::TupleDescIter::remove()
-	{
-		if (_pTd != nullptr && _pTd->_tdItems.size() > 0) {
-			_pTd->_tdItems.erase(_pTd->_tdItems.begin() + _pTd->_tdItems.size() - 1);
-		}
-	}
+
 }

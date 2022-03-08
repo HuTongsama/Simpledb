@@ -26,7 +26,6 @@ namespace Simpledb {
 			TupleDescIter(TupleDesc* p);
 			bool hasNext()override;
 			TDItem& next()override;
-			void remove()override;
 		private:
 			TupleDesc* _pTd;
 		};

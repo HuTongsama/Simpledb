@@ -13,8 +13,6 @@ namespace Simpledb {
             HeapPageIter(HeapPage* page) :_page(page) {}
             bool hasNext()override;
             Tuple& next()override;
-            //empty implement
-            void remove()override{}
         private:
             HeapPage* _page;
         };

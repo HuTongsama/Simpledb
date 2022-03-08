@@ -11,7 +11,6 @@ namespace Simpledb {
 			TupleIter(Tuple* pTuple);
 			bool hasNext()override;
 			shared_ptr<Field>& next()override;
-			void remove()override;
 		private:
 			Tuple* _pTuple;
 		};

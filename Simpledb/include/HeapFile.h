@@ -20,7 +20,6 @@ namespace Simpledb {
 			bool hasNext()override;
 			Tuple& next()override;
 			//empty implement
-			void remove()override {}
 			bool open()override;
 			bool rewind()override;
 			void close()override;
