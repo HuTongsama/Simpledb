@@ -13,16 +13,17 @@ namespace Simpledb
 	BufferPool::~BufferPool()
 	{
 	}
-	shared_ptr<Page> BufferPool::getPage(TransactionId& tid, PageId& pid, Permissions perm)
+	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
 		lock_guard<mutex> lock(_mutex);
-		
-		size_t pidHashCode = pid.hashCode();
+		if (tid == nullptr || pid == nullptr)
+			return nullptr;
+		size_t pidHashCode = pid->hashCode();
 		if (_idToPage.find(pidHashCode) == _idToPage.end()) {
 			if (_curPages == _numPages) {
 				throw runtime_error("too many pages in bufferPool");
 			}
-			size_t tableId = pid.getTableId();
+			size_t tableId = pid->getTableId();
 			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
 			_idToPage[pidHashCode] = dbFile->readPage(pid);
 		}

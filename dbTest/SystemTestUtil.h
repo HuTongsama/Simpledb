@@ -74,7 +74,9 @@ public:
         }
 
         // Convert the tuples list to a heap file and open it
-        shared_ptr<File> temp = make_shared<File>("table.dat");
+        char nameBuf[L_tmpnam_s] = { 0 };
+        tmpnam_s(nameBuf);
+        shared_ptr<File> temp = make_shared<File>(nameBuf);
         temp->deleteOnExit();
         HeapFileEncoder::convert(tuples, *temp, BufferPool::getPageSize(), columns);
         return temp;

@@ -7,9 +7,6 @@ namespace Simpledb {
 		_fileName = fileName;
 		_mode = mode;
 		_pFile = fopen(fileName.c_str(), mode.c_str());
-		if (_pFile == nullptr) {
-			throw runtime_error("failed to open file");
-		}
 	}
 	File::File(FILE* tmpFile)
 	{

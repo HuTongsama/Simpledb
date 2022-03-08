@@ -10,7 +10,7 @@ public:
             :_tableId(tableId), _td(td)
         {};
         
-        shared_ptr<Page> readPage(const PageId& id)override {
+        shared_ptr<Page> readPage(shared_ptr<PageId> id)override {
             throw runtime_error("not implemented");
         }
 
@@ -38,7 +38,7 @@ public:
             return _tableId;
         }
 
-        shared_ptr<DbFileIterator> iterator(const TransactionId& tid)override {
+        shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid)override {
             throw runtime_error("not implemented");
         }
 

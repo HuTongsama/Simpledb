@@ -98,7 +98,7 @@ namespace Simpledb {
                     }
                     else if (typeVec[fieldNo].get() == String_Type::STRING_TYPE.get()) {
                         string tmp = trim(s);
-                        int overflow = Type::STRING_LEN - tmp.length();
+                        int overflow = static_cast<int>(Type::STRING_LEN - tmp.length());
                         if (overflow < 0) {
                             tmp = tmp.substr(0, Type::STRING_LEN);
                         }
@@ -171,7 +171,7 @@ namespace Simpledb {
             outFile.seek(0);
             return true;
         }
-        catch (const std::exception& e)
+        catch (const std::exception)
         {
             return false;
         }

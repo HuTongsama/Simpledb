@@ -24,7 +24,7 @@ namespace Simpledb {
 		*
 		* @returns null if the page does not exist in this file.
 		*/
-		virtual shared_ptr<Page> readPage(const PageId& id) = 0;
+		virtual shared_ptr<Page> readPage(shared_ptr<PageId> id) = 0;
 		/**
 		* Push the specified page to disk.
 		*
@@ -67,7 +67,7 @@ namespace Simpledb {
 		*
 		* @return an iterator over all the tuples stored in this DbFile.
 		*/
-		virtual shared_ptr<DbFileIterator> iterator(const TransactionId& tid) = 0;
+		virtual shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid) = 0;
 		/**
 		* Returns a unique ID used to identify this DbFile in the Catalog. This id 
 		* can be used to look up the table via {@link Catalog#getDatabaseFile} and

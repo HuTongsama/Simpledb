@@ -9,7 +9,8 @@ namespace Simpledb {
 		int headerSize = getHeaderSize();
 		_header = vector<unsigned char>(data.begin(), data.begin() + headerSize);
 		_tuples.resize(_numSlots);
-		DataStream ds((const char *)data.data(), data.size());
+		DataStream ds((const char *)vector<unsigned char>(
+			data.begin() + headerSize,data.end()).data(), data.size());
 		for (int i = 0; i < _numSlots; ++i) {
 			_tuples[i] = readNextTuple(ds, i);
 		}
@@ -177,5 +178,19 @@ namespace Simpledb {
 	}
 	void HeapPage::markSlotUsed(int i, bool value)
 	{
+	}
+	bool HeapPage::HeapPageIter::hasNext()
+	{
+		if (_position >= _page->_tuples.size()
+			|| _page->_tuples[_position] == nullptr) {
+			return false;
+		}
+		return true;
+	}
+	Tuple& HeapPage::HeapPageIter::next()
+	{
+		Tuple& t = *(_page->_tuples[_position]);
+		_position++;
+		return t;
 	}
 }

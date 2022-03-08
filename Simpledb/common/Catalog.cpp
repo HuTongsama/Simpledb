@@ -122,7 +122,7 @@ namespace Simpledb {
                 addTable(tabHf, name, primaryKey);
                 cout << "Added table : " << name << " with schema " << t->toString() << endl;
             }
-
+            return true;
         }
         catch (const std::exception& e)
         {

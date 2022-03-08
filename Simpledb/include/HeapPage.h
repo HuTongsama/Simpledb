@@ -11,11 +11,9 @@ namespace Simpledb {
         class HeapPageIter : public Iterator<Tuple> {
         public:
             HeapPageIter(HeapPage* page) :_page(page) {}
-            bool hasNext()override { return false; }
-            Tuple& next() {
-                static Tuple t(make_shared<TupleDesc>());
-                return t;
-            }
+            bool hasNext()override;
+            Tuple& next()override;
+            //empty implement
             void remove()override{}
         private:
             HeapPage* _page;

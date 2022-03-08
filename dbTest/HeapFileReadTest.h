@@ -40,21 +40,21 @@ TEST_F(HeapFileReadTest, NumPages) {
 	EXPECT_EQ(1, _hf->numPages());
 }
 TEST_F(HeapFileReadTest, ReadPage) {
-	HeapPageId pid(_hf->getId(), 0);
+	shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(_hf->getId(), 0);
 	shared_ptr<HeapPage> page = dynamic_pointer_cast<HeapPage>(_hf->readPage(pid));
 
 	// NOTE: we try not to dig too deeply into the Page API here; we
 	// rely on HeapPageTest for that. perform some basic checks.
 	EXPECT_EQ(484, page->getNumEmptySlots());
 	EXPECT_TRUE(page->isSlotUsed(1));
-	EXPECT_TRUE(page->isSlotUsed(20));
+	EXPECT_FALSE(page->isSlotUsed(20));
 }
 TEST_F(HeapFileReadTest, TestIteratorBasic) {
 	shared_ptr<HeapFile> smallFile = SystemTestUtil::
 		createRandomHeapFile(2, 3, map<int,int>(),
 		vector<vector<int>>());
 
-	shared_ptr<DbFileIterator> it = smallFile->iterator(*_tid);
+	shared_ptr<DbFileIterator> it = smallFile->iterator(_tid);
 	// Not open yet
 	EXPECT_FALSE(it->hasNext());
 	EXPECT_THROW(it->next(), runtime_error);
@@ -75,7 +75,7 @@ TEST_F(HeapFileReadTest, TestIteratorClose) {
 	shared_ptr<HeapFile> twoPageFile = SystemTestUtil::
 		createRandomHeapFile(2, 520, map<int, int>(), vector<vector<int>>());
 
-	shared_ptr<DbFileIterator> it = twoPageFile->iterator(*_tid);
+	shared_ptr<DbFileIterator> it = twoPageFile->iterator(_tid);
 	it->open();
 	EXPECT_TRUE(it->hasNext());
 	it->close();
