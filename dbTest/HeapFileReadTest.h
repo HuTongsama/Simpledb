@@ -14,7 +14,7 @@ protected:
 		_tid = make_shared<TransactionId>();
 	}
 	void TearDown() override {
-		Database::getBufferPool()->transactionComplete(*_tid);
+		Database::getBufferPool()->transactionComplete(_tid);
 	}
 
 	shared_ptr<HeapFile> _hf;

@@ -1,7 +1,8 @@
 #pragma once
+#include"Noncopyable.h"
 namespace Simpledb {
 	template<typename T>
-	class Iterator {
+	class Iterator : public Noncopyable {
 	public:
 		Iterator() :_position(0) {}
 		virtual ~Iterator() {}

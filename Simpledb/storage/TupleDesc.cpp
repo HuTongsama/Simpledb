@@ -8,8 +8,8 @@ namespace Simpledb {
 	//}
 	TupleDesc::TupleDesc(const vector<shared_ptr<Type>>& typeVec, const vector<string>& fieldVec)
 	{
-		int tSz = typeVec.size();
-		int fSz = fieldVec.size();
+		size_t tSz = typeVec.size();
+		size_t fSz = fieldVec.size();
 		for (int i = 0; i < tSz; ++i)
 		{
 			string fieldName = i < fSz ? fieldVec[i] : "";
@@ -22,7 +22,7 @@ namespace Simpledb {
 			_tdItems.push_back(TDItem(t,""));
 		}
 	}
-	int TupleDesc::numFields()const
+	size_t TupleDesc::numFields()const
 	{
 		return _tdItems.size();
 	}
@@ -40,7 +40,7 @@ namespace Simpledb {
 	}
 	int TupleDesc::fieldNameToIndex(const string& name)const
 	{
-		int sz = _tdItems.size();
+		size_t sz = _tdItems.size();
 		for (int i = 0; i < sz; ++i)
 		{
 			if (name == _tdItems[i]._fieldName)
@@ -60,7 +60,7 @@ namespace Simpledb {
 	{
 		vector<shared_ptr<Type>> tVec;
 		vector<string> fVec;
-		int sz1 = td1.numFields(), sz2 = td2.numFields();
+		size_t sz1 = td1.numFields(), sz2 = td2.numFields();
 		for (int i = 0; i < sz1; ++i) {
 			tVec.push_back(td1.getFieldType(i));
 			fVec.push_back(td1.getFieldName(i));
@@ -73,8 +73,8 @@ namespace Simpledb {
 	}
 	bool TupleDesc::equals(const TupleDesc& td)const
 	{
-		int sz1 = _tdItems.size();
-		int sz2 = td.numFields();
+		size_t sz1 = _tdItems.size();
+		size_t sz2 = td.numFields();
 		if (sz1 != sz2)
 			return false;
 		for (int i = 0; i < sz1; ++i)
@@ -92,7 +92,7 @@ namespace Simpledb {
 	}
 	string TupleDesc::toString()const
 	{
-		int sz = _tdItems.size();
+		size_t sz = _tdItems.size();
 		string result = "";
 		for (int i = 0; i < sz; ++i) {
 			result += _tdItems[i]._fieldType->toString() + "(" + _tdItems[i]._fieldName + ")";

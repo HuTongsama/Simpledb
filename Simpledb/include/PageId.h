@@ -15,7 +15,7 @@ namespace Simpledb
 		This class MUST have a constructor that accepts n integer parameters,
 		where n is the number of integers returned in the array from serialize.
 		*/
-		virtual vector<int> serialize()const = 0;
+		virtual vector<size_t> serialize()const = 0;
 		/** @return the unique tableid hashcode with this PageId */
 		virtual size_t getTableId()const = 0;
 		virtual size_t getPageNumber()const = 0;

@@ -97,7 +97,7 @@ namespace Simpledb {
 	}
 	void DataStream::readBytes(char* dst, size_t dstSize)
 	{
-		if (_curPosition + dstSize >= _byteSize) {
+		if (_curPosition + dstSize > _byteSize) {
 			throw out_of_range("read dataStream failed");
 		}
 		else {

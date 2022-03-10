@@ -39,6 +39,7 @@
     <ClInclude Include="HeapPageReadTest.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="RecordIdTest.h" />
+    <ClInclude Include="ScanTest.h" />
     <ClInclude Include="SimpleDbTestBase.h" />
     <ClInclude Include="SystemTestUtil.h" />
     <ClInclude Include="TestUtil.h" />

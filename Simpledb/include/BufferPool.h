@@ -77,7 +77,7 @@ namespace Simpledb {
 		*
 		* @param tid the ID of the transaction requesting the unlock
 		*/
-		void transactionComplete(const TransactionId& tid);// not necessary for lab1|lab2
+		void transactionComplete(shared_ptr<TransactionId> tid);// not necessary for lab1|lab2
 		/** Return true if the specified transaction has a lock on the specified page */
 		bool holdsLock(const TransactionId& tid, const PageId& p);// not necessary for lab1|lab2
 		/**

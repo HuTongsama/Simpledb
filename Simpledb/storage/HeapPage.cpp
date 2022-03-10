@@ -9,8 +9,8 @@ namespace Simpledb {
 		int headerSize = getHeaderSize();
 		_header = vector<unsigned char>(data.begin(), data.begin() + headerSize);
 		_tuples.resize(_numSlots);
-		DataStream ds((const char *)vector<unsigned char>(
-			data.begin() + headerSize,data.end()).data(), data.size());
+		vector<unsigned char> tupleVec(data.begin() + headerSize, data.end());
+		DataStream ds((char*)tupleVec.data(), tupleVec.size());
 		for (int i = 0; i < _numSlots; ++i) {
 			_tuples[i] = readNextTuple(ds, i);
 		}

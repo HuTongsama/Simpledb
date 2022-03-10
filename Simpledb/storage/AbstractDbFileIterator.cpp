@@ -11,6 +11,8 @@ namespace Simpledb {
 	{
 		if (_next == nullptr) {
 			_next = readNext();
+			if (_next == nullptr)
+				throw runtime_error("no such element");
 		}
 		Tuple* result = _next;
 		_next = nullptr;

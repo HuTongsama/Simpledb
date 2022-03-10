@@ -1,6 +1,7 @@
 #pragma once
 #include"DbFile.h"
 #include"HeapPage.h"
+#include"AbstractDbFileIterator.h"
 namespace Simpledb {
 	/**
 	* HeapFile is an implementation of a DbFile that stores a collection of tuples
@@ -11,27 +12,25 @@ namespace Simpledb {
 	*/
 	class HeapFile : public DbFile {
 	public:
-		class HeapFileIterator : public DbFileIterator {
+		class HeapFileIterator : public AbstractDbFileIterator {
 		public:
-			HeapFileIterator(size_t tableId, shared_ptr<TransactionId> tid)
-				:_tableId(tableId), _tid(tid), _pageNo(0),
-				_curPage(nullptr), _curIter(nullptr),
-				_isOpen(false) {}
-			bool hasNext()override;
-			Tuple& next()override;
-			//empty implement
-			bool open()override;
-			bool rewind()override;
+			HeapFileIterator(size_t tableId,size_t pageCount, shared_ptr<TransactionId> tid)
+				: _open(false), _tableId(tableId), _tid(tid),
+				_pageNo(0),_pageCount(pageCount), _iter(nullptr) {
+			}
+			void open()override;
+			void rewind()override;
 			void close()override;
 		private:
-			bool readNextPage();
+			Tuple* readNext()override;
+			void readNextPage();
 
+			bool _open;
 			size_t _tableId;
 			shared_ptr<TransactionId> _tid;
 			size_t _pageNo;
-			shared_ptr<HeapPage> _curPage;
-			shared_ptr<HeapPage::HeapPageIter> _curIter;
-			bool _isOpen;
+			size_t _pageCount;
+			shared_ptr<HeapPage::HeapPageIter> _iter;
 		};
 		/**
 		* Constructs a heap file backed by the specified file.

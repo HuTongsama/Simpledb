@@ -10,14 +10,12 @@ namespace Simpledb {
 	public:
 		/**
 		* Opens the iterator
-		* @returns false if failed,true if succeeded
 		*/
-		virtual bool open() = 0;
+		virtual void open() = 0;
 		/**
 		* Resets the iterator to the start.
-		* @returns false if failed,true if succeeded.
 		*/
-		virtual bool rewind() = 0;
+		virtual void rewind() = 0;
 		/**
 		* Closes the iterator.
 		*/

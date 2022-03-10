@@ -32,7 +32,7 @@ namespace Simpledb
 	void BufferPool::unsafeReleasePage(const TransactionId& tid, const PageId& pid)
 	{
 	}
-	void BufferPool::transactionComplete(const TransactionId& tid)
+	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 	}
 	bool BufferPool::holdsLock(const TransactionId& tid, const PageId& p)

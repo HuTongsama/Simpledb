@@ -128,6 +128,15 @@
     <ClInclude Include="include\DataStream.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Operator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OpIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SeqScan.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -198,6 +207,12 @@
     </ClCompile>
     <ClCompile Include="include\DataStream.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Operator.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\SeqScan.cpp">
+      <Filter>execution</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

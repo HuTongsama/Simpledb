@@ -366,7 +366,7 @@ namespace Simpledb {
     void LogFile::writePageData(File& f, shared_ptr<Page> p)
     {
         shared_ptr<PageId> pid = p->getId();
-        vector<int> pageInfo = pid->serialize();
+        vector<size_t> pageInfo = pid->serialize();
         //page data is:
         // page class name
         // id class name
@@ -380,8 +380,8 @@ namespace Simpledb {
         f.writeUTF8(pageClassName);
         f.writeUTF8(idClassName);
         f.writeInt64(pageInfo.size());
-        for (int j : pageInfo) {
-            f.writeInt(j);
+        for (size_t j : pageInfo) {
+            f.writeInt64(j);
         }
         vector<unsigned char> pageData = p->getPageData();
         f.writeInt64(pageData.size());

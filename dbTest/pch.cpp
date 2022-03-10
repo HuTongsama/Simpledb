@@ -10,3 +10,4 @@
 #include "RecordIdTest.h"
 #include "HeapPageReadTest.h"
 #include "HeapFileReadTest.h"
+#include "ScanTest.h"

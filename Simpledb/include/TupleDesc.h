@@ -62,7 +62,7 @@ namespace Simpledb {
 		/**
 		* @return the number of fields in this TupleDesc
 		*/
-		int numFields()const;
+		size_t numFields()const;
 		/**
 		* Gets the (possibly null) field name of the ith field of this TupleDesc.
 		*

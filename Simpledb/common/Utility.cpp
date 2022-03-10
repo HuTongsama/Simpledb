@@ -110,7 +110,7 @@ namespace Simpledb {
 		shared_ptr<TupleDesc> td = getTupleDesc(cols, colPrefix);
 		return openHeapFile(cols, colPrefix, f, td);
 	}
-	string Utility::listToString(const list<int>& list)
+	string Utility::vectorToString(const vector<int>& list)
 	{
 		string s = "";
 		for (auto i : list) {

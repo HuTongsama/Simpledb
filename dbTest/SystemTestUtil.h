@@ -3,10 +3,14 @@
 #include<vector>
 #include<map>
 #include<random>
+#include<algorithm>
 #include"Utility.h"
 #include"File.h"
 #include"Database.h"
 #include"HeapFileEncoder.h"
+#include"OpIterator.h"
+#include"SeqScan.h"
+#include"IntField.h"
 #include"boost/uuid/uuid.hpp"
 #include"boost/uuid/uuid_io.hpp"
 #include"boost/uuid/uuid_generators.hpp"
@@ -82,6 +86,64 @@ public:
         return temp;
     }
 
+    static vector<int> tupleToVector(Tuple& tuple) {
+        vector<int> vec;
+        size_t numFields = tuple.getTupleDesc()->numFields();
+        for (int i = 0; i < numFields; ++i) {
+            int value = dynamic_pointer_cast<IntField>(tuple.getField(i))->getValue();
+            vec.push_back(value);
+        }
+        return vec;
+    }
+    static void matchTuples(shared_ptr<DbFile> f, vector<vector<int>>& tuples) {
+    
+        shared_ptr<TransactionId> tid = make_shared<TransactionId>();
+        matchTuples(f, tid, tuples);
+        Database::getBufferPool()->transactionComplete(tid);
+    }
+    static void matchTuples(shared_ptr<DbFile> f,
+        shared_ptr<TransactionId> tid, vector<vector<int>>& tuples) {
+        shared_ptr<SeqScan> scan = make_shared<SeqScan>(tid, f->getId(), "");
+        matchTuples(scan, tuples);
+    }
+    static void matchTuples(shared_ptr<OpIterator> iterator, vector<vector<int>>& tuples) {
+    
+        vector<vector<int>> copy(tuples);
+
+        iterator->open();
+        size_t findCount = 0;
+        while (iterator->hasNext()) {
+            Tuple& t = iterator->next();
+            vector<int> vec = tupleToVector(t);
+            auto isExpected = find_if(copy.begin(), copy.end(), [&vec](vector<int>& aim) {
+                return equal(vec.begin(), vec.end(), aim.begin());
+                }) != copy.end();
+            //printf("scanned tuple: %s (%s)", t.toString().data(), isExpected ? "expected" : "not expected");
+            if (!isExpected) {
+                throw runtime_error("expected tuples does not contain: " + t.toString());
+            }
+            else {
+                findCount++;
+            }
+        }
+        iterator->close();
+
+        if (findCount != copy.size()) {
+            stringstream ss;
+            ss << "expected to find the following tuples:\n";
+            int MAX_TUPLES_OUTPUT = 10;
+            int count = 0;
+            for (auto& t : copy) {
+                if (count == MAX_TUPLES_OUTPUT) {
+                    ss << "[" << copy.size() - MAX_TUPLES_OUTPUT << " more tuples]";                  
+                    break;
+                }
+                ss << "\t" << Utility::vectorToString(t) << "\n";
+                count += 1;
+            }
+            throw runtime_error(ss.str());
+        }
+    }
 
 	/**
 	* Generates a unique string each time it is called.

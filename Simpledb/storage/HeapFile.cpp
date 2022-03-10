@@ -66,7 +66,7 @@ namespace Simpledb {
 	}
 	shared_ptr<DbFileIterator> HeapFile::iterator(shared_ptr<TransactionId> tid)
 	{
-		shared_ptr<HeapFileIterator> iter = make_shared<HeapFileIterator>(getId(), tid);
+		shared_ptr<HeapFileIterator> iter = make_shared<HeapFileIterator>(getId(), numPages(), tid);
 		return iter;
 	}
 	size_t HeapFile::getPageOffset(size_t pageNo)
@@ -75,62 +75,58 @@ namespace Simpledb {
 
 		return pageNo * pageSz;
 	}
-	bool HeapFile::HeapFileIterator::hasNext()
+	
+	void HeapFile::HeapFileIterator::open()
 	{
-		if (_curPage == nullptr || _curIter == nullptr || !_isOpen) {
-			return false;
-		}
-		if (_curIter->hasNext()) {
-			return true;
-		}
-		else {
-			readNextPage();
-			return hasNext();
-		}
-		
+		_open = true;
 	}
 	
-	Tuple& HeapFile::HeapFileIterator::next()
-	{
-		if (!_isOpen) {
-			throw runtime_error("iter does not open");
-		}
-		return _curIter->next();
-	}
-
-	bool HeapFile::HeapFileIterator::open()
-	{
-		if (readNextPage()) {
-			_isOpen = true;
-		}
-		return _isOpen;
-	}
-	
-	bool HeapFile::HeapFileIterator::rewind()
+	void HeapFile::HeapFileIterator::rewind()
 	{
 		_pageNo = 0;
-		if (readNextPage()) {
-			return true;
-		}
-		return false;
+		_iter = nullptr;
 	}
 	
 	void HeapFile::HeapFileIterator::close()
 	{
-		_isOpen = false;
+		AbstractDbFileIterator::close();
+		_open = false;
+	}
+
+	Tuple* HeapFile::HeapFileIterator::readNext()
+	{
+		if (!_open) {
+			return nullptr;
+		}
+		if (_iter != nullptr && _iter->hasNext()) {
+			return &(_iter->next());
+		}
+		else {
+			readNextPage();
+			if (_iter == nullptr) {
+				return nullptr;
+			}
+			return readNext();
+		}
 	}
 	
-	bool HeapFile::HeapFileIterator::readNextPage()
+	void HeapFile::HeapFileIterator::readNextPage()
 	{
+		if (_pageNo >= _pageCount) {
+			_iter = nullptr;
+			return;
+		}
 		shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(_tableId, _pageNo);
-		_curPage = dynamic_pointer_cast<HeapPage>
+		shared_ptr<HeapPage> _curPage = dynamic_pointer_cast<HeapPage>
 			(Database::getBufferPool()->getPage(_tid, pid, Permissions::READ_WRITE));
 		if (_curPage != nullptr) {
-			_curIter = _curPage->iterator();
+			_iter = _curPage->iterator();
 			_pageNo++;
-			return true;
 		}
-		return false;
+		else {
+			_iter = nullptr;
+		}
+		return;
 	}
 
 }

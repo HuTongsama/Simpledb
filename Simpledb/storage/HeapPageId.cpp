@@ -7,9 +7,9 @@ namespace Simpledb {
 		:_tableId(tableId), _pgNo(pgNo), _hashcode(0)
 	{
 	}
-	vector<int> HeapPageId::serialize()const
+	vector<size_t> HeapPageId::serialize()const
 	{
-		vector<int> result(2, 0);
+		vector<size_t> result(2, 0);
 		result[0] = getTableId();
 		result[1] = getPageNumber();
 		return result;

@@ -20,7 +20,7 @@ namespace Simpledb {
 		*  number of integers that corresponds to number of args to one of the
 		*  constructors.
 		*/
-		vector<int> serialize()const override;
+		vector<size_t> serialize()const override;
 		/** @return the table associated with this PageId */
 		size_t getTableId()const override;
 		/**
