@@ -9,8 +9,8 @@ namespace Simpledb {
 		void reset();
 		void seek(size_t pos);
 		size_t skipBytes(size_t skipSize);
-		int read(char* dst, size_t dstSize);
-		int write(char* src, size_t srcSize);
+		size_t read(char* dst, size_t dstSize);
+		size_t write(char* src, size_t srcSize);
 		char readChar();
 		void writeChar(char c);
 		double readDouble();

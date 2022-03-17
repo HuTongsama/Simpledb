@@ -1,6 +1,7 @@
 #pragma once
 #include<string>
 #include<memory>
+#include<stdexcept>
 using namespace std;
 namespace Simpledb {
 	/** Predicate compares tuples to a specified Field value.
@@ -10,19 +11,9 @@ namespace Simpledb {
 	class Predicate {
 	public:
 		/** Constants used for return codes in Field.compare */
-		enum Op {
+		enum class Op{
 			EQUALS = 0, GREATER_THAN, LESS_THAN, LESS_THAN_OR_EQ, GREATER_THAN_OR_EQ, LIKE, NOT_EQUALS
 		};
-		/**
-		 * Interface to access operations by a string containing an integer
-		 * index for command-line convenience.
-		 *
-		 * @param s a string containing a valid integer Op index
-		 */
-		static Op getOp(string s) {
-			int i = stoi(s);
-			return getOp(i);
-		}
 		/**
 		 * Interface to access operations by integer value for command-line
 		 * convenience.
@@ -33,6 +24,27 @@ namespace Simpledb {
 			return (Op)i;
 			
 		}
+		static string opToString(Op op) {
+			switch (op)
+			{
+			case Simpledb::Predicate::Op::EQUALS:
+				return "=";
+			case Simpledb::Predicate::Op::GREATER_THAN:
+				return ">";
+			case Simpledb::Predicate::Op::LESS_THAN:
+				return "<";
+			case Simpledb::Predicate::Op::LESS_THAN_OR_EQ:
+				return "<=";
+			case Simpledb::Predicate::Op::GREATER_THAN_OR_EQ:
+				return ">=";
+			case Simpledb::Predicate::Op::LIKE:
+				return "LIKE";
+			case Simpledb::Predicate::Op::NOT_EQUALS:
+				return "<>";
+			default:
+				throw runtime_error("no such op");
+			}
+		}
 		/**
 		* Constructor.
 		*
@@ -41,6 +53,9 @@ namespace Simpledb {
 		* @param operand field value to compare passed in tuples to
 		*/
 		Predicate(int field, Op op, shared_ptr<Field> operand);
+		size_t getField();
+		Op getOp();
+		shared_ptr<Field> getOperand();
 		/**
 		* Compares the field number of t specified in the constructor to the
 		* operand field specified in the constructor using the operator specific

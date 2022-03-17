@@ -11,3 +11,5 @@
 #include "HeapPageReadTest.h"
 #include "HeapFileReadTest.h"
 #include "ScanTest.h"
+#include "PredicateTest.h"
+#include "JoinPredicateTest.h"

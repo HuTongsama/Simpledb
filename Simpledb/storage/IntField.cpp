@@ -15,19 +15,19 @@ namespace Simpledb
 			const IntField& iVal = dynamic_cast<const IntField&>(value);
 			switch (op)
 			{
-			case Simpledb::Predicate::EQUALS:
+			case Simpledb::Predicate::Op::EQUALS:
 				return _value == iVal._value;
-			case Simpledb::Predicate::GREATER_THAN:
+			case Simpledb::Predicate::Op::GREATER_THAN:
 				return _value > iVal._value;
-			case Simpledb::Predicate::LESS_THAN:
+			case Simpledb::Predicate::Op::LESS_THAN:
 				return _value < iVal._value;
-			case Simpledb::Predicate::LESS_THAN_OR_EQ:
+			case Simpledb::Predicate::Op::LESS_THAN_OR_EQ:
 				return _value <= iVal._value;
-			case Simpledb::Predicate::GREATER_THAN_OR_EQ:
+			case Simpledb::Predicate::Op::GREATER_THAN_OR_EQ:
 				return _value >= iVal._value;
-			case Simpledb::Predicate::LIKE:
+			case Simpledb::Predicate::Op::LIKE:
 				return _value == iVal._value;
-			case Simpledb::Predicate::NOT_EQUALS:
+			case Simpledb::Predicate::Op::NOT_EQUALS:
 				return _value != iVal._value;
 			default:
 				return false;

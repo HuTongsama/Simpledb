@@ -37,19 +37,19 @@ namespace Simpledb
 			int cmpVal = _value.compare(stringField._value);
 			switch (op)
 			{
-			case Simpledb::Predicate::EQUALS:
+			case Simpledb::Predicate::Op::EQUALS:
 				return cmpVal == 0;
-			case Simpledb::Predicate::GREATER_THAN:
+			case Simpledb::Predicate::Op::GREATER_THAN:
 				return cmpVal > 0;
-			case Simpledb::Predicate::LESS_THAN:
+			case Simpledb::Predicate::Op::LESS_THAN:
 				return cmpVal < 0;
-			case Simpledb::Predicate::LESS_THAN_OR_EQ:
+			case Simpledb::Predicate::Op::LESS_THAN_OR_EQ:
 				return cmpVal <= 0;
-			case Simpledb::Predicate::GREATER_THAN_OR_EQ:
+			case Simpledb::Predicate::Op::GREATER_THAN_OR_EQ:
 				return cmpVal >= 0;
-			case Simpledb::Predicate::LIKE:
+			case Simpledb::Predicate::Op::LIKE:
 				return _value.find(stringField._value) != string::npos;
-			case Simpledb::Predicate::NOT_EQUALS:
+			case Simpledb::Predicate::Op::NOT_EQUALS:
 				return cmpVal != 0;
 			default:
 				return false;

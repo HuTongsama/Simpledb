@@ -42,12 +42,12 @@ namespace Simpledb {
 		_curPosition += realSz;
 		return realSz;
 	}
-	int DataStream::read(char* dst, size_t dstSize)
+	size_t DataStream::read(char* dst, size_t dstSize)
 	{
 		readBytes(dst, dstSize);
 		return dstSize;
 	}
-	int DataStream::write(char* src, size_t srcSize)
+	size_t DataStream::write(char* src, size_t srcSize)
 	{
 		writeBytes(src, srcSize);
 		return srcSize;

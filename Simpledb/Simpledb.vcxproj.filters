@@ -137,6 +137,18 @@
     <ClInclude Include="include\SeqScan.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\JoinPredicate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Filter.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Join.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TupleIterator.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -190,9 +202,6 @@
     <ClCompile Include="common\Database.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="include\LogFile.cpp">
-      <Filter>storage</Filter>
-    </ClCompile>
     <ClCompile Include="common\PageFactory.cpp">
       <Filter>common</Filter>
     </ClCompile>
@@ -205,14 +214,32 @@
     <ClCompile Include="common\Utility.cpp">
       <Filter>common</Filter>
     </ClCompile>
-    <ClCompile Include="include\DataStream.cpp">
-      <Filter>common</Filter>
-    </ClCompile>
     <ClCompile Include="execution\Operator.cpp">
       <Filter>execution</Filter>
     </ClCompile>
     <ClCompile Include="execution\SeqScan.cpp">
       <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Predicate.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="common\DataStream.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\LogFile.cpp">
+      <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\JoinPredicate.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Filter.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Join.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\TupleIterator.cpp">
+      <Filter>storage</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

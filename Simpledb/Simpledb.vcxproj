@@ -158,12 +158,15 @@
     <ClInclude Include="Include\Field.h" />
     <ClInclude Include="include\BufferPool.h" />
     <ClInclude Include="include\File.h" />
+    <ClInclude Include="include\Filter.h" />
     <ClInclude Include="include\HeapFile.h" />
     <ClInclude Include="include\HeapFileEncoder.h" />
     <ClInclude Include="include\HeapPage.h" />
     <ClInclude Include="include\HeapPageId.h" />
     <ClInclude Include="Include\IntField.h" />
     <ClInclude Include="include\Iterator.h" />
+    <ClInclude Include="include\Join.h" />
+    <ClInclude Include="include\JoinPredicate.h" />
     <ClInclude Include="include\LogFile.h" />
     <ClInclude Include="include\Noncopyable.h" />
     <ClInclude Include="include\Operator.h" />
@@ -180,6 +183,7 @@
     <ClInclude Include="include\TransactionId.h" />
     <ClInclude Include="include\Tuple.h" />
     <ClInclude Include="include\TupleDesc.h" />
+    <ClInclude Include="include\TupleIterator.h" />
     <ClInclude Include="Include\Type.h" />
     <ClInclude Include="include\Utility.h" />
   </ItemGroup>
@@ -187,15 +191,18 @@
     <ClCompile Include="common\Catalog.cpp" />
     <ClCompile Include="common\Common.cpp" />
     <ClCompile Include="common\Database.cpp" />
+    <ClCompile Include="common\DataStream.cpp" />
     <ClCompile Include="common\File.cpp" />
     <ClCompile Include="common\PageFactory.cpp" />
     <ClCompile Include="common\PageIdFactory.cpp" />
     <ClCompile Include="Common\Type.cpp" />
     <ClCompile Include="common\Utility.cpp" />
+    <ClCompile Include="execution\Filter.cpp" />
+    <ClCompile Include="execution\Join.cpp" />
+    <ClCompile Include="execution\JoinPredicate.cpp" />
     <ClCompile Include="execution\Operator.cpp" />
+    <ClCompile Include="execution\Predicate.cpp" />
     <ClCompile Include="execution\SeqScan.cpp" />
-    <ClCompile Include="include\DataStream.cpp" />
-    <ClCompile Include="include\LogFile.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />
@@ -204,10 +211,12 @@
     <ClCompile Include="storage\HeapPage.cpp" />
     <ClCompile Include="storage\HeapPageId.cpp" />
     <ClCompile Include="storage\IntField.cpp" />
+    <ClCompile Include="storage\LogFile.cpp" />
     <ClCompile Include="storage\RecordId.cpp" />
     <ClCompile Include="storage\StringField.cpp" />
     <ClCompile Include="storage\Tuple.cpp" />
     <ClCompile Include="storage\TupleDesc.cpp" />
+    <ClCompile Include="storage\TupleIterator.cpp" />
     <ClCompile Include="transaction\TransactionId.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
