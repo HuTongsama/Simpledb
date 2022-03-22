@@ -13,3 +13,7 @@
 #include "ScanTest.h"
 #include "PredicateTest.h"
 #include "JoinPredicateTest.h"
+#include "FilterTest.h"
+#include "JoinTest.h"
+#include "SysFilterTest.h"
+#include "SysJoinTest.h"

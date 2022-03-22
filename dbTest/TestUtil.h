@@ -1,6 +1,7 @@
 #pragma once
 #include"DbFile.h"
 #include"IntField.h"
+#include"StringField.h"
 #include"OpIterator.h"
 #include"TupleIterator.h"
 #include"Utility.h"
@@ -36,49 +37,49 @@ public:
         result->open();
         return result;
     }
+    struct TupData {
+        shared_ptr<Type> _type;
+        string _str;
+        int _int;
+    };
+    /**
+     * @return a OpIterator over a list of tuples constructed over the data
+     *   provided in the constructor. This iterator is already open.
+     * @param width the number of fields in each tuple
+     * @param tupdata an array such that the ith element the jth tuple lives
+     *   in slot j * width + i.  Objects can be strings or ints;  tuples must all be of same type.
+     * @require tupdata.length % width == 0
+     */
+    static shared_ptr<TupleIterator> createTupleList(int width, vector<TupData>& tupdata) {      
+        vector<shared_ptr<Type>> types;
+        for (int j = 0; j < width; j++) {
+            types.push_back(tupdata[j]._type);
+        }
+        shared_ptr<TupleDesc> td = make_shared<TupleDesc>(types);
+        int i = 0;
+        vector<shared_ptr<Tuple>> tupVec;
+        while (i < tupdata.size()) {
+            shared_ptr<Tuple> tup = make_shared<Tuple>(td);
+            for (int j = 0; j < width; j++) {
+                shared_ptr<Field> f = nullptr;
+                
+                auto& t = tupdata[i];
+                i++;
+                if (t._type->toString() == String_Type::STRING_TYPE->toString())
+                    f = make_shared<StringField>(t._str, Type::STRING_LEN);
+                else
+                    f = make_shared<IntField>(t._int);
 
-    ///**
-    // * @return a OpIterator over a list of tuples constructed over the data
-    // *   provided in the constructor. This iterator is already open.
-    // * @param width the number of fields in each tuple
-    // * @param tupdata an array such that the ith element the jth tuple lives
-    // *   in slot j * width + i.  Objects can be strings or ints;  tuples must all be of same type.
-    // * @require tupdata.length % width == 0
-    // */
-    //public static TupleIterator createTupleList(int width, Object[] tupdata) {
-    //    List<Tuple> tuplist = new ArrayList<>();
-    //    TupleDesc td;
-    //    Type[] types = new Type[width];
-    //    int i = 0;
-    //    for (int j = 0; j < width; j++) {
-    //        if (tupdata[j] instanceof String) {
-    //            types[j] = Type.STRING_TYPE;
-    //        }
-    //        if (tupdata[j] instanceof Integer) {
-    //            types[j] = Type.INT_TYPE;
-    //        }
-    //    }
-    //    td = new TupleDesc(types);
 
-    //    while (i < tupdata.length) {
-    //        Tuple tup = new Tuple(td);
-    //        for (int j = 0; j < width; j++) {
-    //            Field f;
-    //            Object t = tupdata[i++];
-    //            if (t instanceof String)
-    //                f = new StringField((String)t, Type.STRING_LEN);
-    //            else
-    //                f = new IntField((Integer)t);
+                tup->setField(j, f);
+            }
+            tupVec.push_back(tup);
+        }
 
-    //            tup.setField(j, f);
-    //        }
-    //        tuplist.add(tup);
-    //    }
-
-    //    TupleIterator result = new TupleIterator(td, tuplist);
-    //    result.open();
-    //    return result;
-    //}
+        shared_ptr<TupleIterator> result = make_shared<TupleIterator>(td, tupVec);
+        result->open();
+        return result;
+    }
 
 
     /**
@@ -115,6 +116,34 @@ public:
     // Both must now be exhausted
     EXPECT_FALSE(expected.hasNext());
     EXPECT_FALSE(actual.hasNext());
+    }
+
+    /**
+    * Check to see if every tuple in expected matches <b>some</b> tuple
+    *   in actual via compareTuples. Note that actual may be a superset.
+    * If not, throw an assertion.
+    */
+    static void matchAllTuples(shared_ptr<OpIterator> expected, shared_ptr<OpIterator> actual){
+        // TODO(ghuo): this n^2 set comparison is kind of dumb, but we haven't
+        // implemented hashCode or equals for tuples.
+        bool matched = false;
+        while (expected->hasNext()) {
+            Tuple& expectedTup = expected->next();
+            matched = false;
+            actual->rewind();
+
+            while (actual->hasNext()) {
+                Tuple& next = actual->next();
+                if (compareTuples(expectedTup, next)) {
+                    matched = true;
+                    break;
+                }
+            }
+
+            if (!matched) {
+                throw runtime_error("expected tuple not found: " + expectedTup.toString());
+            }
+        }
     }
 
     /**
