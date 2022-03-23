@@ -1,26 +1,33 @@
 #include"Predicate.h"
+#include"Tuple.h"
 namespace Simpledb {
 	Predicate::Predicate(int field, Op op, shared_ptr<Field> operand)
 	{
+		_field = field;
+		_op = op;
+		_operand = operand;
+		//"f = field_id op = op_string operand = operand_string
+		_str = "f = " + to_string(_field) + " op = " + opToString(_op) + " operand = " + operand->toString();
 	}
-	size_t Predicate::getField()
+	int Predicate::getField()
 	{
-		return size_t();
+		return _field;
 	}
 	Predicate::Op Predicate::getOp()
 	{
-		return Op();
+		return _op;
 	}
 	shared_ptr<Field> Predicate::getOperand()
 	{
-		return shared_ptr<Field>();
+		return _operand;
 	}
 	bool Predicate::filter(shared_ptr<Tuple> t)
 	{
-		return false;
+		shared_ptr<Field> lhs = t->getField(_field);
+		return lhs->compare(_op, *_operand);
 	}
 	string Predicate::toString()
 	{
-		return string();
+		return _str;
 	}
 }

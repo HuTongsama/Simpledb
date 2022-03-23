@@ -48,13 +48,25 @@ namespace Simpledb {
 		/**
 		* Constructor.
 		*
-		* @param field field number of passed in tuples to compare against.
-		* @param op operation to use for comparison
-		* @param operand field value to compare passed in tuples to
+		* @param field 
+		*				field number of passed in tuples to compare against.
+		* @param op 
+		*				operation to use for comparison
+		* @param operand 
+		*				field value to compare passed in tuples to
 		*/
 		Predicate(int field, Op op, shared_ptr<Field> operand);
-		size_t getField();
+		/**
+		* @return the field number
+		*/
+		int getField();
+		/**
+		* @return the operator
+		*/
 		Op getOp();
+		/**
+		* @return the operand
+		*/
 		shared_ptr<Field> getOperand();
 		/**
 		* Compares the field number of t specified in the constructor to the
@@ -71,5 +83,10 @@ namespace Simpledb {
 		* "f = field_id op = op_string operand = operand_string
 		*/
 		string toString();
+	private:
+		int _field;
+		Op _op;
+		shared_ptr<Field> _operand;
+		string _str;
 	};
 }
