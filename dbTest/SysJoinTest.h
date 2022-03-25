@@ -58,7 +58,6 @@ TEST_F(SysJoinTest, TestSingleMatch) {
 TEST_F(SysJoinTest, TestNoMatch) {
     validateJoin(1, 2, 2, 10);
 }
-
 TEST_F(SysJoinTest, TestMultipleMatch) {
     validateJoin(1, 3, 1, 3);
 }

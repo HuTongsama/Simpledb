@@ -20,3 +20,19 @@ protected:
         return resultCount;
 	}
 };
+
+TEST_F(SysFilterTest, TestEquals) {
+    validatePredicate(0, 1, 1, 2, Predicate::Op::EQUALS);
+}
+TEST_F(SysFilterTest, TestLessThan) {
+    validatePredicate(1, 1, 2, 1, Predicate::Op::LESS_THAN);
+}
+TEST_F(SysFilterTest, TestLessThanOrEq) {
+    validatePredicate(2, 42, 42, 41, Predicate::Op::LESS_THAN_OR_EQ);
+}
+TEST_F(SysFilterTest, TestGreaterThan) {
+    validatePredicate(2, 42, 41, 42, Predicate::Op::GREATER_THAN);
+}
+TEST_F(SysFilterTest, TestGreaterThanOrEq) {
+    validatePredicate(2, 42, 42, 43, Predicate::Op::GREATER_THAN_OR_EQ);
+}

@@ -15,9 +15,7 @@ protected:
 	virtual int applyPredicate(
 		shared_ptr<HeapFile> table,
 		shared_ptr<TransactionId> tid,
-		shared_ptr<Predicate> predicate) {
-		return -1;
-	}
+		shared_ptr<Predicate> predicate) = 0;
 	void validateAfter(shared_ptr<HeapFile> table) {}
 
 	int runTransactionForPredicate(shared_ptr<HeapFile> table, shared_ptr<Predicate> predicate){
@@ -51,19 +49,3 @@ protected:
 			COLUMNS, ROWS, columnSpecification, _createdTuples);
 	}
 };
-
-TEST_F(FilterBase, TestEquals) {
-	validatePredicate(0, 1, 1, 2, Predicate::Op::EQUALS);
-}
-TEST_F(FilterBase, TestLessThan) {
-	validatePredicate(1, 1, 2, 1, Predicate::Op::LESS_THAN);
-}
-TEST_F(FilterBase, TestLessThanOrEq) {
-	validatePredicate(2, 42, 42, 41, Predicate::Op::LESS_THAN_OR_EQ);
-}
-TEST_F(FilterBase, TestGreaterThan) {
-	validatePredicate(2, 42, 41, 42, Predicate::Op::GREATER_THAN);
-}
-TEST_F(FilterBase, TestGreaterThanOrEq) {
-	validatePredicate(2, 42, 42, 43, Predicate::Op::GREATER_THAN_OR_EQ);
-}

@@ -244,22 +244,22 @@ public:
         Tuple& next()override {
             if (_cur >= _high)
                 throw runtime_error("no such element");
-            shared_ptr<Tuple> _t = make_shared<Tuple>(getTupleDesc());
+            _t = make_shared<Tuple>(getTupleDesc());
             for (int i = 0; i < _width; ++i)
                 _t->setField(i, make_shared<IntField>(_cur));
             _cur++;
             return *_t;
         }
     protected:
-        shared_ptr<Tuple> readNext() {
+        Tuple* readNext() {
             if (_cur >= _high) 
                 return nullptr;
 
-            shared_ptr<Tuple> tup = make_shared<Tuple>(getTupleDesc());
+            _t = make_shared<Tuple>(getTupleDesc());
             for (int i = 0; i < _width; ++i)
-                tup->setField(i, make_shared<IntField>(_cur));
+                _t->setField(i, make_shared<IntField>(_cur));
             _cur++;
-            return tup;
+            return _t.get();
         }
     private:
         int _cur;

@@ -3,33 +3,51 @@ namespace Simpledb {
 	long Filter::_serialVersionUID = 1l;
 	Filter::Filter(shared_ptr<Predicate> p, shared_ptr<OpIterator> child)
 	{
+		_p = p;
+		_children.push_back(child);
+		_td = child->getTupleDesc();
 	}
 	shared_ptr<Predicate> Filter::getPredicate()
 	{
-		return shared_ptr<Predicate>();
+		return _p;
 	}
 	shared_ptr<TupleDesc> Filter::getTupleDesc()
 	{
-		return shared_ptr<TupleDesc>();
+		return _td;
 	}
 	void Filter::open()
 	{
+		Operator::open();
+		_children[0]->open();
 	}
 	void Filter::close()
 	{
+		_children[0]->close();
+		Operator::close();
 	}
 	void Filter::rewind()
 	{
+		_children[0]->rewind();		
 	}
 	vector<shared_ptr<OpIterator>> Filter::getChildren()
 	{
-		return vector<shared_ptr<OpIterator>>();
+		return _children;
 	}
 	void Filter::setChildren(const vector<shared_ptr<OpIterator>>& children)
 	{
+		_children = children;
 	}
-	shared_ptr<Tuple> Filter::fetchNext()
+	Tuple* Filter::fetchNext()
 	{
-		return shared_ptr<Tuple>();
+		Tuple* pNext = nullptr;
+		while (_children[0]->hasNext()) {
+			Tuple& next = _children[0]->next();
+			if (_p->filter(next))
+			{
+				pNext = &next;
+				break;
+			}
+		}
+		return pNext;
 	}
 }

@@ -23,7 +23,13 @@ namespace Simpledb {
 	}
 	bool Predicate::filter(shared_ptr<Tuple> t)
 	{
-		shared_ptr<Field> lhs = t->getField(_field);
+		return filter(*t);
+	}
+	bool Predicate::filter(Tuple& t)
+	{
+		shared_ptr<Field> lhs = t.getField(_field);
+		if (lhs == nullptr)
+			return false;
 		return lhs->compare(_op, *_operand);
 	}
 	string Predicate::toString()

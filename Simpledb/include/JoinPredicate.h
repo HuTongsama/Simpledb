@@ -27,10 +27,14 @@ namespace Simpledb {
 		* @return true if the tuples satisfy the predicate.
 		*/
 		bool filter(shared_ptr<Tuple> t1, shared_ptr<Tuple> t2);
+		bool filter(Tuple& t1, Tuple& t2);
 		int getField1();
 		int getField2();
 		Predicate::Op getOperator();
 	private:
 		static long _serialVersionUID;
+		int _field1;
+		int _field2;
+		Predicate::Op _op;
 	};
 }

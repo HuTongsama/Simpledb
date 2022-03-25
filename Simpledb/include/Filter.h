@@ -14,7 +14,7 @@ namespace Simpledb {
          */
         Filter(shared_ptr<Predicate> p, shared_ptr<OpIterator> child);
         shared_ptr<Predicate> getPredicate();
-        shared_ptr<TupleDesc> getTupleDesc();
+        shared_ptr<TupleDesc> getTupleDesc()override;
         void open()override;
         void close()override;
         void rewind()override;
@@ -31,8 +31,11 @@ namespace Simpledb {
          *         more tuples
          * @see Predicate#filter
          */
-        shared_ptr<Tuple> fetchNext()override;
+        Tuple* fetchNext()override;
     private:
         static long _serialVersionUID;
+        shared_ptr<Predicate> _p;
+        vector<shared_ptr<OpIterator>> _children;
+        shared_ptr<TupleDesc> _td;
 	};
 }

@@ -78,6 +78,7 @@ namespace Simpledb {
 		* @return true if the comparison is true, false otherwise.
 		*/
 		bool filter(shared_ptr<Tuple> t);
+		bool filter(Tuple& t);
 		/**
 		* Returns something useful, like
 		* "f = field_id op = op_string operand = operand_string

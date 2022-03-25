@@ -58,8 +58,14 @@ namespace Simpledb {
          * @return The next matching tuple.
          * @see JoinPredicate#filter
          */
-        shared_ptr<Tuple> fetchNext()override;
+        Tuple* fetchNext()override;
     private:
         static long _serialVersionUID;
+        shared_ptr<JoinPredicate> _p;
+        vector<shared_ptr<OpIterator>> _children;
+        shared_ptr<TupleDesc> _td;
+        shared_ptr<Tuple> _tuple;
+        Tuple* _lhs;
+        Tuple* _rhs;
 	};
 }
