@@ -93,7 +93,7 @@ public:
         for (int i = 0; i < t1.getTupleDesc()->numFields(); ++i) {
             if (t1.getTupleDesc()->getFieldType(i)->toString() != t2.getTupleDesc()->getFieldType(i)->toString())
                 return false;
-            if (!(t1.getField(i)->equals(*(t2.getField(i)))))
+            if ((t1.getField(i) == nullptr || t2.getField(i) == nullptr) || !(t1.getField(i)->equals(*(t2.getField(i)))))
                 return false;
         }
 

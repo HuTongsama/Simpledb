@@ -58,13 +58,13 @@ namespace Simpledb {
 	Tuple* Join::fetchNext()
 	{
 		Tuple* pNext = nullptr;
-		while (_children[1]->hasNext()){
-			if (_rhs == nullptr) {
-				_rhs = &(_children[1]->next());
+		while (_children[0]->hasNext() || _lhs != nullptr){
+			if (_lhs == nullptr) {
+				_lhs = &(_children[0]->next());
 			}
-			while (_children[0]->hasNext()) {
-				if (_lhs == nullptr) {
-					_lhs = &(_children[0]->next());
+			while (_children[1]->hasNext()) {
+				if (_rhs == nullptr) {
+					_rhs = &(_children[1]->next());
 				}
 				if (_p->filter(*_lhs, *_rhs)) {
 					_tuple = make_shared<Tuple>(_td);
@@ -81,16 +81,16 @@ namespace Simpledb {
 					break;
 				}
 				else {
-					_lhs = nullptr;
+					_rhs = nullptr;
 				}
 			}
 			if (!pNext) {
-				_children[0]->rewind();
+				_children[1]->rewind();
 				_lhs = nullptr;
 				_rhs = nullptr;
 			}
 			else{
-				_lhs = nullptr;
+				_rhs = nullptr;
 				break;
 			}
 		}

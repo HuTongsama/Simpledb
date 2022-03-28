@@ -4,6 +4,7 @@
 #include<map>
 #include<random>
 #include<algorithm>
+#include<chrono>
 #include"Utility.h"
 #include"File.h"
 #include"Database.h"
@@ -58,7 +59,7 @@ public:
         int maxValue, map<int,int>& columnSpecification,
         vector<vector<int>>& tuples){
         tuples.resize(rows);
-        default_random_engine r = default_random_engine(time(0));
+        default_random_engine r = default_random_engine(chrono::system_clock::now().time_since_epoch().count());
 
         // Fill the tuples list with generated values
         for (int i = 0; i < rows; ++i) {

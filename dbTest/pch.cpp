@@ -10,7 +10,7 @@
 #include "RecordIdTest.h"
 #include "HeapPageReadTest.h"
 #include "HeapFileReadTest.h"
-//#include "ScanTest.h"
+#include "ScanTest.h"
 #include "PredicateTest.h"
 #include "JoinPredicateTest.h"
 #include "FilterTest.h"
