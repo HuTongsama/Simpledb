@@ -149,6 +149,18 @@
     <ClInclude Include="include\TupleIterator.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Aggregator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Aggregate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\IntegerAggregator.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\StringAggregator.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -240,6 +252,15 @@
     </ClCompile>
     <ClCompile Include="storage\TupleIterator.cpp">
       <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Aggregate.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\IntegerAggregator.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\StringAggregator.cpp">
+      <Filter>execution</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

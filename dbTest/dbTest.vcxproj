@@ -33,12 +33,14 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="AggregateTest.h" />
     <ClInclude Include="CatalogTest.h" />
     <ClInclude Include="FilterBase.h" />
     <ClInclude Include="FilterTest.h" />
     <ClInclude Include="HeapFileReadTest.h" />
     <ClInclude Include="HeapPageIdTest.h" />
     <ClInclude Include="HeapPageReadTest.h" />
+    <ClInclude Include="IntegerAggregatorTest.h" />
     <ClInclude Include="JoinPredicateTest.h" />
     <ClInclude Include="JoinTest.h" />
     <ClInclude Include="pch.h" />
@@ -46,6 +48,7 @@
     <ClInclude Include="RecordIdTest.h" />
     <ClInclude Include="ScanTest.h" />
     <ClInclude Include="SimpleDbTestBase.h" />
+    <ClInclude Include="StringAggregatorTest.h" />
     <ClInclude Include="SysFilterTest.h" />
     <ClInclude Include="SysJoinTest.h" />
     <ClInclude Include="SystemTestUtil.h" />

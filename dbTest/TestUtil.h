@@ -41,6 +41,9 @@ public:
         shared_ptr<Type> _type;
         string _str;
         int _int;
+        TupData(shared_ptr<Type> t, const string& s = "", int i = 0)
+            :_type(t),_str(s),_int(i)
+        {}
     };
     /**
      * @return a OpIterator over a list of tuples constructed over the data
