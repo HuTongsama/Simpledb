@@ -17,3 +17,7 @@
 #include "JoinTest.h"
 #include "SysFilterTest.h"
 #include "SysJoinTest.h"
+#include "IntegerAggregatorTest.h"
+//#include "StringAggregatorTest.h"
+//#include "AggregateTest.h"
+//#include "SysAggregateTest.h"

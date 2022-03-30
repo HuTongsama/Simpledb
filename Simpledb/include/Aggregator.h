@@ -7,13 +7,13 @@ namespace Simpledb {
 	*/
 	class Aggregator {
 	public:
-        int NO_GROUPING = -1;
+        static const int NO_GROUPING = -1;
         /**
          * SUM_COUNT and SC_AVG will
          * only be used in lab7, you are not required
          * to implement them until then.
          * */
-        enum Op {
+        enum class Op {
             MIN, MAX, SUM, AVG, COUNT,
             /**
              * SUM_COUNT: compute sum and count simultaneously, will be
@@ -49,19 +49,19 @@ namespace Simpledb {
         {
             switch (op)
             {
-            case Simpledb::Aggregator::MIN:
+            case Simpledb::Aggregator::Op::MIN:
                 return "min";
-            case Simpledb::Aggregator::MAX:
+            case Simpledb::Aggregator::Op::MAX:
                 return "max";
-            case Simpledb::Aggregator::SUM:
+            case Simpledb::Aggregator::Op::SUM:
                 return "sum";
-            case Simpledb::Aggregator::AVG:
+            case Simpledb::Aggregator::Op::AVG:
                 return "avg";
-            case Simpledb::Aggregator::COUNT:
+            case Simpledb::Aggregator::Op::COUNT:
                 return "count";
-            case Simpledb::Aggregator::SUM_COUNT:
+            case Simpledb::Aggregator::Op::SUM_COUNT:
                 return "sum_count";
-            case Simpledb::Aggregator::SC_AVG:
+            case Simpledb::Aggregator::Op::SC_AVG:
                 return "sc_avg";
             default:
                 throw runtime_error("impossible to reach here");

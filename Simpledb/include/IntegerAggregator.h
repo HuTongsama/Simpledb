@@ -1,5 +1,6 @@
 #pragma once
 #include"Aggregator.h"
+#include<map>
 namespace Simpledb {
 	/**
 	* Knows how to compute some aggregate over a set of IntFields.
@@ -40,5 +41,11 @@ namespace Simpledb {
         shared_ptr<OpIterator> iterator()override;
     private:
         static long _serialVersionUID;
+        int _gbfield;
+        shared_ptr<Type> _gbfieldtype;
+        int _afield;
+        Aggregator::Op _op;
+        vector<shared_ptr<Tuple>> _tuples;
+        map<int64_t, int64_t> _groupToCount;
 	};
 }

@@ -49,6 +49,7 @@
     <ClInclude Include="ScanTest.h" />
     <ClInclude Include="SimpleDbTestBase.h" />
     <ClInclude Include="StringAggregatorTest.h" />
+    <ClInclude Include="SysAggregateTest.h" />
     <ClInclude Include="SysFilterTest.h" />
     <ClInclude Include="SysJoinTest.h" />
     <ClInclude Include="SystemTestUtil.h" />
