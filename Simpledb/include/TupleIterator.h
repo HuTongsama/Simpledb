@@ -13,7 +13,7 @@ namespace Simpledb {
          * @param tuples
          *            The set of tuples to iterate over
          */
-        TupleIterator(shared_ptr<TupleDesc> td, const vector<shared_ptr<Tuple>>& tuples);
+        TupleIterator(shared_ptr<TupleDesc> td, vector<shared_ptr<Tuple>>& tuples);
         void open()override {
             _open = true;
         }
@@ -42,7 +42,7 @@ namespace Simpledb {
     private:
         static long _serialVersionUID;
         shared_ptr<TupleDesc> _td;
-        vector<shared_ptr<Tuple>> _tuples;
+        vector<shared_ptr<Tuple>>& _tuples;
         bool _open;
 	};
 }
