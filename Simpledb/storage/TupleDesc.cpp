@@ -79,8 +79,8 @@ namespace Simpledb {
 			return false;
 		for (int i = 0; i < sz1; ++i)
 		{
-			string t1 = _tdItems[i]._fieldType->toString();
-			string t2 = td.getFieldType(i)->toString();
+			auto t1 = _tdItems[i]._fieldType->type();
+			auto t2 = td.getFieldType(i)->type();
 			if (t1 != t2)
 				return false;
 		}

@@ -80,6 +80,16 @@ namespace Simpledb {
         */
         Tuple* fetchNext()override;
     private:
+        void updateIter();
+
+
         static long _serialVersionUID;
+        vector<shared_ptr<OpIterator>> _children;
+        int _afield;
+        int _gfield;
+        Aggregator::Op _aop;
+        shared_ptr<TupleDesc> _td;
+        shared_ptr<Aggregator> _aggregator;
+        shared_ptr<OpIterator> _iter;
 };
 }

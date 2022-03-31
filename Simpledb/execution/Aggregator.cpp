@@ -1,6 +1,21 @@
 #include "Aggregator.h"
 #include "IntField.h"
 namespace Simpledb {
+	Aggregator::Aggregator(int gbfield, shared_ptr<Type> gbfieldtype, int afield, Aggregator::Op what)
+		:_gbfield(gbfield), _gbfieldtype(gbfieldtype), _afield(afield), _op(what)
+	{
+		if (_gbfield == Aggregator::NO_GROUPING) {
+
+			_td = make_shared<TupleDesc>(
+				vector<shared_ptr<Type>>{Int_Type::INT_TYPE},
+				vector<string>{""});
+		}
+		else {
+			_td = make_shared<TupleDesc>(
+				vector<shared_ptr<Type>>{_gbfieldtype, Int_Type::INT_TYPE},
+				vector<string>{"", ""});
+		}
+	}
 	shared_ptr<Tuple> Aggregator::getAimTuple(Tuple& tup)
 	{
 		shared_ptr<Field> gbField1 = tup.getField(_gbfield);
@@ -28,7 +43,7 @@ namespace Simpledb {
 				if (_td == nullptr) {
 					_td = make_shared<TupleDesc>(
 						vector<shared_ptr<Type>>{Int_Type::INT_TYPE},
-						vector<string>{"Aggregator"});
+						vector<string>{""});
 				}
 				aimTuple = make_shared<Tuple>(_td);
 			}
@@ -36,7 +51,7 @@ namespace Simpledb {
 				if (_td == nullptr) {
 					_td = make_shared<TupleDesc>(
 						vector<shared_ptr<Type>>{Int_Type::INT_TYPE, Int_Type::INT_TYPE},
-						vector<string>{"Aggregator", tup.getTupleDesc()->getFieldName(_gbfield)});
+						vector<string>{"", tup.getTupleDesc()->getFieldName(_gbfield)});
 				}
 				aimTuple = make_shared<Tuple>(_td);
 				aimTuple->setField(0, gbField1);

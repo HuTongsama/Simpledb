@@ -71,8 +71,7 @@ namespace Simpledb {
             }
         }
         
-        Aggregator(int gbfield, shared_ptr<Type> gbfieldtype, int afield, Aggregator::Op what)
-            :_gbfield(gbfield), _gbfieldtype(gbfieldtype), _afield(afield), _op(what) {}
+        Aggregator(int gbfield, shared_ptr<Type> gbfieldtype, int afield, Aggregator::Op what);
 
         virtual ~Aggregator() {}
         /**
