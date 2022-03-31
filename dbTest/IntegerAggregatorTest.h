@@ -137,8 +137,7 @@ TEST_F(IntegerAggregatorTest, TestIterator) {
             count++;
         }
     }
-    catch (const std::exception&)
-    {
+    catch (const std::exception&){
         // explicitly ignored
     }
     EXPECT_EQ(3, count);
