@@ -1,5 +1,6 @@
 #pragma once
 #include"Aggregator.h"
+#include<map>
 /**
  * Knows how to compute some aggregate over a set of StringFields.
  */

@@ -202,6 +202,7 @@
     <ClCompile Include="Common\Type.cpp" />
     <ClCompile Include="common\Utility.cpp" />
     <ClCompile Include="execution\Aggregate.cpp" />
+    <ClCompile Include="execution\Aggregator.cpp" />
     <ClCompile Include="execution\Filter.cpp" />
     <ClCompile Include="execution\IntegerAggregator.cpp" />
     <ClCompile Include="execution\Join.cpp" />

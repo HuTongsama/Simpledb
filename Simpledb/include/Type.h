@@ -13,11 +13,17 @@ namespace Simpledb
 	class Type : public Noncopyable
 	{
 	public:
+		enum class TYPE
+		{
+			INT_TYPE = 0,
+			STRING_TYPE
+		};
 		virtual ~Type() {}
 		/**
 		* @return the number of bytes required to store a field of this type.
 		*/
 		virtual int getLen() = 0;
+		virtual TYPE type() = 0;
 		/**
 		* @return a Field object of the same type as this object that has contents
 		* read from the specified DataInputStream.
@@ -33,6 +39,7 @@ namespace Simpledb
 	public:
 		int getLen()override { return 4; }
 		shared_ptr<Field> parse(DataStream& ds)override;
+		TYPE type()override { return TYPE::INT_TYPE; }
 		string toString()override {
 			return "INT_TYPE";
 		}
@@ -46,6 +53,7 @@ namespace Simpledb
 	public:
 		int getLen()override { return STRING_LEN + 4; }
 		shared_ptr<Field> parse(DataStream& ds)override;
+		TYPE type()override { return TYPE::STRING_TYPE; }
 		string toString()override {
 			return "STRING_TYPE";
 		}

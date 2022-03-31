@@ -1,5 +1,7 @@
 #pragma once
 #include"OpIterator.h"
+#include"TupleIterator.h"
+#include<map>
 namespace Simpledb {
 	/**
 	* The common interface for any class that can compute an aggregate over a
@@ -69,6 +71,9 @@ namespace Simpledb {
             }
         }
         
+        Aggregator(int gbfield, shared_ptr<Type> gbfieldtype, int afield, Aggregator::Op what)
+            :_gbfield(gbfield), _gbfieldtype(gbfieldtype), _afield(afield), _op(what) {}
+
         virtual ~Aggregator() {}
         /**
          * Merge a new tuple into the aggregate for a distinct group value;
@@ -83,5 +88,21 @@ namespace Simpledb {
          * @see TupleIterator for a possible helper
          */
         virtual shared_ptr<OpIterator> iterator() = 0;
+    protected:
+        shared_ptr<Tuple> getAimTuple(Tuple& tup);
+        int getModifyfield() {
+            int field = _gbfield == Aggregator::NO_GROUPING ? 0 : 1;
+            return field;
+        }
+
+
+
+        int _gbfield;
+        shared_ptr<Type> _gbfieldtype;
+        int _afield;
+        Aggregator::Op _op;
+        vector<shared_ptr<Tuple>> _tuples;
+        map<int64_t, int64_t> _groupToCount;
+        shared_ptr<TupleDesc> _td;
 	};
 }

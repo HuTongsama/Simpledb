@@ -42,17 +42,9 @@ namespace Simpledb {
          */
         shared_ptr<OpIterator> iterator()override;
     private:
-        void modifyTuple(shared_ptr<Tuple> t, int modifyfield, int groupVal, shared_ptr<IntField> aggregateField);
-
-
+        void modifyTuple(shared_ptr<Tuple> t, int modifyfield, int64_t groupVal, shared_ptr<IntField> aggregateField);
 
         static long _serialVersionUID;
-        int _gbfield;
-        shared_ptr<Type> _gbfieldtype;
-        int _afield;
-        Aggregator::Op _op;
-        vector<shared_ptr<Tuple>> _tuples;
-        map<int64_t, int64_t> _groupToCount;
-        shared_ptr<TupleDesc> _td;
+
 	};
 }

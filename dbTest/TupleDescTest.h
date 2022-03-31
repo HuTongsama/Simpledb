@@ -33,7 +33,7 @@ TEST_F(TupleDescTest, Combine) {
     EXPECT_EQ(3 * Int_Type::INT_TYPE->getLen(), td3->getSize());
     
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->toString(), td3->getFieldType(i)->toString());
+        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td1, td2, td3));
 
@@ -43,7 +43,7 @@ TEST_F(TupleDescTest, Combine) {
     EXPECT_EQ(3 * Int_Type::INT_TYPE->getLen(), td3->getSize());
     
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->toString(), td3->getFieldType(i)->toString());
+        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td2, td1, td3));
 
@@ -52,7 +52,7 @@ TEST_F(TupleDescTest, Combine) {
     EXPECT_EQ(4, td3->numFields());
     EXPECT_EQ(4 * Int_Type::INT_TYPE->getLen(), td3->getSize());
     for (int i = 0; i < 4; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->toString(), td3->getFieldType(i)->toString());
+        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td2, td2, td3));
 }
@@ -61,7 +61,7 @@ TEST_F(TupleDescTest, GetType) {
     for (auto len : lengths) {
         shared_ptr<TupleDesc> td = Utility::getTupleDesc(len);
         for (int i = 0; i < len; ++i) {
-            EXPECT_EQ(Int_Type::INT_TYPE->toString(), td->getFieldType(i)->toString());
+            EXPECT_EQ(Int_Type::INT_TYPE->type(), td->getFieldType(i)->type());
         }
     }
 }

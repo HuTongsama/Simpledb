@@ -262,5 +262,8 @@
     <ClCompile Include="execution\StringAggregator.cpp">
       <Filter>execution</Filter>
     </ClCompile>
+    <ClCompile Include="execution\Aggregator.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
