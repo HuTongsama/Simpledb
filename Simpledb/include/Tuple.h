@@ -6,14 +6,6 @@ namespace Simpledb {
 	
 	class Tuple : public Noncopyable {
 	public:
-		class TupleIter :public Iterator<shared_ptr<Field>> {
-		public:
-			TupleIter(Tuple* pTuple);
-			bool hasNext()override;
-			shared_ptr<Field>& next()override;
-		private:
-			Tuple* _pTuple;
-		};
 		/**
 		* Create a new tuple with the specified schema (type).
 		*
@@ -48,7 +40,7 @@ namespace Simpledb {
 		*/
 		void setField(int i, shared_ptr<Field> field);
 		/**
-		* @return the value of the ith field, or null if it has not been set.
+		* @return the value of the ith field, or nullptr if it has not been set.
 		*
 		* @param i
 		*         field index to return. Must be a valid index.
@@ -63,23 +55,17 @@ namespace Simpledb {
 		* where \t is any whitespace (except a newline)
 		*/
 		string toString();
-		/**
-		* @return
-		*        An iterator which iterates over all the fields of this tuple
-		* */
-		const TupleIter& fields() {
-			return _iter;
-		};
+
+
 		/**
 		* reset the TupleDesc of this tuple (only affecting the TupleDesc)
 		* */
 		void resetTupleDesc(shared_ptr<TupleDesc> td);
-
+		void copyTo(Tuple& dest);
 	private:
 		static long _serialVersionUID;
 		shared_ptr<TupleDesc> _pTd;
 		shared_ptr<RecordId> _pRId;
 		vector<shared_ptr<Field>> _fields;
-		TupleIter _iter;
 	};
 }

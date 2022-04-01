@@ -25,13 +25,13 @@ protected:
                 TestUtil::TupData(Int_Type::INT_TYPE, "", 5), TestUtil::TupData(String_Type::STRING_TYPE, "a"), });
         _scan3 = TestUtil::createTupleList(_width1,
             vector<TestUtil::TupData>{
-                TestUtil::TupData(Int_Type::INT_TYPE, "a"), TestUtil::TupData(String_Type::STRING_TYPE, "", 2),
-                TestUtil::TupData(Int_Type::INT_TYPE, "a"), TestUtil::TupData(String_Type::STRING_TYPE, "", 4),
-                TestUtil::TupData(Int_Type::INT_TYPE, "a"), TestUtil::TupData(String_Type::STRING_TYPE, "", 6),
-                TestUtil::TupData(Int_Type::INT_TYPE, "b"), TestUtil::TupData(String_Type::STRING_TYPE, "", 2),
-                TestUtil::TupData(Int_Type::INT_TYPE, "b"), TestUtil::TupData(String_Type::STRING_TYPE, "", 4),
-                TestUtil::TupData(Int_Type::INT_TYPE, "b"), TestUtil::TupData(String_Type::STRING_TYPE, "", 6),
-                TestUtil::TupData(Int_Type::INT_TYPE, "c"), TestUtil::TupData(String_Type::STRING_TYPE, "", 7), });
+                TestUtil::TupData(String_Type::STRING_TYPE, "a"), TestUtil::TupData(Int_Type::INT_TYPE, "", 2),
+                TestUtil::TupData(String_Type::STRING_TYPE, "a"), TestUtil::TupData(Int_Type::INT_TYPE, "", 4),
+                TestUtil::TupData(String_Type::STRING_TYPE, "a"), TestUtil::TupData(Int_Type::INT_TYPE, "", 6),
+                TestUtil::TupData(String_Type::STRING_TYPE, "b"), TestUtil::TupData(Int_Type::INT_TYPE, "", 2),
+                TestUtil::TupData(String_Type::STRING_TYPE, "b"), TestUtil::TupData(Int_Type::INT_TYPE, "", 4),
+                TestUtil::TupData(String_Type::STRING_TYPE, "b"), TestUtil::TupData(Int_Type::INT_TYPE, "", 6),
+                TestUtil::TupData(String_Type::STRING_TYPE, "c"), TestUtil::TupData(Int_Type::INT_TYPE, "", 7), });
 
         _sum = TestUtil::createTupleList(_width1,
             vector<int> { 1, 12,
@@ -39,9 +39,9 @@ protected:
             5, 7 });
         _sumstring = TestUtil::createTupleList(_width1,
             vector<TestUtil::TupData>{
-                TestUtil::TupData(Int_Type::INT_TYPE, "a"), TestUtil::TupData(String_Type::STRING_TYPE, "", 12),
-                TestUtil::TupData(Int_Type::INT_TYPE, "b"), TestUtil::TupData(String_Type::STRING_TYPE, "", 12),
-                TestUtil::TupData(Int_Type::INT_TYPE, "c"), TestUtil::TupData(String_Type::STRING_TYPE, "", 7), });
+                TestUtil::TupData(String_Type::STRING_TYPE, "a"), TestUtil::TupData(Int_Type::INT_TYPE, "", 12),
+                TestUtil::TupData(String_Type::STRING_TYPE, "b"), TestUtil::TupData(Int_Type::INT_TYPE, "", 12),
+                TestUtil::TupData(String_Type::STRING_TYPE, "c"), TestUtil::TupData(Int_Type::INT_TYPE, "", 7), });
 
         _avg = TestUtil::createTupleList(_width1,
             vector<int> { 1, 4,

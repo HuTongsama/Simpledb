@@ -38,8 +38,6 @@ protected:
                 break;
             case Simpledb::Aggregator::Op::SUM:
             case Simpledb::Aggregator::Op::AVG:
-                break;
-            case Simpledb::Aggregator::Op::COUNT:
                 value += v;
                 break;
             default:

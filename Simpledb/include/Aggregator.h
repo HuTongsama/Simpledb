@@ -101,6 +101,7 @@ namespace Simpledb {
         int _afield;
         Aggregator::Op _op;
         vector<shared_ptr<Tuple>> _tuples;
+        vector<int64_t> _gbValues;
         map<int64_t, int64_t> _groupToCount;
         shared_ptr<TupleDesc> _td;
 	};

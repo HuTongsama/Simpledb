@@ -19,7 +19,10 @@ namespace Simpledb {
 	shared_ptr<Tuple> Aggregator::getAimTuple(Tuple& tup)
 	{
 		shared_ptr<Field> gbField1 = tup.getField(_gbfield);
-		int64_t gbValue1 = gbField1->hashCode();
+		int64_t gbValue1 = Aggregator::NO_GROUPING;
+		if (gbField1 != nullptr) {
+			gbValue1 = gbField1->hashCode();
+		}
 		shared_ptr<Tuple> aimTuple = nullptr;
 		if (_gbfield == Aggregator::NO_GROUPING) {
 			if (!_tuples.empty()) {
@@ -64,6 +67,7 @@ namespace Simpledb {
 			aimTuple->setField(modifyfield, make_shared<IntField>(initVal));
 
 			_tuples.push_back(aimTuple);
+			_gbValues.push_back(gbValue1);
 		}
 		return aimTuple;
 	}

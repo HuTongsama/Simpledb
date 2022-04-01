@@ -5,7 +5,7 @@ namespace Simpledb
 {
 	long Tuple::_serialVersionUID = 1l;
 	Tuple::Tuple(shared_ptr<TupleDesc> td)
-		:_pTd(td) , _iter(this) {
+		:_pTd(td) {
 		auto iter = _pTd->iterator();
 		while(iter->hasNext()){
 			auto& item = iter->next();
@@ -61,23 +61,21 @@ namespace Simpledb
 	{
 		_pTd = td;
 	}
-	Tuple::TupleIter::TupleIter(Tuple* pTuple)
-		:_pTuple(pTuple)
+	void Tuple::copyTo(Tuple& dest)
 	{
-	}
-	bool Tuple::TupleIter::hasNext()
-	{
-		if (_pTuple != nullptr && _pTuple->_fields.size() > _position)
-			return true;
-		return false;
-	}
-	shared_ptr<Field>& Tuple::TupleIter::next()
-	{
-		if (_pTuple != nullptr && _position < _pTuple->_fields.size()) {
-			shared_ptr<Field>& p = _pTuple->_fields[_position];
-			_position++;
-			return p;
+		dest.resetTupleDesc(_pTd);
+		dest._fields.clear();
+		size_t fields = _pTd->numFields();
+		for (int i = 0; i < fields; ++i) {
+			auto type = _pTd->getFieldType(i)->type();
+			if (type == Type::TYPE::INT_TYPE) {
+				dest._fields.push_back(make_shared<IntField>(
+					dynamic_pointer_cast<IntField>(_fields[i])->getValue()));
+			}
+			else if (type == Type::TYPE::STRING_TYPE) {
+				dest._fields.push_back(make_shared<StringField>(
+					dynamic_pointer_cast<StringField>(_fields[i])->getValue(),Type::STRING_LEN));
+			}
 		}
-		throw "no such element";
 	}
 }
