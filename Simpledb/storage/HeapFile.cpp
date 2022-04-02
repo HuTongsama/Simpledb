@@ -56,13 +56,14 @@ namespace Simpledb {
 		size_t pageNum = pageSize == 0 ? 0 : fileSize / pageSize;
 		return pageNum;
 	}
-	list<shared_ptr<Page>> HeapFile::insertTuple(const TransactionId& tid, const Tuple& t)
+	vector<shared_ptr<Page>> HeapFile::insertTuple(const TransactionId& tid, shared_ptr<Tuple> t)
 	{
-		return list<shared_ptr<Page>>();
+		
+		return vector<shared_ptr<Page>>();
 	}
-	list<shared_ptr<Page>> HeapFile::deleteTuple(const TransactionId& tid, const Tuple& t)
+	vector<shared_ptr<Page>> HeapFile::deleteTuple(const TransactionId& tid, shared_ptr<Tuple> t)
 	{
-		return list<shared_ptr<Page>>();
+		return vector<shared_ptr<Page>>();
 	}
 	shared_ptr<DbFileIterator> HeapFile::iterator(shared_ptr<TransactionId> tid)
 	{
@@ -102,6 +103,9 @@ namespace Simpledb {
 			return &(_iter->next());
 		}
 		else {
+			if (_iter != nullptr) {
+				_iter->close();
+			}
 			readNextPage();
 			if (_iter == nullptr) {
 				return nullptr;
@@ -121,6 +125,7 @@ namespace Simpledb {
 			(Database::getBufferPool()->getPage(_tid, pid, Permissions::READ_WRITE));
 		if (_curPage != nullptr) {
 			_iter = _curPage->iterator();
+			_iter->open();
 			_pageNo++;
 		}
 		else {

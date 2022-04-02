@@ -2,20 +2,13 @@
 #include"Page.h"
 #include"HeapPageId.h"
 #include"Tuple.h"
+#include"TupleIterator.h"
 #include"Common.h"
 #include"DataStream.h"
 #include<mutex>
 namespace Simpledb {
 	class HeapPage : public Page {
 	public:
-        class HeapPageIter : public Iterator<Tuple> {
-        public:
-            HeapPageIter(HeapPage* page) :_page(page) {}
-            bool hasNext()override;
-            Tuple& next()override;
-        private:
-            HeapPage* _page;
-        };
         /**
          * Create a HeapPage from a set of bytes of data read from disk.
          * The format of a HeapPage is a set of header bytes indicating
@@ -81,15 +74,15 @@ namespace Simpledb {
          *         already empty.
          * @param t The tuple to delete
          */
-        void deleteTuple(const Tuple& t);
+        void deleteTuple(shared_ptr<Tuple> t);
         /**
-         * Adds the specified tuple to the page;  the tuple should be updated to reflect 
-         * that it is now stored on this page.
-         * @throws DbException if the page is full (no empty slots) or tupledesc
+         * Adds the specified tuple to the page; the tuple should be updated to reflect 
+         * that it is now stored on this page. 
+         * @throws DbException if the page is full (no empty slots) or tupledesc 
          *         is mismatch.
          * @param t The tuple to add.
          */
-        void insertTuple(const Tuple& t);
+        void insertTuple(shared_ptr<Tuple> t);
         /**
          * Returns the number of empty slots on this page.
          */
@@ -102,7 +95,7 @@ namespace Simpledb {
          * @return an iterator over all tuples on this page (calling remove on this iterator is invalid)
          * (note that this iterator shouldn't return tuples in empty slots!)
          */
-        shared_ptr<HeapPageIter> iterator();
+        shared_ptr<TupleIterator> iterator();
     private:
         /** Retrieve the number of tuples on this page.
             @return the number of tuples on this page

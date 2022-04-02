@@ -20,7 +20,8 @@ namespace Simpledb {
         bool hasNext()override {
             if (!_open)
                 return false;
-            return _position < _tuples.size();
+            return (_position < _tuples.size()
+                && _tuples[_position] != nullptr);
         }
         Tuple& next()override {
             if (!_open) {

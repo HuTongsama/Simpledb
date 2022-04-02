@@ -189,11 +189,11 @@ public:
             throw runtime_error("not implemented");
         }
 
-        list<shared_ptr<Page>> insertTuple(const TransactionId& tid,const Tuple& t)override {
+        vector<shared_ptr<Page>> insertTuple(const TransactionId& tid,shared_ptr<Tuple> t)override {
             throw runtime_error("not implemented");
         }
 
-        list<shared_ptr<Page>> deleteTuple(const TransactionId& tid,const Tuple& t)override {
+        vector<shared_ptr<Page>> deleteTuple(const TransactionId& tid,shared_ptr<Tuple> t)override {
             throw runtime_error("not implemented");
         }
 

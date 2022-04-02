@@ -62,6 +62,7 @@ namespace Simpledb {
 		* */
 		void resetTupleDesc(shared_ptr<TupleDesc> td);
 		void copyTo(Tuple& dest);
+		bool equals(Tuple& t);
 	private:
 		static long _serialVersionUID;
 		shared_ptr<TupleDesc> _pTd;

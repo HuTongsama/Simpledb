@@ -6,7 +6,7 @@ namespace Simpledb {
 	{
         // check that all tuples are the right TupleDesc
         for (auto t : _tuples) {
-            if (!t->getTupleDesc()->equals(*td))
+            if (t != nullptr && !t->getTupleDesc()->equals(*td))
                 throw runtime_error("incompatible tuple in tuple set");
         }
 	}

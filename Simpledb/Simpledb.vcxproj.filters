@@ -277,8 +277,5 @@
     <ClCompile Include="execution\Delete.cpp">
       <Filter>execution</Filter>
     </ClCompile>
-    <ClCompile Include="include\Delete.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

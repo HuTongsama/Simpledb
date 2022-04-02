@@ -30,7 +30,7 @@ namespace Simpledb {
 			shared_ptr<TransactionId> _tid;
 			size_t _pageNo;
 			size_t _pageCount;
-			shared_ptr<HeapPage::HeapPageIter> _iter;
+			shared_ptr<TupleIterator> _iter;
 		};
 		/**
 		* Constructs a heap file backed by the specified file.
@@ -66,8 +66,8 @@ namespace Simpledb {
 		* Returns the number of pages in this HeapFile.
 		*/
 		size_t numPages();
-		list<shared_ptr<Page>> insertTuple(const TransactionId& tid, const Tuple& t)override;
-		list<shared_ptr<Page>> deleteTuple(const TransactionId& tid, const Tuple& t)override;
+		vector<shared_ptr<Page>> insertTuple(const TransactionId& tid, shared_ptr<Tuple> t)override;
+		vector<shared_ptr<Page>> deleteTuple(const TransactionId& tid, shared_ptr<Tuple> t)override;
 		shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid)override;
 	private:
 		size_t getPageOffset(size_t pageNo);

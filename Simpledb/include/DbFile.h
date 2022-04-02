@@ -4,7 +4,7 @@
 #include"Tuple.h"
 #include"DbFileIterator.h"
 #include"File.h"
-#include<list>
+#include<vector>
 #include<stdio.h>
 using namespace std;
 namespace Simpledb {	
@@ -41,11 +41,11 @@ namespace Simpledb {
 		* @param tid The transaction performing the update
 		* @param t The tuple to add.  This tuple should be updated to reflect that
 		*          it is now stored in this file.
-		* @return a list contain the pages that were modified,
-		*		  empty list if the tuple cannot be added,
+		* @return a vector contain the pages that were modified,
+		*		  empty vector if the tuple cannot be added,
 		*         empty if the needed file can't be read/written
 		*/
-		virtual list<shared_ptr<Page>> insertTuple(const TransactionId& tid,const Tuple& t) = 0;
+		virtual vector<shared_ptr<Page>> insertTuple(const TransactionId& tid,shared_ptr<Tuple> t) = 0;
 		/**
 		* Removes the specified tuple from the file on behalf of the specified
 		* transaction.
@@ -55,11 +55,11 @@ namespace Simpledb {
 		* @param tid The transaction performing the update
 		* @param t The tuple to delete.  This tuple should be updated to reflect that
 		*          it is no longer stored on any page.
-		* @return a list contain the pages that were modified,
-		*		  empty list if the tuple cannot be deleted or is not a member
-		*   of the file
+		* @return a vector contain the pages that were modified,
+		*		  empty vector if the tuple cannot be deleted or is not a member
+		*		  of the file
 		*/
-		virtual list<shared_ptr<Page>> deleteTuple(const TransactionId& tid, const Tuple& t) = 0;
+		virtual vector<shared_ptr<Page>> deleteTuple(const TransactionId& tid, shared_ptr<Tuple> t) = 0;
 		/**
 		* Returns an iterator over all the tuples stored in this DbFile. The
 		* iterator must use {@link BufferPool#getPage}, rather than

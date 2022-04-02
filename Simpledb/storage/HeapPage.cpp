@@ -78,11 +78,32 @@ namespace Simpledb {
 		size_t sz = BufferPool::getPageSize();
 		return vector<unsigned char>(sz,0);
 	}
-	void HeapPage::deleteTuple(const Tuple& t)
+	void HeapPage::deleteTuple(shared_ptr<Tuple> t)
 	{
+		shared_ptr<RecordId> record = t->getRecordId();
+		int slotId = record->getTupleNumber();
+		if (!isSlotUsed(slotId)) {
+			throw runtime_error("page slot is already empty");
+		}
+		shared_ptr<Tuple> t1 = _tuples[slotId];
+		if (!t1->equals(*t)) {
+			throw runtime_error("tuple does not exist");
+		}
+		_tuples[slotId] = nullptr;
+		markSlotUsed(slotId, false);
 	}
-	void HeapPage::insertTuple(const Tuple& t)
+	void HeapPage::insertTuple(shared_ptr<Tuple> t)
 	{
+		if (!_td->equals(*t->getTupleDesc())) {
+			throw runtime_error("TupleDesc does not match");
+		}
+		for (int slotId = 0; slotId < _numSlots; ++slotId) {
+			if (isSlotUsed(slotId))
+				continue;
+			t->setRecordId(make_shared<RecordId>(_pid, slotId));
+			_tuples[slotId] = t;
+			markSlotUsed(slotId, true);
+		}
 	}
 	size_t HeapPage::getNumEmptySlots()
 	{
@@ -115,9 +136,9 @@ namespace Simpledb {
 		bool result = (((b >> bitPos) & 0x1) > 0);
 		return result;
 	}
-	shared_ptr<HeapPage::HeapPageIter> HeapPage::iterator()
+	shared_ptr<TupleIterator> HeapPage::iterator()
 	{
-		return make_shared<HeapPageIter>(this);
+		return make_shared<TupleIterator>(_td, _tuples);
 	}
 	int HeapPage::getNumTuples()
 	{
@@ -178,19 +199,18 @@ namespace Simpledb {
 	}
 	void HeapPage::markSlotUsed(int i, bool value)
 	{
-	}
-	bool HeapPage::HeapPageIter::hasNext()
-	{
-		if (_position >= _page->_tuples.size()
-			|| _page->_tuples[_position] == nullptr) {
-			return false;
+		size_t bytePos = i / 8;
+		size_t bitPos = i % 8;
+
+		char b = _header[bytePos];
+		char mask = 0x1 << bitPos;
+		if (value) {
+			b = (b | mask);
 		}
-		return true;
-	}
-	Tuple& HeapPage::HeapPageIter::next()
-	{
-		Tuple& t = *(_page->_tuples[_position]);
-		_position++;
-		return t;
+		else {
+			mask = ~mask;
+			b = (b & mask);
+		}
+		_header[bytePos] = b;
 	}
 }

@@ -78,4 +78,17 @@ namespace Simpledb
 			}
 		}
 	}
+	bool Tuple::equals(Tuple& t)
+	{
+		if (t.getTupleDesc()->equals(*_pTd))
+			return false;
+		int numFields = _fields.size();
+		for (int id = 0; id < numFields; ++id) {
+			auto f1 = t.getField(id);
+			auto f2 = _fields[id];
+			if (f1->equals(*f2))
+				return false;
+		}
+		return true;
+	}
 }

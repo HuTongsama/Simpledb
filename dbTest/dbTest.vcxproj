@@ -40,6 +40,8 @@
     <ClInclude Include="HeapFileReadTest.h" />
     <ClInclude Include="HeapPageIdTest.h" />
     <ClInclude Include="HeapPageReadTest.h" />
+    <ClInclude Include="HeapPageTestBase.h" />
+    <ClInclude Include="HeapPageWriteTest.h" />
     <ClInclude Include="InsertTest.h" />
     <ClInclude Include="IntegerAggregatorTest.h" />
     <ClInclude Include="JoinPredicateTest.h" />
