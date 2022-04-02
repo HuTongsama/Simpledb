@@ -3,6 +3,7 @@
 #include<string>
 #include<vector>
 #include<stdexcept>
+#include<memory>
 using namespace std;
 namespace Simpledb {
 
@@ -34,6 +35,8 @@ namespace Simpledb {
 		//clear
 		void reset();
 		void close();
+
+		static shared_ptr<File> createTempFile();
 	private:
 		template<typename T>
 		T readBaseType();

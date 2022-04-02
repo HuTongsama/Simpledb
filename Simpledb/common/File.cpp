@@ -130,5 +130,12 @@ namespace Simpledb {
 	{
 		fclose(_pFile);
 	}
+	shared_ptr<File> File::createTempFile()
+	{
+		char nameBuf[L_tmpnam_s] = { 0 };
+		tmpnam_s(nameBuf);
+		shared_ptr<File> temp = make_shared<File>(nameBuf);
+		return temp;
+	}
 }
 

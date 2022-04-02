@@ -5,6 +5,8 @@
 #include"OpIterator.h"
 #include"TupleIterator.h"
 #include"Utility.h"
+#include"HeapFile.h"
+#include"File.h"
 using namespace Simpledb;
 class TestUtil {
 public:
@@ -270,5 +272,37 @@ public:
         int _high;
         int _width;
         shared_ptr<Tuple> _t;
+    };
+
+    /** JUnit fixture that creates a heap file and cleans it up afterward. */
+    class CreateHeapFile {
+    protected:
+        CreateHeapFile() {
+            try
+            {
+                _emptyFile = File::createTempFile();
+            }
+            catch (const std::exception&)
+            {
+                throw runtime_error("createHeapFile failed");
+            }
+            _emptyFile->deleteOnExit();
+        }
+
+        void setUp() {
+            try
+            {
+                _empty = Utility::createEmptyHeapFile(_emptyFile->fileName(), 2);
+            }
+            catch (const std::exception&)
+            {
+                throw runtime_error("createHeapFile setUp failed");
+            }
+
+        }
+
+        shared_ptr<HeapFile> _empty;
+    private:
+        shared_ptr<File> _emptyFile;
     };
 };

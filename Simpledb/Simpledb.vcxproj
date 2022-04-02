@@ -157,6 +157,7 @@
     <ClInclude Include="include\DataStream.h" />
     <ClInclude Include="include\DbFile.h" />
     <ClInclude Include="include\DbFileIterator.h" />
+    <ClInclude Include="include\Delete.h" />
     <ClInclude Include="Include\Field.h" />
     <ClInclude Include="include\BufferPool.h" />
     <ClInclude Include="include\File.h" />
@@ -165,6 +166,7 @@
     <ClInclude Include="include\HeapFileEncoder.h" />
     <ClInclude Include="include\HeapPage.h" />
     <ClInclude Include="include\HeapPageId.h" />
+    <ClInclude Include="include\Insert.h" />
     <ClInclude Include="include\IntegerAggregator.h" />
     <ClInclude Include="Include\IntField.h" />
     <ClInclude Include="include\Iterator.h" />
@@ -204,13 +206,16 @@
     <ClCompile Include="execution\Aggregate.cpp" />
     <ClCompile Include="execution\Aggregator.cpp" />
     <ClCompile Include="execution\Filter.cpp" />
+    <ClCompile Include="execution\Insert.cpp" />
     <ClCompile Include="execution\IntegerAggregator.cpp" />
     <ClCompile Include="execution\Join.cpp" />
     <ClCompile Include="execution\JoinPredicate.cpp" />
     <ClCompile Include="execution\Operator.cpp" />
     <ClCompile Include="execution\Predicate.cpp" />
     <ClCompile Include="execution\SeqScan.cpp" />
+    <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
+    <ClCompile Include="include\Delete.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />

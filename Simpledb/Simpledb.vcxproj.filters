@@ -161,6 +161,12 @@
     <ClInclude Include="include\StringAggregator.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Insert.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Delete.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -264,6 +270,15 @@
     </ClCompile>
     <ClCompile Include="execution\Aggregator.cpp">
       <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Insert.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Delete.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="include\Delete.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

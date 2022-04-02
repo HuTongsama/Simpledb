@@ -40,6 +40,7 @@
     <ClInclude Include="HeapFileReadTest.h" />
     <ClInclude Include="HeapPageIdTest.h" />
     <ClInclude Include="HeapPageReadTest.h" />
+    <ClInclude Include="InsertTest.h" />
     <ClInclude Include="IntegerAggregatorTest.h" />
     <ClInclude Include="JoinPredicateTest.h" />
     <ClInclude Include="JoinTest.h" />
@@ -50,7 +51,9 @@
     <ClInclude Include="SimpleDbTestBase.h" />
     <ClInclude Include="StringAggregatorTest.h" />
     <ClInclude Include="SysAggregateTest.h" />
+    <ClInclude Include="SysDeleteTest.h" />
     <ClInclude Include="SysFilterTest.h" />
+    <ClInclude Include="SysInsertTest.h" />
     <ClInclude Include="SysJoinTest.h" />
     <ClInclude Include="SystemTestUtil.h" />
     <ClInclude Include="TestUtil.h" />

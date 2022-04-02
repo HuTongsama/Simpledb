@@ -16,7 +16,7 @@ protected:
 		shared_ptr<HeapFile> table,
 		shared_ptr<TransactionId> tid,
 		shared_ptr<Predicate> predicate) = 0;
-	void validateAfter(shared_ptr<HeapFile> table) {}
+	virtual void validateAfter(shared_ptr<HeapFile> table) {}
 
 	int runTransactionForPredicate(shared_ptr<HeapFile> table, shared_ptr<Predicate> predicate){
 		shared_ptr<TransactionId> tid = make_shared<TransactionId>();

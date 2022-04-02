@@ -23,7 +23,7 @@ class SystemTestUtil {
 private:
     static int MAX_RAND_VALUE;
 public:
-    
+    static shared_ptr<TupleDesc> SINGLE_INT_DESCRIPTOR;
     /** @param columnSpecification Mapping between column index and value. */
     static shared_ptr<HeapFile> createRandomHeapFile(
         int columns, int rows,
@@ -79,9 +79,7 @@ public:
         }
 
         // Convert the tuples list to a heap file and open it
-        char nameBuf[L_tmpnam_s] = { 0 };
-        tmpnam_s(nameBuf);
-        shared_ptr<File> temp = make_shared<File>(nameBuf);
+        shared_ptr<File> temp = File::createTempFile();
         temp->deleteOnExit();
         HeapFileEncoder::convert(tuples, *temp, BufferPool::getPageSize(), columns);
         return temp;
