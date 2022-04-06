@@ -21,3 +21,4 @@
 #include "StringAggregatorTest.h"
 #include "AggregateTest.h"
 #include "SysAggregateTest.h"
+#include "HeapPageWriteTest.h"

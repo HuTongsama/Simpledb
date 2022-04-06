@@ -35,7 +35,7 @@ namespace Simpledb
 		/**
 		* Set the dirty state of this page as dirtied by a particular transaction
 		*/
-		virtual void markDirty(bool dirty, const TransactionId& tid) = 0;
+		virtual void markDirty(bool dirty, shared_ptr<TransactionId> tid) = 0;
 		/**
 		* Generates a byte array representing the contents of this page.
 		* Used to serialize this page to disk.

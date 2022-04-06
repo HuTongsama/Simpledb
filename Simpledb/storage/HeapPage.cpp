@@ -2,7 +2,7 @@
 #include"Database.h"
 namespace Simpledb {
 	HeapPage::HeapPage(shared_ptr<HeapPageId> id, const vector<unsigned char>& data)
-		:_pid(id)
+		:_pid(id), _tid(nullptr)
 	{
 		_td = Database::getCatalog()->getTupleDesc(_pid->getTableId());
 		_numSlots = getNumTuples();
@@ -22,10 +22,16 @@ namespace Simpledb {
 	}
 	shared_ptr<TransactionId> HeapPage::isDirty()const
 	{
-		return nullptr;
+		return _tid;
 	}
-	void HeapPage::markDirty(bool dirty, const TransactionId& tid)
+	void HeapPage::markDirty(bool dirty, shared_ptr<TransactionId> tid)
 	{
+		if (dirty) {
+			_tid = tid;
+		}
+		else {
+			_tid = nullptr;
+		}
 	}
 	vector<unsigned char> HeapPage::getPageData()
 	{
@@ -97,12 +103,16 @@ namespace Simpledb {
 		if (!_td->equals(*t->getTupleDesc())) {
 			throw runtime_error("TupleDesc does not match");
 		}
+		if (0 == getNumEmptySlots()) {
+			throw runtime_error("Page is full");
+		}
 		for (int slotId = 0; slotId < _numSlots; ++slotId) {
 			if (isSlotUsed(slotId))
 				continue;
 			t->setRecordId(make_shared<RecordId>(_pid, slotId));
 			_tuples[slotId] = t;
 			markSlotUsed(slotId, true);
+			break;
 		}
 	}
 	size_t HeapPage::getNumEmptySlots()
@@ -113,15 +123,14 @@ namespace Simpledb {
 				count += 8;
 			}
 			else if (byte == 0) {
-				break;
+				continue;
 			}
 			else {
-				char c = byte;
-				while (c > 0) {
-					count++;
-					c <<= 1;
+				unsigned char c = byte;
+				for (int i = 0; i < 8; ++i) {
+					if (((c >> i) & 0x1) > 0)
+						count++;
 				}
-				break;
 			}
 		}
 		size_t result = _numSlots - count;

@@ -9,12 +9,12 @@ class HeapPageWriteTest : public HeapPageTestBase {};
 TEST_F(HeapPageWriteTest, TestDirty) {
     shared_ptr<TransactionId> tid = make_shared<TransactionId>();
     shared_ptr<HeapPage> page = make_shared<HeapPage>(_pid, EXAMPLE_DATA);
-    page->markDirty(true, *tid);
+    page->markDirty(true, tid);
     shared_ptr<TransactionId> dirtier = page->isDirty();
     EXPECT_TRUE(dirtier != nullptr);
     EXPECT_TRUE(dirtier->equals(*tid));
 
-    page->markDirty(false, *tid);
+    page->markDirty(false, tid);
     dirtier = page->isDirty();
     EXPECT_FALSE(dirtier != nullptr);
 }
@@ -36,6 +36,7 @@ TEST_F(HeapPageWriteTest, AddTuple) {
         // on the page
         shared_ptr<TupleIterator> it = page->iterator();
         bool found = false;
+        it->open();
         while (it->hasNext()) {
             Tuple& tup = it->next();
             if (TestUtil::compareTuples(*addition, tup)) {
@@ -45,6 +46,7 @@ TEST_F(HeapPageWriteTest, AddTuple) {
                 break;
             }
         }
+        it->close();
         EXPECT_TRUE(found);
     }
     // now, the page should be full.
@@ -68,16 +70,17 @@ TEST_F(HeapPageWriteTest, DeleteTuple) {
 
     // first, build a list of the tuples on the page.
     shared_ptr<TupleIterator> it = page->iterator();
-    vector<Tuple&> tuples;
+    vector<Tuple*> tuples;
+    it->open();
     while (it->hasNext())
-        tuples.push_back(it->next());
-    Tuple& first = tuples.front();
+        tuples.push_back(&(it->next()));
+    Tuple& first = *tuples.front();
 
     // now, delete them one-by-one from both the front and the end.
     int deleted = 0;
     while (tuples.size() > 0) {
-        Tuple& front = tuples.front();
-        Tuple& back = tuples.back();
+        Tuple& front = *tuples.front();
+        Tuple& back = *tuples.back();
         tuples.erase(tuples.begin());
         tuples.erase(tuples.begin() + tuples.size() - 1);
         page->deleteTuple(front);
@@ -86,4 +89,5 @@ TEST_F(HeapPageWriteTest, DeleteTuple) {
         EXPECT_EQ(free + deleted, page->getNumEmptySlots());
     }
     EXPECT_THROW(page->deleteTuple(first), runtime_error);
+    it->close();
 }

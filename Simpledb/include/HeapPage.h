@@ -33,14 +33,14 @@ namespace Simpledb {
          */
         shared_ptr<PageId> getId()const override;
         /**
-        * Returns the tid of the transaction that last dirtied this page, or null if the page is not dirty
+        * Returns the tid of the transaction that last dirtied this page, or nullptr if the page is not dirty
         */
         shared_ptr<TransactionId> isDirty()const override;
         /**
         * Marks this page as dirty/not dirty and record that transaction
         * that did the dirtying
         */
-        void markDirty(bool dirty, const TransactionId& tid)override;
+        void markDirty(bool dirty, shared_ptr<TransactionId> tid)override;
         /**
          * Generates a byte array representing the contents of this page.
          * Used to serialize this page to disk.
@@ -122,5 +122,6 @@ namespace Simpledb {
         int _numSlots;
         vector<unsigned char> _oldData;
         mutex _oldDataLock;
+        shared_ptr<TransactionId> _tid;
 	};
 }
