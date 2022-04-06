@@ -189,11 +189,11 @@ public:
             throw runtime_error("not implemented");
         }
 
-        vector<shared_ptr<Page>> insertTuple(const TransactionId& tid,shared_ptr<Tuple> t)override {
+        vector<shared_ptr<Page>> insertTuple(shared_ptr<TransactionId> tid,shared_ptr<Tuple> t)override {
             throw runtime_error("not implemented");
         }
 
-        vector<shared_ptr<Page>> deleteTuple(const TransactionId& tid,shared_ptr<Tuple> t)override {
+        vector<shared_ptr<Page>> deleteTuple(shared_ptr<TransactionId> tid,Tuple& t)override {
             throw runtime_error("not implemented");
         }
 
@@ -289,7 +289,7 @@ public:
             _emptyFile->deleteOnExit();
         }
 
-        void setUp() {
+        void SetUp() {
             try
             {
                 _empty = Utility::createEmptyHeapFile(_emptyFile->fileName(), 2);

@@ -74,7 +74,7 @@ namespace Simpledb {
          *         already empty.
          * @param t The tuple to delete
          */
-        void deleteTuple(shared_ptr<Tuple> t);
+        void deleteTuple(Tuple& t);
         /**
          * Adds the specified tuple to the page; the tuple should be updated to reflect 
          * that it is now stored on this page. 

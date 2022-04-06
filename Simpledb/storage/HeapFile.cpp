@@ -56,12 +56,11 @@ namespace Simpledb {
 		size_t pageNum = pageSize == 0 ? 0 : fileSize / pageSize;
 		return pageNum;
 	}
-	vector<shared_ptr<Page>> HeapFile::insertTuple(const TransactionId& tid, shared_ptr<Tuple> t)
-	{
-		
+	vector<shared_ptr<Page>> HeapFile::insertTuple(shared_ptr<TransactionId> tid, shared_ptr<Tuple> t)
+	{	
 		return vector<shared_ptr<Page>>();
 	}
-	vector<shared_ptr<Page>> HeapFile::deleteTuple(const TransactionId& tid, shared_ptr<Tuple> t)
+	vector<shared_ptr<Page>> HeapFile::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
 		return vector<shared_ptr<Page>>();
 	}

@@ -78,15 +78,15 @@ namespace Simpledb {
 		size_t sz = BufferPool::getPageSize();
 		return vector<unsigned char>(sz,0);
 	}
-	void HeapPage::deleteTuple(shared_ptr<Tuple> t)
+	void HeapPage::deleteTuple(Tuple& t)
 	{
-		shared_ptr<RecordId> record = t->getRecordId();
+		shared_ptr<RecordId> record = t.getRecordId();
 		int slotId = record->getTupleNumber();
 		if (!isSlotUsed(slotId)) {
 			throw runtime_error("page slot is already empty");
 		}
 		shared_ptr<Tuple> t1 = _tuples[slotId];
-		if (!t1->equals(*t)) {
+		if (!t1->equals(t)) {
 			throw runtime_error("tuple does not exist");
 		}
 		_tuples[slotId] = nullptr;

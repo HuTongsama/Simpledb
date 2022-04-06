@@ -45,7 +45,7 @@ namespace Simpledb {
 		*		  empty vector if the tuple cannot be added,
 		*         empty if the needed file can't be read/written
 		*/
-		virtual vector<shared_ptr<Page>> insertTuple(const TransactionId& tid,shared_ptr<Tuple> t) = 0;
+		virtual vector<shared_ptr<Page>> insertTuple(shared_ptr<TransactionId> tid,shared_ptr<Tuple> t) = 0;
 		/**
 		* Removes the specified tuple from the file on behalf of the specified
 		* transaction.
@@ -59,7 +59,7 @@ namespace Simpledb {
 		*		  empty vector if the tuple cannot be deleted or is not a member
 		*		  of the file
 		*/
-		virtual vector<shared_ptr<Page>> deleteTuple(const TransactionId& tid, shared_ptr<Tuple> t) = 0;
+		virtual vector<shared_ptr<Page>> deleteTuple(shared_ptr<TransactionId> tid, Tuple& t) = 0;
 		/**
 		* Returns an iterator over all the tuples stored in this DbFile. The
 		* iterator must use {@link BufferPool#getPage}, rather than

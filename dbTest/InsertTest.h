@@ -7,7 +7,7 @@ class InsertTest :public SimpleDbTestBase, public TestUtil::CreateHeapFile {
 protected:
 	void SetUp()override {
 		SimpleDbTestBase::SetUp();
-		TestUtil::CreateHeapFile::setUp();
+		TestUtil::CreateHeapFile::SetUp();
 
         _scan1 = TestUtil::createTupleList(2,
             vector<int> { 1, 2,

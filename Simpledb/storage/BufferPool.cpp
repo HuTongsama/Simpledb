@@ -42,10 +42,10 @@ namespace Simpledb
 	void BufferPool::transactionComplete(const TransactionId& tid, bool commit)
 	{
 	}
-	void BufferPool::insertTuple(const TransactionId& tid, int tableId, const Tuple& t)
+	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, int tableId, shared_ptr<Tuple> t)
 	{
 	}
-	void BufferPool::deleteTuple(const TransactionId& tid, const Tuple& t)
+	void BufferPool::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
 	}
 	void BufferPool::flushAllPages()

@@ -34,10 +34,12 @@
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
     <ClInclude Include="AggregateTest.h" />
+    <ClInclude Include="BufferPoolWriteTest.h" />
     <ClInclude Include="CatalogTest.h" />
     <ClInclude Include="FilterBase.h" />
     <ClInclude Include="FilterTest.h" />
     <ClInclude Include="HeapFileReadTest.h" />
+    <ClInclude Include="HeapFileWriteTest.h" />
     <ClInclude Include="HeapPageIdTest.h" />
     <ClInclude Include="HeapPageReadTest.h" />
     <ClInclude Include="HeapPageTestBase.h" />
