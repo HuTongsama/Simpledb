@@ -22,3 +22,4 @@
 #include "AggregateTest.h"
 #include "SysAggregateTest.h"
 #include "HeapPageWriteTest.h"
+#include "HeapFileWriteTest.h"

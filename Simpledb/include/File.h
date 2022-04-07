@@ -9,7 +9,7 @@ namespace Simpledb {
 
 	class File : public Noncopyable {
 	public:
-		File(const string& fileName,const string& mode = "ab+");
+		File(const string& fileName);
 		//construct from tmpfile
 		File(FILE* tmpFile);
 		~File();

@@ -68,7 +68,7 @@ namespace Simpledb {
          */
         static vector<unsigned char> createEmptyPageData();
         /**
-         * Delete the specified tuple from the page; the corresponding header bit should be updated to reflect
+         * Delete the specified tuple from the page; the corresponding header bit should be updated to reflect 
          *   that it is no longer stored on any page.
          * @throws DbException if this tuple is not on this page, or tuple slot is
          *         already empty.

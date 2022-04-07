@@ -2,11 +2,16 @@
 #include<stdexcept>
 #pragma warning(disable:4996)
 namespace Simpledb {
-	File::File(const string& fileName, const string& mode)
+	File::File(const string& fileName)
 	{
 		_fileName = fileName;
-		_mode = mode;
-		_pFile = fopen(fileName.c_str(), mode.c_str());
+		_mode = "rb+";
+		_pFile = fopen(fileName.c_str(), _mode.c_str());
+		if (_pFile == nullptr) {
+			_pFile = fopen(fileName.c_str(), "w");
+			fclose(_pFile);
+			_pFile = fopen(fileName.c_str(), _mode.c_str());
+		}
 	}
 	File::File(FILE* tmpFile)
 	{

@@ -39,8 +39,6 @@ namespace Simpledb {
 		*/
 		HeapFile(shared_ptr<File> f, shared_ptr<TupleDesc> td);
 		/**
-		* Returns the File backing this HeapFile on disk.
-		*
 		* @return the File backing this HeapFile on disk.
 		*/
 		shared_ptr<File> getFile();

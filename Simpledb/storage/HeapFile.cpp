@@ -58,11 +58,55 @@ namespace Simpledb {
 	}
 	vector<shared_ptr<Page>> HeapFile::insertTuple(shared_ptr<TransactionId> tid, shared_ptr<Tuple> t)
 	{	
-		return vector<shared_ptr<Page>>();
+		vector<shared_ptr<Page>> pages;
+		if (nullptr == t)
+			return pages;
+		size_t curPageNum = numPages();
+		size_t num = 0;
+		size_t tableId = getId();
+		while (true) {
+			shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(tableId, num);
+			shared_ptr<HeapPage> hp = dynamic_pointer_cast<HeapPage>(
+				Database::getBufferPool()->getPage(tid, pid, Permissions::READ_WRITE));
+
+			if (hp->getNumEmptySlots() > 0) {
+				hp->insertTuple(t);
+				pages.push_back(hp);
+				break;
+			}
+			else {
+				num++;
+				if (num >= curPageNum) {
+					size_t byteCount = BufferPool::getPageSize();
+					vector<unsigned char> bytes(byteCount, 0);
+					_file->writeBytes(bytes.data(), byteCount);
+				}
+			}
+		}
+	
+		return pages;
 	}
 	vector<shared_ptr<Page>> HeapFile::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
-		return vector<shared_ptr<Page>>();
+		vector<shared_ptr<Page>> pages;
+		size_t num = numPages();
+		size_t tableId = getId();
+		for (int i = 0; i < num; ++i) {
+			shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(tableId, i);
+			shared_ptr<HeapPage> hp = dynamic_pointer_cast<HeapPage>(
+				Database::getBufferPool()->getPage(tid, pid, Permissions::READ_WRITE));
+			try
+			{
+				hp->deleteTuple(t);
+				pages.push_back(hp);
+				break;
+			}
+			catch (const std::exception&)
+			{
+				continue;
+			}
+		}
+		return pages;
 	}
 	shared_ptr<DbFileIterator> HeapFile::iterator(shared_ptr<TransactionId> tid)
 	{

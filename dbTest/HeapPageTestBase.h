@@ -22,7 +22,7 @@ protected:
         // Convert it to a HeapFile and read in the bytes
         fs::path p = fs::current_path();
         string filename = p.string() + "\\" + "table.dat";
-        File temp(filename.c_str(), "wb+");
+        File temp(filename.c_str());
         temp.deleteOnExit();
         HeapFileEncoder::convert(table, temp, BufferPool::getPageSize(), 2);
         EXAMPLE_DATA = TestUtil::readFileBytes(temp.fileName());

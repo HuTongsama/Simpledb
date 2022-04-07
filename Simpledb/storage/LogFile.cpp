@@ -178,7 +178,7 @@ namespace Simpledb {
         string newLogName("logtmp");
         newLogName += ctime(&time);
         //FILE* logNew = fopen(newLogName.c_str(), "ab+");
-        File logNew(newLogName, "ab+");
+        File logNew(newLogName);
         logNew.seek(0);
         logNew.writeInt64((cpLoc - minLogRecord) + LONG_SIZE);
         // we can truncate everything before minLogRecord

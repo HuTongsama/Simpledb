@@ -168,7 +168,7 @@ namespace Simpledb {
                     npages++;
                 }
             }
-            outFile.seek(0);
+            outFile.seek(0);      
             return true;
         }
         catch (const std::exception)
