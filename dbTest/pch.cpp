@@ -26,4 +26,4 @@
 #include "BufferPoolWriteTest.h"
 #include "InsertTest.h"
 #include "SysInsertTest.h"
-//#include "SysDeleteTest.h"
+#include "SysDeleteTest.h"

@@ -51,11 +51,12 @@ namespace Simpledb {
 	{
 		shared_ptr<OpIterator> iter = _children[0];
 		int count = 0;
+		BufferPool* pBufferPool = Database::getBufferPool();
 		while (iter->hasNext()) {
 			Tuple& t1 = iter->next();
 			shared_ptr<Tuple> t2 = make_shared<Tuple>(_td);
 			t1.copyTo(*t2);
-			Database::getBufferPool()->insertTuple(_tid, _tableId, t2);
+			pBufferPool->insertTuple(_tid, _tableId, t2);
 			count++;
 		}
 		if (_result == nullptr) {

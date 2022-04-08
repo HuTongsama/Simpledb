@@ -39,5 +39,9 @@ namespace Simpledb {
 
     private:
         static long _serialVersionUID;
+        shared_ptr<TransactionId> _tid;
+        vector<shared_ptr<OpIterator>> _children;
+        shared_ptr<Tuple> _result;
+        shared_ptr<TupleDesc> _td;
 	};
 }
