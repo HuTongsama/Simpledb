@@ -27,7 +27,7 @@ namespace Simpledb {
     }
     bool HeapFileEncoder::convert(File& inFile, File& outFile, int npagebytes, int numFields)
     {
-        vector<shared_ptr<Type>> typeVec(numFields, Int_Type::INT_TYPE);
+        vector<shared_ptr<Type>> typeVec(numFields, Int_Type::INT_TYPE());
         return convert(inFile, outFile, npagebytes, numFields, typeVec);
     }
     bool HeapFileEncoder::convert(File& inFile, File& outFile, int npagebytes, int numFields,
@@ -91,12 +91,12 @@ namespace Simpledb {
 
                 if (c == fieldSeparator || c == '\n' || c == '\r') {
                     string s(buf, curpos);
-                    if (typeVec[fieldNo].get() == Int_Type::INT_TYPE.get()) {
+                    if (typeVec[fieldNo].get() == Int_Type::INT_TYPE().get()) {
                         string tmp = trim(s);
                         int num = atoi(tmp.c_str());
                         pPage.writeInt(num);
                     }
-                    else if (typeVec[fieldNo].get() == String_Type::STRING_TYPE.get()) {
+                    else if (typeVec[fieldNo].get() == String_Type::STRING_TYPE().get()) {
                         string tmp = trim(s);
                         int overflow = static_cast<int>(Type::STRING_LEN - tmp.length());
                         if (overflow < 0) {

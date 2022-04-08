@@ -7,7 +7,7 @@ namespace Simpledb {
 		:_tid(t), _tableId(tableId)
 	{
 		_children.push_back(child);
-		_td = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE });
+		_td = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE() });
 		shared_ptr<TupleDesc> tableTd = Database::getCatalog()->getTupleDesc(tableId);
 		if (!tableTd->equals(*(child->getTupleDesc()))) {
 			throw runtime_error("TupleDesc does not match");
@@ -58,11 +58,14 @@ namespace Simpledb {
 			Database::getBufferPool()->insertTuple(_tid, _tableId, t2);
 			count++;
 		}
-		if (count != 0) {
+		if (_result == nullptr) {
 			_result = make_shared<Tuple>(_td);
 			_result->setField(0, make_shared<IntField>(count));
 			return _result.get();
 		}
-		return nullptr;
+		else {
+			return nullptr;
+		}
+		
 	}
 }

@@ -34,7 +34,7 @@ namespace Simpledb {
 		*   key in a hash table in the BufferPool, for example.)
 		* @see BufferPool
 		*/
-		size_t hashCode() override;
+		size_t hashCode()const override;
 		/**
 		* Compares one PageId to another.
 		*
@@ -42,11 +42,11 @@ namespace Simpledb {
 		* @return true if the objects are equal (e.g., page numbers and table
 		*   ids are the same)
 		*/
-		bool equals(PageId& pId) override;
+		bool equals(const PageId& pId)const override;
 	private:
 		size_t _tableId;
 		size_t _pgNo;
-		string _combineStr;
-		size_t _hashcode;
+		mutable string _combineStr;
+		mutable size_t _hashcode;
 	};
 }

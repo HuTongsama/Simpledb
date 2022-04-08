@@ -65,22 +65,51 @@ namespace Simpledb
 				break;
 			}
 		}
-
-
 	}
 	void BufferPool::flushAllPages()
 	{
+		lock_guard<mutex> lock(_mutex);
+		for (auto& iter : _idToPage) {
+			shared_ptr<Page> p = iter.second;
+			if (p->isDirty()) {
+				flushPageInner(p);
+				p->markDirty(false, nullptr);
+			}
+		}
 	}
 	void BufferPool::discardPage(const PageId& pid)
 	{
 	}
 	void BufferPool::flushPage(const PageId& pid)
 	{
+		lock_guard<mutex> lock(_mutex);
+		flushPageInner(pid);
 	}
 	void BufferPool::flushPages(const TransactionId& tid)
 	{
 	}
 	void BufferPool::evictPage()
 	{
+	}
+	void BufferPool::flushPageInner(const PageId& pid)
+	{
+		
+		shared_ptr<Page> p = nullptr;
+		for (auto& iter : _idToPage) {
+			if (iter.second->getId()->equals(pid))
+			{
+				p = iter.second;
+				break;
+			}
+		}
+		flushPageInner(p);
+	}
+	void BufferPool::flushPageInner(shared_ptr<Page> p)
+	{
+		if (nullptr == p)
+			return;
+		size_t tableId = p->getId()->getTableId();
+		shared_ptr<DbFile> dbfile = Database::getCatalog()->getDatabaseFile(tableId);
+		dbfile->writePage(p);
 	}
 }

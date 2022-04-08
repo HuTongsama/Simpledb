@@ -9,7 +9,7 @@
 namespace Simpledb {
 	vector<shared_ptr<Type>> Utility::getTypes(int len)
 	{
-		vector<shared_ptr<Type>> result(len, Int_Type::INT_TYPE);
+		vector<shared_ptr<Type>> result(len, Int_Type::INT_TYPE());
 		return result;
 	}
 	vector<string> Utility::getStrings(int len, const string& val)

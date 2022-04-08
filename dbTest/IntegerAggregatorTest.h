@@ -58,7 +58,7 @@ protected:
  */
 TEST_F(IntegerAggregatorTest, MergeSum) {
     _scan1->open();
-    IntegerAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::SUM);
+    IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::SUM);
 
     for (auto& step : _sum) {
         agg.mergeTupleIntoGroup(_scan1->next());
@@ -73,7 +73,7 @@ TEST_F(IntegerAggregatorTest, MergeSum) {
  */
 TEST_F(IntegerAggregatorTest, MergeMin) {
     _scan1->open();
-    IntegerAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::MIN);
+    IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::MIN);
 
     for (auto& step : _min) {
         agg.mergeTupleIntoGroup(_scan1->next());
@@ -88,7 +88,7 @@ TEST_F(IntegerAggregatorTest, MergeMin) {
  */
 TEST_F(IntegerAggregatorTest, MergeMax) {
     _scan1->open();
-    IntegerAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::MAX);
+    IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::MAX);
     for (auto& step : _max) {
         agg.mergeTupleIntoGroup(_scan1->next());
         shared_ptr<OpIterator> it = agg.iterator();
@@ -102,7 +102,7 @@ TEST_F(IntegerAggregatorTest, MergeMax) {
  */
 TEST_F(IntegerAggregatorTest, MergeAvg) {
     _scan1->open();
-    IntegerAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::AVG);
+    IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::AVG);
     for (auto& step : _avg) {
         agg.mergeTupleIntoGroup(_scan1->next());
         shared_ptr<OpIterator> it = agg.iterator();
@@ -117,7 +117,7 @@ TEST_F(IntegerAggregatorTest, MergeAvg) {
 TEST_F(IntegerAggregatorTest, TestIterator) {
     // first, populate the aggregator via sum over scan1
     _scan1->open();
-    IntegerAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::SUM);
+    IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::SUM);
     try {
         while (true)
             agg.mergeTupleIntoGroup(_scan1->next());

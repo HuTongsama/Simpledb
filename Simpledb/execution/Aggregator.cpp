@@ -7,12 +7,12 @@ namespace Simpledb {
 		if (_gbfield == Aggregator::NO_GROUPING) {
 
 			_td = make_shared<TupleDesc>(
-				vector<shared_ptr<Type>>{Int_Type::INT_TYPE},
+				vector<shared_ptr<Type>>{Int_Type::INT_TYPE()},
 				vector<string>{""});
 		}
 		else {
 			_td = make_shared<TupleDesc>(
-				vector<shared_ptr<Type>>{_gbfieldtype, Int_Type::INT_TYPE},
+				vector<shared_ptr<Type>>{_gbfieldtype, Int_Type::INT_TYPE()},
 				vector<string>{"", ""});
 		}
 	}
@@ -45,7 +45,7 @@ namespace Simpledb {
 			if (_gbfield == Aggregator::NO_GROUPING) {
 				if (_td == nullptr) {
 					_td = make_shared<TupleDesc>(
-						vector<shared_ptr<Type>>{Int_Type::INT_TYPE},
+						vector<shared_ptr<Type>>{Int_Type::INT_TYPE()},
 						vector<string>{""});
 				}
 				aimTuple = make_shared<Tuple>(_td);
@@ -53,7 +53,7 @@ namespace Simpledb {
 			else {
 				if (_td == nullptr) {
 					_td = make_shared<TupleDesc>(
-						vector<shared_ptr<Type>>{Int_Type::INT_TYPE, Int_Type::INT_TYPE},
+						vector<shared_ptr<Type>>{Int_Type::INT_TYPE(), Int_Type::INT_TYPE()},
 						vector<string>{"", tup.getTupleDesc()->getFieldName(_gbfield)});
 				}
 				aimTuple = make_shared<Tuple>(_td);

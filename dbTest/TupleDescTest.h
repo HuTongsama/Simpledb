@@ -30,29 +30,29 @@ TEST_F(TupleDescTest, Combine) {
     // test td1.combine(td2)
     td3 = TupleDesc::merge(*td1, *td2);
     EXPECT_EQ(3, td3->numFields());
-    EXPECT_EQ(3 * Int_Type::INT_TYPE->getLen(), td3->getSize());
+    EXPECT_EQ(3 * Int_Type::INT_TYPE()->getLen(), td3->getSize());
     
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
+        EXPECT_EQ(Int_Type::INT_TYPE()->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td1, td2, td3));
 
     // test td2.combine(td1)
     td3 = TupleDesc::merge(*td2, *td1);
     EXPECT_EQ(3, td3->numFields());
-    EXPECT_EQ(3 * Int_Type::INT_TYPE->getLen(), td3->getSize());
+    EXPECT_EQ(3 * Int_Type::INT_TYPE()->getLen(), td3->getSize());
     
     for (int i = 0; i < 3; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
+        EXPECT_EQ(Int_Type::INT_TYPE()->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td2, td1, td3));
 
     // test td2.combine(td2)
     td3 = TupleDesc::merge(*td2, *td2);
     EXPECT_EQ(4, td3->numFields());
-    EXPECT_EQ(4 * Int_Type::INT_TYPE->getLen(), td3->getSize());
+    EXPECT_EQ(4 * Int_Type::INT_TYPE()->getLen(), td3->getSize());
     for (int i = 0; i < 4; ++i) {
-        EXPECT_EQ(Int_Type::INT_TYPE->type(), td3->getFieldType(i)->type());
+        EXPECT_EQ(Int_Type::INT_TYPE()->type(), td3->getFieldType(i)->type());
     }
     EXPECT_TRUE(combinedStringArrays(td2, td2, td3));
 }
@@ -61,7 +61,7 @@ TEST_F(TupleDescTest, GetType) {
     for (auto len : lengths) {
         shared_ptr<TupleDesc> td = Utility::getTupleDesc(len);
         for (int i = 0; i < len; ++i) {
-            EXPECT_EQ(Int_Type::INT_TYPE->type(), td->getFieldType(i)->type());
+            EXPECT_EQ(Int_Type::INT_TYPE()->type(), td->getFieldType(i)->type());
         }
     }
 }
@@ -87,7 +87,7 @@ TEST_F(TupleDescTest, GetSize) {
     vector<int> lengths{ 1,2,1000 };
     for (int len : lengths) {
         shared_ptr<TupleDesc> td = Utility::getTupleDesc(len);
-        EXPECT_EQ(len * Int_Type::INT_TYPE->getLen(), td->getSize());
+        EXPECT_EQ(len * Int_Type::INT_TYPE()->getLen(), td->getSize());
     }
 }
 TEST_F(TupleDescTest, NumFields) {
@@ -98,10 +98,10 @@ TEST_F(TupleDescTest, NumFields) {
     }
 }
 TEST_F(TupleDescTest, TestEquals) {
-    shared_ptr<TupleDesc> singleInt = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE });
-    shared_ptr<TupleDesc> singleInt2 = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE });
-    shared_ptr<TupleDesc> intString = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE, String_Type::STRING_TYPE });
-    shared_ptr<TupleDesc> intString2 = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE, String_Type::STRING_TYPE });
+    shared_ptr<TupleDesc> singleInt = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE() });
+    shared_ptr<TupleDesc> singleInt2 = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE() });
+    shared_ptr<TupleDesc> intString = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE(), String_Type::STRING_TYPE() });
+    shared_ptr<TupleDesc> intString2 = make_shared<TupleDesc>(vector<shared_ptr<Type>>{ Int_Type::INT_TYPE(), String_Type::STRING_TYPE() });
   
     EXPECT_TRUE(singleInt->equals(*singleInt));
     EXPECT_TRUE(singleInt->equals(*singleInt2));

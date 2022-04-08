@@ -8,13 +8,13 @@ protected:
 	void SetUp()override {
         _scan1 = TestUtil::createTupleList(_width1,
             vector<TestUtil::TupData>{
-                TestUtil::TupData(Int_Type::INT_TYPE,"",1), TestUtil::TupData(String_Type::STRING_TYPE, "a"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 1), TestUtil::TupData(String_Type::STRING_TYPE, "b"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 1), TestUtil::TupData(String_Type::STRING_TYPE, "c"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 3), TestUtil::TupData(String_Type::STRING_TYPE, "d"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 3), TestUtil::TupData(String_Type::STRING_TYPE, "e"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 3), TestUtil::TupData(String_Type::STRING_TYPE, "f"),
-                TestUtil::TupData(Int_Type::INT_TYPE, "", 5), TestUtil::TupData(String_Type::STRING_TYPE, "g")});
+                TestUtil::TupData(Int_Type::INT_TYPE(),"",1), TestUtil::TupData(String_Type::STRING_TYPE(), "a"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 1), TestUtil::TupData(String_Type::STRING_TYPE(), "b"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 1), TestUtil::TupData(String_Type::STRING_TYPE(), "c"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 3), TestUtil::TupData(String_Type::STRING_TYPE(), "d"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 3), TestUtil::TupData(String_Type::STRING_TYPE(), "e"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 3), TestUtil::TupData(String_Type::STRING_TYPE(), "f"),
+                TestUtil::TupData(Int_Type::INT_TYPE(), "", 5), TestUtil::TupData(String_Type::STRING_TYPE(), "g")});
 
         // verify how the results progress after a few merges
         _count = vector<vector<int>>{
@@ -36,7 +36,7 @@ protected:
    */
 TEST_F(StringAggregatorTest, MergeCount) {
     _scan1->open();
-    StringAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::COUNT);
+    StringAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::COUNT);
 
     for (auto& step : _count) {
         agg.mergeTupleIntoGroup(_scan1->next());
@@ -52,7 +52,7 @@ TEST_F(StringAggregatorTest, MergeCount) {
 TEST_F(StringAggregatorTest, TestIterator) {
     // first, populate the aggregator via sum over scan1
     _scan1->open();
-    StringAggregator agg(0, Int_Type::INT_TYPE, 1, Aggregator::Op::COUNT);
+    StringAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::COUNT);
     try
     {
         while (true)

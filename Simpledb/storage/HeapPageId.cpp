@@ -22,7 +22,7 @@ namespace Simpledb {
 	{
 		return _pgNo;
 	}
-	size_t HeapPageId::hashCode()
+	size_t HeapPageId::hashCode()const
 	{
 		if (_combineStr == "") {
 			stringstream ss;
@@ -32,11 +32,11 @@ namespace Simpledb {
 		}
 		return _hashcode;
 	}
-	bool HeapPageId::equals(PageId& pId)
+	bool HeapPageId::equals(const PageId& pId)const
 	{
 		try
 		{
-			HeapPageId& hid = dynamic_cast<HeapPageId&>(pId);
+			const HeapPageId& hid = dynamic_cast<const HeapPageId&>(pId);
 			return hashCode() == hid.hashCode();
 		}
 		catch (const std::exception&)

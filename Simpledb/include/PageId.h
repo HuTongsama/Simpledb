@@ -25,7 +25,7 @@ namespace Simpledb
 		*   key in a hash table in the BufferPool, for example.)
 		* @see BufferPool
 		*/
-		virtual size_t hashCode() = 0;
+		virtual size_t hashCode()const = 0;
 		/**
 		* Compares one PageId to another.
 		*
@@ -33,6 +33,6 @@ namespace Simpledb
 		* @return true if the objects are equal (e.g., page numbers and table
 		*   ids are the same)
 		*/
-		virtual bool equals(PageId& pId) = 0;	
+		virtual bool equals(const PageId& pId)const = 0;	
 	};
 }

@@ -147,6 +147,9 @@ namespace Simpledb {
 		void evictPage();//synchronized , not necessary for lab1
 
 	private:
+		void flushPageInner(const PageId& pid);
+		void flushPageInner(shared_ptr<Page> p);
+
 		static int _pageSize;
 		size_t _numPages;
 		size_t _curPages;

@@ -43,7 +43,10 @@ namespace Simpledb
 		string toString()override {
 			return "INT_TYPE";
 		}
-		static shared_ptr<Int_Type> INT_TYPE;
+		static shared_ptr<Int_Type> INT_TYPE() {
+			static shared_ptr<Int_Type> type(new Int_Type());
+			return type;
+		}
 	private:
 		Int_Type() = default;
 	};
@@ -57,7 +60,10 @@ namespace Simpledb
 		string toString()override {
 			return "STRING_TYPE";
 		}
-		static shared_ptr<String_Type> STRING_TYPE;
+		static shared_ptr<String_Type> STRING_TYPE() {
+			static shared_ptr<String_Type> type(new String_Type());
+			return type;
+		};
 	private:
 		String_Type() = default;
 	};

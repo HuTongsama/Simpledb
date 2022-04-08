@@ -10,7 +10,7 @@ namespace Simpledb {
 	class Utility {
 	public:
 		/**
-		* @return a Type array of length len populated with Type.INT_TYPE
+		* @return a Type array of length len populated with Type.INT_TYPE()
 		*/
 		static vector<shared_ptr<Type>> getTypes(int len);
 		/**
@@ -19,12 +19,12 @@ namespace Simpledb {
 		*/
 		static vector<string> getStrings(int len, const string& val);
 		/**
-		* @return a TupleDesc with n fields of type Type.INT_TYPE, each named
+		* @return a TupleDesc with n fields of type Type.INT_TYPE(), each named
 		* name + n (name1, name2, etc.).
 		*/
 		static shared_ptr<TupleDesc> getTupleDesc(int n, const string& name);
 		/**
-		* @return a TupleDesc with n fields of type Type.INT_TYPE
+		* @return a TupleDesc with n fields of type Type.INT_TYPE()
 		*/
 		static shared_ptr<TupleDesc> getTupleDesc(int n);
 		/**

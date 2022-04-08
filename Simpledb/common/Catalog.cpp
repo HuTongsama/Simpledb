@@ -99,10 +99,10 @@ namespace Simpledb {
                     vector<string> els2 = split(trim(e), " ");
                     names.push_back(trim(els2[0]));
                     if (equalsIgnoreCase(trim(els2[1]), "int")){
-                        types.push_back(Int_Type::INT_TYPE);
+                        types.push_back(Int_Type::INT_TYPE());
                     }
                     else if (equalsIgnoreCase(trim(els2[1]), "string")) {
-                        types.push_back(String_Type::STRING_TYPE);
+                        types.push_back(String_Type::STRING_TYPE());
                     }
                     else{
                         cout << "Unknown type " << els2[1] << endl;

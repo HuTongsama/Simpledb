@@ -42,7 +42,7 @@ namespace Simpledb
 	}
 	shared_ptr<Type> IntField::getType()const
 	{
-		return Int_Type::INT_TYPE;
+		return Int_Type::INT_TYPE();
 	}
 	int64_t IntField::hashCode()const
 	{

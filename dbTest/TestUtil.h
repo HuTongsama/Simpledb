@@ -70,7 +70,7 @@ public:
                 
                 auto& t = tupdata[i];
                 i++;
-                if (t._type->type() == String_Type::STRING_TYPE->type())
+                if (t._type->type() == String_Type::STRING_TYPE()->type())
                     f = make_shared<StringField>(t._str, Type::STRING_LEN);
                 else
                     f = make_shared<IntField>(t._int);

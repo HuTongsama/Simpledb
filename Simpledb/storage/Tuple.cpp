@@ -10,10 +10,10 @@ namespace Simpledb
 		while(iter->hasNext()){
 			auto& item = iter->next();
 			auto type = item._fieldType->type();
-			if (type == Int_Type::INT_TYPE->type()){
+			if (type == Int_Type::INT_TYPE()->type()){
 				_fields.push_back(make_shared<IntField>(0));
 			}
-			else if(type == String_Type::STRING_TYPE->type()) {
+			else if(type == String_Type::STRING_TYPE()->type()) {
 				_fields.push_back(make_shared<StringField>("",0));
 			}
 		}

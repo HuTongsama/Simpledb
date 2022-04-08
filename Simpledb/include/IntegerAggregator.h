@@ -16,7 +16,7 @@ namespace Simpledb {
          *            the 0-based index of the group-by field in the tuple, or
          *            NO_GROUPING if there is no grouping
          * @param gbfieldtype
-         *            the type of the group by field (e.g., Type.INT_TYPE), or null
+         *            the type of the group by field (e.g., Type.INT_TYPE()), or null
          *            if there is no grouping
          * @param afield
          *            the 0-based index of the aggregate field in the tuple
