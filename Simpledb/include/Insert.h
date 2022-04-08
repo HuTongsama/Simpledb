@@ -22,7 +22,7 @@ namespace Simpledb {
          *             if TupleDesc of child differs from table into which we are to
          *             insert.
          */
-        Insert(shared_ptr<TransactionId> t, shared_ptr<OpIterator> child, int tableId);
+        Insert(shared_ptr<TransactionId> t, shared_ptr<OpIterator> child, size_t tableId);
         shared_ptr<TupleDesc> getTupleDesc()override;
         void open()override;
         void close()override;
@@ -48,5 +48,10 @@ namespace Simpledb {
 
     private:
         static long _serialVersionUID;
+        shared_ptr<TransactionId> _tid;
+        vector<shared_ptr<OpIterator>> _children;
+        size_t _tableId;
+        shared_ptr<TupleDesc> _td;
+        shared_ptr<Tuple> _result;
 	};
 }

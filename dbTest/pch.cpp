@@ -24,3 +24,4 @@
 #include "HeapPageWriteTest.h"
 #include "HeapFileWriteTest.h"
 #include "BufferPoolWriteTest.h"
+#include "InsertTest.h"
