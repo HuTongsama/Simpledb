@@ -65,6 +65,7 @@ namespace Simpledb
 	{
 		dest.resetTupleDesc(_pTd);
 		dest._fields.clear();
+		dest.setRecordId(_pRId);
 		size_t fields = _pTd->numFields();
 		for (int i = 0; i < fields; ++i) {
 			auto type = _pTd->getFieldType(i)->type();

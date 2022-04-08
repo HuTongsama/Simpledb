@@ -20,9 +20,12 @@ protected:
 				byte[] emptyData = HeapPage.createEmptyPageData();
 				bw.write(emptyData);
 				bw.close();*/
+				vector<unsigned char> emptyData = HeapPage::createEmptyPageData();
+				shared_ptr<File> f = getFile();
+				f->writeBytes(emptyData.data(), emptyData.size());
 				shared_ptr<HeapPage> p = make_shared<HeapPage>(
 					make_shared<HeapPageId>(HeapFile::getId(), HeapFile::numPages() - 1),
-					HeapPage::createEmptyPageData());
+					emptyData);
 				p->insertTuple(t);
 				dirtypages.push_back(p);
 			}
@@ -73,17 +76,19 @@ TEST_F(BufferPoolWriteTest, DeleteTuple) {
 	shared_ptr<DbFileIterator> it = hf->iterator(_tid);
 	it->open();
 
-	vector<Tuple&> tuples;
+	vector<shared_ptr<Tuple>> tuples;
 	while (it->hasNext()) {
-		tuples.push_back(it->next());
+		Tuple& t1 = it->next();
+		shared_ptr<Tuple> t2 = make_shared<Tuple>(t1.getTupleDesc());
+		t1.copyTo(*t2);
+		tuples.push_back(t2);
 	}
 
 	// clear the cache
 	Database::resetBufferPool(BufferPool::DEFAULT_PAGES);
-
 	// delete 504 tuples from the first page
 	for (int i = 0; i < 504; ++i) {
-		Tuple& t = tuples.at(i);
+		Tuple& t = *tuples.at(i);
 		Database::getBufferPool()->deleteTuple(_tid, t);
 		shared_ptr<HeapPage> p = dynamic_pointer_cast<HeapPage>(
 			Database::getBufferPool()->getPage(_tid, t.getRecordId()->getPageId(), Permissions::READ_ONLY));
@@ -92,7 +97,7 @@ TEST_F(BufferPoolWriteTest, DeleteTuple) {
 
 	// delete 504 tuples from the second page
 	for (int i = 0; i < 504; ++i) {
-		Tuple& t = tuples.at(i + 504);
+		Tuple& t = *tuples.at(i + 504);
 		Database::getBufferPool()->deleteTuple(_tid, t);
 		shared_ptr<HeapPage> p = dynamic_pointer_cast<HeapPage>(
 			Database::getBufferPool()->getPage(_tid, t.getRecordId()->getPageId(), Permissions::READ_ONLY));

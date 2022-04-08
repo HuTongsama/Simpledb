@@ -23,6 +23,7 @@ namespace Simpledb {
 			string _name;
 			string _pkeyField;
 		};
+
 		/**
 		* Constructor.
 		* Creates a new, empty catalog.
@@ -68,7 +69,7 @@ namespace Simpledb {
 		*/
 		shared_ptr<DbFile> getDatabaseFile(size_t tableid);
 		string getPrimaryKey(size_t tableid);
-		Iterator<int>* tableIdIterator();
+		shared_ptr<Iterator<size_t>> tableIdIterator();
 		string getTableName(size_t tableid);
 		void clear();
 		/**

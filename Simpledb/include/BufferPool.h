@@ -103,7 +103,7 @@ namespace Simpledb {
 		* @param tableId the table to add the tuple to
 		* @param t the tuple to add
 		*/
-		void insertTuple(shared_ptr<TransactionId> tid, int tableId,shared_ptr<Tuple> t);// not necessary for lab1
+		void insertTuple(shared_ptr<TransactionId> tid, size_t tableId,shared_ptr<Tuple> t);
 		/**
 		* Remove the specified tuple from the buffer pool.
 		* Will acquire a write lock on the page the tuple is removed from and any
@@ -117,7 +117,7 @@ namespace Simpledb {
 		* @param tid the transaction deleting the tuple.
 		* @param t the tuple to delete
 		*/
-		void deleteTuple(shared_ptr<TransactionId> tid, Tuple& t);// not necessary for lab1
+		void deleteTuple(shared_ptr<TransactionId> tid, Tuple& t);
 		/**
 		* Flush all dirty pages to disk.
 		* NB: Be careful using this routine -- it writes dirty data to disk so will

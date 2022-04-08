@@ -23,3 +23,4 @@
 #include "SysAggregateTest.h"
 #include "HeapPageWriteTest.h"
 #include "HeapFileWriteTest.h"
+#include "BufferPoolWriteTest.h"

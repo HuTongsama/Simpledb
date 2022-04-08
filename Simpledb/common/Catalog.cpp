@@ -55,9 +55,13 @@ namespace Simpledb {
         }
         throw runtime_error("no such element");
 	}
-	Iterator<int>* Catalog::tableIdIterator()
+    shared_ptr<Iterator<size_t>> Catalog::tableIdIterator()
 	{
-		return nullptr;
+        vector<size_t> tableIds;
+        for (auto& iter : _nameToTable) {
+            tableIds.push_back(iter.second._file->getId());
+        }
+		return make_shared<Iterator<size_t>>(tableIds);
 	}
 	string Catalog::getTableName(size_t tableid)
 	{

@@ -42,11 +42,31 @@ namespace Simpledb
 	void BufferPool::transactionComplete(const TransactionId& tid, bool commit)
 	{
 	}
-	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, int tableId, shared_ptr<Tuple> t)
+	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, size_t tableId, shared_ptr<Tuple> t)
 	{
+		shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
+		vector<shared_ptr<Page>> pages = dbFile->insertTuple(tid, t);
+		for (auto& page : pages) {
+			dbFile->writePage(page);
+		}
 	}
 	void BufferPool::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
+		auto idIter = Database::getCatalog()->tableIdIterator();
+		while (idIter->hasNext())
+		{
+			size_t tableId = idIter->next();
+			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
+			vector<shared_ptr<Page>> pages = dbFile->deleteTuple(tid, t);
+			if (!pages.empty()) {
+				for (auto& page : pages) {
+					dbFile->writePage(page);
+				}
+				break;
+			}
+		}
+
+
 	}
 	void BufferPool::flushAllPages()
 	{
