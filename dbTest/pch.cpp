@@ -27,3 +27,4 @@
 #include "InsertTest.h"
 #include "SysInsertTest.h"
 #include "SysDeleteTest.h"
+#include "EvictionTest.h"

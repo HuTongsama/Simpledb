@@ -8,7 +8,6 @@ namespace Simpledb
 	BufferPool::BufferPool(int numPages)
 	{
 		_numPages = numPages;
-		_curPages = 0;
 	}
 	BufferPool::~BufferPool()
 	{
@@ -19,15 +18,16 @@ namespace Simpledb
 		if (tid == nullptr || pid == nullptr)
 			return nullptr;
 		size_t pidHashCode = pid->hashCode();
-		if (_idToPage.find(pidHashCode) == _idToPage.end()) {
-			if (_curPages == _numPages) {
-				throw runtime_error("too many pages in bufferPool");
+		if (_idToPageInfo.find(pidHashCode) == _idToPageInfo.end()) {
+			if (_idToPageInfo.size() == _numPages) {
+				evictPageInner();
 			}
 			size_t tableId = pid->getTableId();
 			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
-			_idToPage[pidHashCode] = dbFile->readPage(pid);
+			_idToPageInfo[pidHashCode]._page = dbFile->readPage(pid);
 		}
-		return _idToPage[pidHashCode];
+		_idToPageInfo[pidHashCode]._lastGetTime = clock();
+		return _idToPageInfo[pidHashCode]._page;
 	}
 	void BufferPool::unsafeReleasePage(const TransactionId& tid, const PageId& pid)
 	{
@@ -69,8 +69,8 @@ namespace Simpledb
 	void BufferPool::flushAllPages()
 	{
 		lock_guard<mutex> lock(_mutex);
-		for (auto& iter : _idToPage) {
-			shared_ptr<Page> p = iter.second;
+		for (auto& iter : _idToPageInfo) {
+			shared_ptr<Page> p = iter.second._page;
 			if (p->isDirty()) {
 				flushPageInner(p);
 				p->markDirty(false, nullptr);
@@ -79,6 +79,13 @@ namespace Simpledb
 	}
 	void BufferPool::discardPage(const PageId& pid)
 	{
+		lock_guard<mutex> lock(_mutex);
+		for (auto& iter : _idToPageInfo) {
+			if (iter.second._page->getId()->equals(pid)) {
+				_idToPageInfo.erase(iter.first);
+				break;
+			}
+		}
 	}
 	void BufferPool::flushPage(const PageId& pid)
 	{
@@ -90,15 +97,17 @@ namespace Simpledb
 	}
 	void BufferPool::evictPage()
 	{
+		lock_guard<mutex> lock(_mutex);
+		evictPageInner();
 	}
 	void BufferPool::flushPageInner(const PageId& pid)
 	{
 		
 		shared_ptr<Page> p = nullptr;
-		for (auto& iter : _idToPage) {
-			if (iter.second->getId()->equals(pid))
+		for (auto& iter : _idToPageInfo) {
+			if (iter.second._page->getId()->equals(pid))
 			{
-				p = iter.second;
+				p = iter.second._page;
 				break;
 			}
 		}
@@ -111,5 +120,29 @@ namespace Simpledb
 		size_t tableId = p->getId()->getTableId();
 		shared_ptr<DbFile> dbfile = Database::getCatalog()->getDatabaseFile(tableId);
 		dbfile->writePage(p);
+	}
+	void BufferPool::evictPageInner()
+	{
+		clock_t t = -1;
+		size_t id = 0;
+		for (auto& iter : _idToPageInfo) {
+			if (-1 == t) {
+				id = iter.first;
+				t = iter.second._lastGetTime;
+			}
+			else {
+				if (t > iter.second._lastGetTime)
+				{
+					t = iter.second._lastGetTime;
+					id = iter.first;
+				}
+			}
+		}
+		if (t != -1) {
+			PageInfo& info = _idToPageInfo[id];
+			if (info._page->isDirty())
+				flushPageInner(info._page);
+			_idToPageInfo.erase(id);
+		}
 	}
 }

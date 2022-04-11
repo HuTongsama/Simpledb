@@ -12,7 +12,13 @@
 using namespace Simpledb;
 class EvictionTest :public SimpleDbTestBase {
 protected:
-	const static int MEMORY_LIMIT_IN_MB = 5;
+#ifdef _DEBUG
+    const static int MEMORY_LIMIT_IN_MB = 6;
+#else
+    const static int MEMORY_LIMIT_IN_MB = 5;
+#endif // _DEBUG
+
+	
 	const static int BUFFER_PAGES = 16;
 
 	static void insertRow(shared_ptr<HeapFile> f, shared_ptr<Transaction> t) {
@@ -69,5 +75,6 @@ TEST_F(EvictionTest, TestHeapFileScanWithManyPages) {
     GetProcessMemoryInfo(handle, &pmc, sizeof(pmc));
     long endMem = pmc.WorkingSetSize;
     long memDiff = (endMem - beginMem) / (1024 * 1024);
+    cout << "Memory: " << memDiff << endl;
     EXPECT_LE(memDiff, MEMORY_LIMIT_IN_MB);
 }

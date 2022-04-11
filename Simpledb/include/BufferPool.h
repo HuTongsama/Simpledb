@@ -123,7 +123,7 @@ namespace Simpledb {
 		* NB: Be careful using this routine -- it writes dirty data to disk so will
 		*     break simpledb if running in NO STEAL mode.
 		*/
-		void flushAllPages();//synchronized , not necessary for lab1
+		void flushAllPages();
 		/** Remove the specific page id from the buffer pool.
 		Needed by the recovery manager to ensure that the
 		buffer pool doesn't keep a rolled back page in its
@@ -132,28 +132,34 @@ namespace Simpledb {
 		Also used by B+ tree files to ensure that deleted pages
 		are removed from the cache so they can be reused safely
 		*/
-		void discardPage(const PageId& pid);//synchronized , not necessary for lab1
+		void discardPage(const PageId& pid);
 		/**
 		* Flushes a certain page to disk
 		* @param pid an ID indicating the page to flush
 		*/
-		void flushPage(const PageId& pid);//synchronized , not necessary for lab1
+		void flushPage(const PageId& pid);
 		/** Write all pages of the specified transaction to disk.*/
 		void flushPages(const TransactionId& tid);//synchronized , not necessary for lab1 | lab2
 		/**
 		* Discards a page from the buffer pool.
 		* Flushes the page to disk to ensure dirty pages are updated on disk.
 		*/
-		void evictPage();//synchronized , not necessary for lab1
+		void evictPage();
 
 	private:
+		struct PageInfo {
+			clock_t _lastGetTime;
+			shared_ptr<Page> _page;
+		};
+
+		
 		void flushPageInner(const PageId& pid);
 		void flushPageInner(shared_ptr<Page> p);
+		void evictPageInner();
 
 		static int _pageSize;
 		size_t _numPages;
-		size_t _curPages;
-		map<size_t, shared_ptr<Page>> _idToPage;
+		map<size_t, PageInfo> _idToPageInfo;
 		mutex _mutex;
 	};
 }

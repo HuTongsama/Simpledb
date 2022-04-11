@@ -186,6 +186,7 @@
     <ClInclude Include="include\SeqScan.h" />
     <ClInclude Include="include\StringAggregator.h" />
     <ClInclude Include="include\StringField.h" />
+    <ClInclude Include="include\Transaction.h" />
     <ClInclude Include="include\TransactionId.h" />
     <ClInclude Include="include\Tuple.h" />
     <ClInclude Include="include\TupleDesc.h" />
