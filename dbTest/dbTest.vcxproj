@@ -47,6 +47,7 @@
     <ClInclude Include="HeapPageWriteTest.h" />
     <ClInclude Include="InsertTest.h" />
     <ClInclude Include="IntegerAggregatorTest.h" />
+    <ClInclude Include="IntHistogramTest.h" />
     <ClInclude Include="JoinPredicateTest.h" />
     <ClInclude Include="JoinTest.h" />
     <ClInclude Include="pch.h" />

@@ -162,6 +162,7 @@
     <ClInclude Include="include\BufferPool.h" />
     <ClInclude Include="include\File.h" />
     <ClInclude Include="include\Filter.h" />
+    <ClInclude Include="include\IntHistogram.h" />
     <ClInclude Include="include\HeapFile.h" />
     <ClInclude Include="include\HeapFileEncoder.h" />
     <ClInclude Include="include\HeapPage.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="optimizer\IntHistogram.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />
     <ClCompile Include="storage\HeapFile.cpp" />
