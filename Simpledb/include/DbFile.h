@@ -87,5 +87,9 @@ namespace Simpledb {
 		* @return TupleDesc of this DbFile.
 		*/
 		virtual shared_ptr<TupleDesc> getTupleDesc() = 0;
+		/**
+		* Returns the number of pages.
+		*/
+		virtual size_t numPages() = 0;
 	};
 }

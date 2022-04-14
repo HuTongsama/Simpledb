@@ -181,7 +181,7 @@ public:
             throw runtime_error("not implemented");
         }
 
-        int numPages() {
+        size_t numPages()override {
             throw runtime_error("not implemented");
         }
 

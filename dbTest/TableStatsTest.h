@@ -92,6 +92,8 @@ TEST_F(TableStatsTest, EstimateTableCardinalityTest) {
 	EXPECT_EQ(0, s.estimateTableCardinality(0.0));
 }
 
+
+
 /**
  * Verify that selectivity estimates do something reasonable.
  * Don't bother splitting this into N different functions for
@@ -110,6 +112,7 @@ TEST_F(TableStatsTest, EstimateSelectivityTest) {
 	TableStats s(_tableId, IO_COST);
 
 	for (int col = 0; col < 10; col++) {
+		
 		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::EQUALS, aboveMax), 0.001);
 		EXPECT_EQ(1.0 / 32.0, s.estimateSelectivity(col, Predicate::Op::EQUALS, halfMaxMin), 0.015);
 		EXPECT_EQ(0, s.estimateSelectivity(col, Predicate::Op::EQUALS, belowMin), 0.001);
@@ -141,4 +144,5 @@ TEST_F(TableStatsTest, EstimateSelectivityTest) {
 		EXPECT_EQ(0.5, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, halfMaxMin), 0.1);
 		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, atMin), 0.05);
 		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, belowMin), 0.001);
+	}
 }

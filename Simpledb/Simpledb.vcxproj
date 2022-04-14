@@ -188,6 +188,7 @@
     <ClInclude Include="include\SeqScan.h" />
     <ClInclude Include="include\StringAggregator.h" />
     <ClInclude Include="include\StringField.h" />
+    <ClInclude Include="include\StringHistogram.h" />
     <ClInclude Include="include\TableStats.h" />
     <ClInclude Include="include\Transaction.h" />
     <ClInclude Include="include\TransactionId.h" />
@@ -221,6 +222,7 @@
     <ClCompile Include="execution\StringAggregator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optimizer\IntHistogram.cpp" />
+    <ClCompile Include="optimizer\StringHistogram.cpp" />
     <ClCompile Include="optimizer\TableStats.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />

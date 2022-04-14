@@ -7,6 +7,7 @@ namespace Simpledb {
 	*/
 	class IntHistogram {
 	public:
+		IntHistogram() {}
         /**
 		* Create a new IntHistogram.
 		*

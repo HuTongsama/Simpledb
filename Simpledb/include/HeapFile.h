@@ -63,7 +63,7 @@ namespace Simpledb {
 		/**
 		* Returns the number of pages in this HeapFile.
 		*/
-		size_t numPages();
+		size_t numPages()override;
 		vector<shared_ptr<Page>> insertTuple(shared_ptr<TransactionId> tid, shared_ptr<Tuple> t)override;
 		vector<shared_ptr<Page>> deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)override;
 		shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid)override;

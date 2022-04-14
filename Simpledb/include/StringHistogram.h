@@ -3,6 +3,7 @@
 namespace Simpledb {
 	class StringHistogram {
 	public:
+		StringHistogram() {}
         /**
 		* Create a new StringHistogram with a specified number of buckets.
 		* <p>

@@ -40,9 +40,9 @@ namespace Simpledb
 		}
 		
 	}
-	shared_ptr<Type> IntField::getType()const
+	Type::TYPE IntField::getType()const
 	{
-		return Int_Type::INT_TYPE();
+		return Type::TYPE::INT_TYPE;
 	}
 	int64_t IntField::hashCode()const
 	{

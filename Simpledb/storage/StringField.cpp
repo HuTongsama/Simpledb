@@ -62,9 +62,9 @@ namespace Simpledb
 		}
 		
 	}
-	shared_ptr<Type> StringField::getType()const
+	Type::TYPE StringField::getType()const
 	{
-		return String_Type::STRING_TYPE();
+		return Type::TYPE::STRING_TYPE;
 	}
 	int64_t StringField::hashCode()const
 	{

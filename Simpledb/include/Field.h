@@ -32,7 +32,7 @@ namespace Simpledb
 		* Returns the type of this field (see {@link Type#INT_TYPE} or {@link Type#STRING_TYPE}
 		* @return type of this field
 		*/
-		virtual shared_ptr<Type> getType()const = 0;
+		virtual Type::TYPE getType()const = 0;
 		/**
 		* Hash code.
 		* Different Field objects representing the same value should probably

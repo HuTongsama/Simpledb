@@ -5,6 +5,8 @@
 #include"Predicate.h"
 #include"Field.h"
 #include"ConcurrentMap.h"
+#include"IntHistogram.h"
+#include"StringHistogram.h"
 using namespace std;
 namespace Simpledb {
 	class TableStats {
@@ -25,7 +27,7 @@ namespace Simpledb {
 		*            The cost per page of IO. This doesn't differentiate between
 		*            sequential-scan IO and disk seeks.
 		*/
-		TableStats(int tableid, int ioCostPerPage);
+		TableStats(size_t tableid, int ioCostPerPage);
 		/**
 		* Estimates the cost of sequentially scanning the file, given that the cost
 		* to read a page is costPerPageIO. You can assume that there are no seeks
@@ -89,5 +91,10 @@ namespace Simpledb {
 		static const int NUM_HIST_BINS = 100;
 		static ConcurrentMap<string, shared_ptr<TableStats>> _map;
 		
+		map<int, IntHistogram> _fieldToIntHist;
+		map<int, StringHistogram> _fieldToStringHist;
+		size_t _numPages;
+		size_t _numTuples;
+		int _ioCostPerPage;
 	};
 }

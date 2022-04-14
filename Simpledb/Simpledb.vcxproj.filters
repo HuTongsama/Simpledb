@@ -179,6 +179,9 @@
     <ClInclude Include="include\ConcurrentMap.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\StringHistogram.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -293,6 +296,9 @@
       <Filter>optimizer</Filter>
     </ClCompile>
     <ClCompile Include="optimizer\TableStats.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\StringHistogram.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>

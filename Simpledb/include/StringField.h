@@ -33,7 +33,7 @@ namespace Simpledb {
 		/**
 		* @return the Type for this Field
 		*/
-		shared_ptr<Type> getType()const override;
+		Type::TYPE getType()const override;
 		int64_t hashCode()const override;
 		bool equals(const Field& feild)const override;
 		string toString()const override;
