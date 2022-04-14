@@ -173,6 +173,12 @@
     <ClInclude Include="include\IntHistogram.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\TableStats.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ConcurrentMap.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -284,6 +290,9 @@
       <Filter>execution</Filter>
     </ClCompile>
     <ClCompile Include="optimizer\IntHistogram.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\TableStats.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>

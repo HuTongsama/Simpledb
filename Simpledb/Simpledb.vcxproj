@@ -153,6 +153,7 @@
     <ClInclude Include="include\Catalog.h" />
     <ClInclude Include="include\Collection.h" />
     <ClInclude Include="include\Common.h" />
+    <ClInclude Include="include\ConcurrentMap.h" />
     <ClInclude Include="include\Database.h" />
     <ClInclude Include="include\DataStream.h" />
     <ClInclude Include="include\DbFile.h" />
@@ -187,6 +188,7 @@
     <ClInclude Include="include\SeqScan.h" />
     <ClInclude Include="include\StringAggregator.h" />
     <ClInclude Include="include\StringField.h" />
+    <ClInclude Include="include\TableStats.h" />
     <ClInclude Include="include\Transaction.h" />
     <ClInclude Include="include\TransactionId.h" />
     <ClInclude Include="include\Tuple.h" />
@@ -219,6 +221,7 @@
     <ClCompile Include="execution\StringAggregator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optimizer\IntHistogram.cpp" />
+    <ClCompile Include="optimizer\TableStats.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />
     <ClCompile Include="storage\HeapFile.cpp" />

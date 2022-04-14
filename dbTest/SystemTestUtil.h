@@ -19,6 +19,11 @@
 
 using namespace std;
 using namespace Simpledb;
+
+union Object {
+    bool _bool;
+    double _double;
+};
 class SystemTestUtil {
 private:
     static int MAX_RAND_VALUE;
@@ -152,4 +157,54 @@ public:
 		return boost::lexical_cast<std::string>(boost::uuids::random_generator()());
 	}
 
+    static vector<double> getDiff(vector<double>& sequence) {
+        vector<double> ret(sequence.size() - 1);
+        for (int i = 0; i < sequence.size() - 1; ++i)
+            ret[i] = sequence[i + 1] - sequence[i];
+        
+        return ret;
+    }
+    /**
+    * Checks if the sequence represents a quadratic sequence (approximately)
+    * ret[0] is true if the sequence is quadratic
+    * ret[1] is the common difference of the sequence if ret[0] is true.
+    * @param sequence
+    * @return ret[0] = true if sequence is qudratic(or sub-quadratic or linear), ret[1] = the coefficient of n^2
+    */
+    static vector<Object> checkQuadratic(vector<double>& sequence) {
+        vector<Object> ret = checkLinear(getDiff(sequence));
+        ret[1]._double = ret[1]._double / 2.0;
+        return ret;
+    }
+    /**
+    * Checks if the sequence represents an arithmetic sequence (approximately)
+    * ret[0] is true if the sequence is linear
+    * ret[1] is the common difference of the sequence if ret[0] is true.
+    * @param sequence
+    * @return ret[0] = true if sequence is linear, ret[1] = the common difference
+    */
+    static vector<Object> checkLinear(vector<double>& sequence) {
+        return checkConstant(getDiff(sequence));
+    }
+    /**
+    * Checks if the sequence represents approximately a fixed sequence (c,c,c,c,..)
+    * ret[0] is true if the sequence is linear
+    * ret[1] is the constant of the sequence if ret[0] is true.
+    * @param sequence
+    * @return ret[0] = true if sequence is constant, ret[1] = the constant
+    */
+    static vector<Object> checkConstant(vector<double>& sequence) {
+        vector<Object> ret(2);
+        //compute average
+        double sum = 0.0;
+        for (double& value : sequence) sum += value;
+        double av = sequence.size() == 0 ? 0 : sum / sequence.size();
+        //compute standard deviation
+        double sqsum = 0;
+        for (double v : sequence) sqsum += (v - av) * (v - av);
+        double std = sequence.size() == 0 ? 0 : sqrt(sqsum / sequence.size());
+        ret[0]._bool = std < 1.0 ? true : false;
+        ret[1]._double = av;
+        return ret;
+    }
 };
