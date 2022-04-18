@@ -6,6 +6,7 @@
 #include"IntField.h"
 #include<vector>
 using namespace Simpledb;
+using ::testing::DoubleNear;
 class TableStatsTest : public SimpleDbTestBase {
 protected:
 	const static int IO_COST = 71;
@@ -92,8 +93,6 @@ TEST_F(TableStatsTest, EstimateTableCardinalityTest) {
 	EXPECT_EQ(0, s.estimateTableCardinality(0.0));
 }
 
-
-
 /**
  * Verify that selectivity estimates do something reasonable.
  * Don't bother splitting this into N different functions for
@@ -113,36 +112,37 @@ TEST_F(TableStatsTest, EstimateSelectivityTest) {
 
 	for (int col = 0; col < 10; col++) {
 		
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::EQUALS, aboveMax), 0.001);
-		EXPECT_EQ(1.0 / 32.0, s.estimateSelectivity(col, Predicate::Op::EQUALS, halfMaxMin), 0.015);
-		EXPECT_EQ(0, s.estimateSelectivity(col, Predicate::Op::EQUALS, belowMin), 0.001);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::EQUALS, aboveMax), DoubleNear(0.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::EQUALS, halfMaxMin), DoubleNear(1.0 / 32.0, 0.015));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::EQUALS, belowMin), DoubleNear(0.0, 0.001));
 
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, aboveMax), 0.001);
-		EXPECT_EQ(31.0 / 32.0, s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, halfMaxMin), 0.015);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, belowMin), 0.015);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, aboveMax), DoubleNear(1.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, halfMaxMin), DoubleNear(31.0 / 32.0, 0.015));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::NOT_EQUALS, belowMin), DoubleNear(1.0, 0.015));
 
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, aboveMax), 0.001);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, atMax), 0.001);
-		EXPECT_EQ(0.5, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, halfMaxMin), 0.1);
-		EXPECT_EQ(31.0 / 32.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, atMin), 0.05);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, belowMin), 0.001);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, aboveMax), DoubleNear(0.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, atMax), DoubleNear(0.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, halfMaxMin), DoubleNear(0.5, 0.1));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, atMin), DoubleNear(31.0 / 32.0, 0.05));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN, belowMin), DoubleNear(1.0, 0.001));
 
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN, aboveMax), 0.001);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN, atMax), 0.015);
-		EXPECT_EQ(0.5, s.estimateSelectivity(col, Predicate::Op::LESS_THAN, halfMaxMin), 0.1);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN, atMin), 0.001);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN, belowMin), 0.001);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN, aboveMax), DoubleNear(1.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN, atMax), DoubleNear(1.0, 0.05));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN, halfMaxMin), DoubleNear(0.5, 0.1));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN, atMin), DoubleNear(0.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN, belowMin), DoubleNear(0.0, 0.001));
 
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, aboveMax), 0.001);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, atMax), 0.015);
-		EXPECT_EQ(0.5, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, halfMaxMin), 0.1);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, atMin), 0.015);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, belowMin), 0.001);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, aboveMax), DoubleNear(0.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, atMax), DoubleNear(0.0, 0.05));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, halfMaxMin), DoubleNear(0.5, 0.1));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, atMin), DoubleNear(1.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::GREATER_THAN_OR_EQ, belowMin), DoubleNear(1.0, 0.001));
 
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, aboveMax), 0.001);
-		EXPECT_EQ(1.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, atMax), 0.015);
-		EXPECT_EQ(0.5, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, halfMaxMin), 0.1);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, atMin), 0.05);
-		EXPECT_EQ(0.0, s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, belowMin), 0.001);
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, aboveMax), DoubleNear(1.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, atMax), DoubleNear(1.0, 0.001));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, halfMaxMin), DoubleNear(0.5, 0.1));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, atMin), DoubleNear(0.0, 0.05));
+		EXPECT_THAT(s.estimateSelectivity(col, Predicate::Op::LESS_THAN_OR_EQ, belowMin), DoubleNear(0.0, 0.001));
+
 	}
 }
