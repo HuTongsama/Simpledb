@@ -154,6 +154,7 @@
     <ClInclude Include="include\Collection.h" />
     <ClInclude Include="include\Common.h" />
     <ClInclude Include="include\ConcurrentMap.h" />
+    <ClInclude Include="include\CostCard.h" />
     <ClInclude Include="include\Database.h" />
     <ClInclude Include="include\DataStream.h" />
     <ClInclude Include="include\DbFile.h" />
@@ -173,8 +174,15 @@
     <ClInclude Include="Include\IntField.h" />
     <ClInclude Include="include\Iterator.h" />
     <ClInclude Include="include\Join.h" />
+    <ClInclude Include="include\JoinOptimizer.h" />
     <ClInclude Include="include\JoinPredicate.h" />
     <ClInclude Include="include\LogFile.h" />
+    <ClInclude Include="include\LogicalFilterNode.h" />
+    <ClInclude Include="include\LogicalJoinNode.h" />
+    <ClInclude Include="include\LogicalPlan.h" />
+    <ClInclude Include="include\LogicalScanNode.h" />
+    <ClInclude Include="include\LogicalSelectListNode.h" />
+    <ClInclude Include="include\LogicalSubplanJoinNode.h" />
     <ClInclude Include="include\Noncopyable.h" />
     <ClInclude Include="include\Operator.h" />
     <ClInclude Include="include\OpIterator.h" />
@@ -183,6 +191,7 @@
     <ClInclude Include="include\PageId.h" />
     <ClInclude Include="include\PageIdFactory.h" />
     <ClInclude Include="include\Permissions.h" />
+    <ClInclude Include="include\PlanCache.h" />
     <ClInclude Include="include\Predicate.h" />
     <ClInclude Include="include\RecordId.h" />
     <ClInclude Include="include\SeqScan.h" />
@@ -222,6 +231,8 @@
     <ClCompile Include="execution\StringAggregator.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optimizer\IntHistogram.cpp" />
+    <ClCompile Include="optimizer\JoinOptimizer.cpp" />
+    <ClCompile Include="optimizer\LogicalPlan.cpp" />
     <ClCompile Include="optimizer\StringHistogram.cpp" />
     <ClCompile Include="optimizer\TableStats.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />

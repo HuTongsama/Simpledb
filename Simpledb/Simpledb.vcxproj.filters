@@ -182,6 +182,33 @@
     <ClInclude Include="include\StringHistogram.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\LogicalJoinNode.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\JoinOptimizer.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogicalFilterNode.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogicalScanNode.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogicalSelectListNode.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogicalSubplanJoinNode.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\LogicalPlan.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CostCard.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PlanCache.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -299,6 +326,12 @@
       <Filter>optimizer</Filter>
     </ClCompile>
     <ClCompile Include="optimizer\StringHistogram.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\JoinOptimizer.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\LogicalPlan.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>
