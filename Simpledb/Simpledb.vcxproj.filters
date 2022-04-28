@@ -209,6 +209,18 @@
     <ClInclude Include="include\PlanCache.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\Parser.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Query.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\OperatorCardinality.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\HashEquiJoin.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -332,6 +344,18 @@
       <Filter>optimizer</Filter>
     </ClCompile>
     <ClCompile Include="optimizer\LogicalPlan.cpp">
+      <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="Parser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\Query.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="execution\HashEquiJoin.cpp">
+      <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="optimizer\OperatorCardinality.cpp">
       <Filter>optimizer</Filter>
     </ClCompile>
   </ItemGroup>

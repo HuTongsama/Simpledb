@@ -2,6 +2,7 @@
 #include"LogicalPlan.h"
 #include"CostCard.h"
 #include"PlanCache.h"
+#include"ConcurrentMap.h"
 #include<set>
 namespace Simpledb {
 	class JoinOptimizer {
@@ -81,14 +82,14 @@ namespace Simpledb {
 		 * @return The cardinality of the join
 		 */
 		int estimateJoinCardinality(shared_ptr<LogicalJoinNode> j, int card1, int card2,
-			bool t1pkey, bool t2pkey, map<string, shared_ptr<TableStats>>& stats);
+			bool t1pkey, bool t2pkey, ConcurrentMap<string, shared_ptr<TableStats>>& stats);
 		/**
 		 * Estimate the join cardinality of two tables.
 		 * */
 		static int estimateTableJoinCardinality(Predicate::Op joinOp,
 			const string& table1Alias, const string& table2Alias, const string& field1PureName,
 			const string& field2PureName, int card1, int card2, bool t1pkey,
-			bool t2pkey, map<string, shared_ptr<TableStats>>& stats,
+			bool t2pkey, ConcurrentMap<string, shared_ptr<TableStats>>& stats,
 			map<string, size_t>& tableAliasToId);
 		/**
 		 * Helper method to enumerate all of the subsets of a given size of a
@@ -156,7 +157,7 @@ namespace Simpledb {
 		 *             tables involved in join
 		 */
 		shared_ptr<CostCard> computeCostAndCardOfSubplan(
-			map<string, shared_ptr<TableStats>>& stats,
+			ConcurrentMap<string, shared_ptr<TableStats>>& stats,
 			map<string, double>& filterSelectivities,
 			shared_ptr<LogicalJoinNode> joinToRemove, set<shared_ptr<LogicalJoinNode>>& joinSet,
 			double bestCostSoFar, shared_ptr<PlanCache> pc);

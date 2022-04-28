@@ -92,12 +92,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -107,7 +111,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -115,6 +120,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -122,12 +130,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -137,7 +149,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>./include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./include;$(SolutionDir)/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -145,6 +158,9 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
+    <Lib>
+      <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\AbstractDbFileIterator.h" />
@@ -164,6 +180,7 @@
     <ClInclude Include="include\BufferPool.h" />
     <ClInclude Include="include\File.h" />
     <ClInclude Include="include\Filter.h" />
+    <ClInclude Include="include\HashEquiJoin.h" />
     <ClInclude Include="include\IntHistogram.h" />
     <ClInclude Include="include\HeapFile.h" />
     <ClInclude Include="include\HeapFileEncoder.h" />
@@ -185,14 +202,17 @@
     <ClInclude Include="include\LogicalSubplanJoinNode.h" />
     <ClInclude Include="include\Noncopyable.h" />
     <ClInclude Include="include\Operator.h" />
+    <ClInclude Include="include\OperatorCardinality.h" />
     <ClInclude Include="include\OpIterator.h" />
     <ClInclude Include="include\Page.h" />
     <ClInclude Include="include\PageFactory.h" />
     <ClInclude Include="include\PageId.h" />
     <ClInclude Include="include\PageIdFactory.h" />
+    <ClInclude Include="include\Parser.h" />
     <ClInclude Include="include\Permissions.h" />
     <ClInclude Include="include\PlanCache.h" />
     <ClInclude Include="include\Predicate.h" />
+    <ClInclude Include="include\Query.h" />
     <ClInclude Include="include\RecordId.h" />
     <ClInclude Include="include\SeqScan.h" />
     <ClInclude Include="include\StringAggregator.h" />
@@ -220,12 +240,14 @@
     <ClCompile Include="execution\Aggregate.cpp" />
     <ClCompile Include="execution\Aggregator.cpp" />
     <ClCompile Include="execution\Filter.cpp" />
+    <ClCompile Include="execution\HashEquiJoin.cpp" />
     <ClCompile Include="execution\Insert.cpp" />
     <ClCompile Include="execution\IntegerAggregator.cpp" />
     <ClCompile Include="execution\Join.cpp" />
     <ClCompile Include="execution\JoinPredicate.cpp" />
     <ClCompile Include="execution\Operator.cpp" />
     <ClCompile Include="execution\Predicate.cpp" />
+    <ClCompile Include="execution\Query.cpp" />
     <ClCompile Include="execution\SeqScan.cpp" />
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
@@ -233,8 +255,10 @@
     <ClCompile Include="optimizer\IntHistogram.cpp" />
     <ClCompile Include="optimizer\JoinOptimizer.cpp" />
     <ClCompile Include="optimizer\LogicalPlan.cpp" />
+    <ClCompile Include="optimizer\OperatorCardinality.cpp" />
     <ClCompile Include="optimizer\StringHistogram.cpp" />
     <ClCompile Include="optimizer\TableStats.cpp" />
+    <ClCompile Include="Parser.cpp" />
     <ClCompile Include="storage\AbstractDbFileIterator.cpp" />
     <ClCompile Include="storage\BufferPool.cpp" />
     <ClCompile Include="storage\HeapFile.cpp" />

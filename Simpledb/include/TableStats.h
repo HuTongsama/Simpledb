@@ -14,7 +14,7 @@ namespace Simpledb {
 		static shared_ptr<TableStats> getTableStats(const string& tablename);
 		static void setTableStats(const string& tablename, shared_ptr<TableStats> stats);
 		static void setStatsMap(ConcurrentMap<string, shared_ptr<TableStats>>& s);
-		static const ConcurrentMap<string,shared_ptr<TableStats>>& getStatsMap();
+		static ConcurrentMap<string,shared_ptr<TableStats>>& getStatsMap();
 		static void computeStatistics();
 
 		/**

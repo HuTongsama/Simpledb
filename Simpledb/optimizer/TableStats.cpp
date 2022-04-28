@@ -16,7 +16,7 @@ namespace Simpledb {
 	{
 		_map.reset(s);
 	}
-	const ConcurrentMap<string, shared_ptr<TableStats>>& TableStats::getStatsMap()
+	ConcurrentMap<string, shared_ptr<TableStats>>& TableStats::getStatsMap()
 	{
 		return _map;
 	}

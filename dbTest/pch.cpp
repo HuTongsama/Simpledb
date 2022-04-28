@@ -30,3 +30,4 @@
 #include "EvictionTest.h"
 #include "IntHistogramTest.h"
 #include "TableStatsTest.h"
+#include "JoinOptimizerTest.h"

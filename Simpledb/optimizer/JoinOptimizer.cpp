@@ -62,7 +62,7 @@ namespace Simpledb {
         }
     }
     int JoinOptimizer::estimateJoinCardinality(shared_ptr<LogicalJoinNode> j, int card1, int card2,
-        bool t1pkey, bool t2pkey, map<string, shared_ptr<TableStats>>& stats)
+        bool t1pkey, bool t2pkey, ConcurrentMap<string, shared_ptr<TableStats>>& stats)
     {
         shared_ptr<LogicalSubplanJoinNode> tmpj = dynamic_pointer_cast<LogicalSubplanJoinNode>(j);
         if (tmpj != nullptr) {
@@ -79,7 +79,7 @@ namespace Simpledb {
     }
     int JoinOptimizer::estimateTableJoinCardinality(Predicate::Op joinOp, const string& table1Alias, const string& table2Alias,
         const string& field1PureName, const string& field2PureName, int card1, int card2,
-        bool t1pkey, bool t2pkey, map<string, shared_ptr<TableStats>>& stats, map<string, size_t>& tableAliasToId)
+        bool t1pkey, bool t2pkey, ConcurrentMap<string, shared_ptr<TableStats>>& stats, map<string, size_t>& tableAliasToId)
     {
         int card = 1;
         // some code goes here
@@ -92,7 +92,7 @@ namespace Simpledb {
         //Replace the following
         return _joins;
     }
-    shared_ptr<CostCard> JoinOptimizer::computeCostAndCardOfSubplan(map<string, shared_ptr<TableStats>>& stats,
+    shared_ptr<CostCard> JoinOptimizer::computeCostAndCardOfSubplan(ConcurrentMap<string, shared_ptr<TableStats>>& stats,
         map<string, double>& filterSelectivities, shared_ptr<LogicalJoinNode> joinToRemove,
         set<shared_ptr<LogicalJoinNode>>& joinSet, double bestCostSoFar, shared_ptr<PlanCache> pc)
     {
@@ -130,13 +130,13 @@ namespace Simpledb {
 
         vector<shared_ptr<LogicalJoinNode>> prevBest;
         if (news.empty()) { // base case -- both are base relations
-            t1cost = stats.at(table1Name)->estimateScanCost();
-            t1card = stats.at(table1Name)->estimateTableCardinality(
+            t1cost = (*stats.getValue(table1Name))->estimateScanCost();
+            t1card = (*stats.getValue(table1Name))->estimateTableCardinality(
                 filterSelectivities.at(j->t1Alias));
             leftPkey = isPkey(j->t1Alias, j->f1PureName);
 
-            t2cost = table2Alias == "" ? 0 : stats.at(table2Name)->estimateScanCost();
-            t2card = table2Alias == "" ? 0 : stats.at(table2Name)->estimateTableCardinality(
+            t2cost = table2Alias == "" ? 0 : (*stats.getValue(table2Name))->estimateScanCost();
+            t2card = table2Alias == "" ? 0 : (*stats.getValue(table2Name))->estimateTableCardinality(
                     filterSelectivities.at(j->t2Alias));
             rightPkey = table2Alias != "" && isPkey(table2Alias, j->f2PureName);
         }
@@ -160,8 +160,8 @@ namespace Simpledb {
                 t1card = bestCard;
                 leftPkey = hasPkey(prevBest);
 
-                t2cost = j->t2Alias == "" ? 0 : stats.at(table2Name)->estimateScanCost();
-                t2card = j->t2Alias == "" ? 0 : stats.at(table2Name)->estimateTableCardinality(
+                t2cost = j->t2Alias == "" ? 0 : (*stats.getValue(table2Name))->estimateScanCost();
+                t2card = j->t2Alias == "" ? 0 : (*stats.getValue(table2Name))->estimateTableCardinality(
                         filterSelectivities.at(j->t2Alias));
                 rightPkey = j->t2Alias != "" && isPkey(j->t2Alias,
                     j->f2PureName);
@@ -172,8 +172,8 @@ namespace Simpledb {
                                        // left subtree is
                 t2card = bestCard;
                 rightPkey = hasPkey(prevBest);
-                t1cost = stats.at(table1Name)->estimateScanCost();
-                t1card = stats.at(table1Name)->estimateTableCardinality(
+                t1cost = (*stats.getValue(table1Name))->estimateScanCost();
+                t1card = (*stats.getValue(table1Name))->estimateTableCardinality(
                     filterSelectivities.at(j->t1Alias));
                 leftPkey = isPkey(j->t1Alias, j->f1PureName);
 
