@@ -52,15 +52,15 @@ namespace Simpledb {
             throw runtime_error("OR expressions currently unsupported.");
         }
         else {
-            if (expr->exprList != nullptr) {
-                if (expr->exprList->size() != 2) {
+            if (expr->expr != nullptr && expr->expr2 != nullptr) {
+                /*if (expr->exprList->size() != 2) {
                     throw runtime_error("Only simple binary expresssions of the form A op B are currently supported.");
-                }
+                }*/
                 bool isJoin = false;
                 Predicate::Op op = getOp(expr->opType);
                 bool op1const = false, op2const = false;
-                hsql::Expr* expr1 = expr->exprList->at(0);
-                hsql::Expr* expr2 = expr->exprList->at(1);
+                hsql::Expr* expr1 = expr->expr;
+                hsql::Expr* expr2 = expr->expr2;
                 if (isConstant(expr1->type))
                     op1const = true;
                 if (isConstant(expr2->type))
@@ -200,14 +200,16 @@ namespace Simpledb {
                     lp->addProjectField(aggField, aggFun);
                 }
                 else {
-                    string tmp = string(si->table) + "." + si->name;
-                    if (groupByField != ""
-                        && !(groupByField == tmp
-                        || groupByField == si->name)) {
-                        throw runtime_error(string("Non-aggregate field ") + si->name + " does not appear in GROUP BY list.");
+                    if (si->table != nullptr && si->name != nullptr) {
+                        string tmp = string(si->table) + "." + si->name;
+                        if (groupByField != ""
+                            && !(groupByField == tmp
+                                || groupByField == si->name)) {
+                            throw runtime_error(string("Non-aggregate field ") + si->name + " does not appear in GROUP BY list.");
+                        }
+                        string tmp1("");
+                        lp->addProjectField(tmp, tmp1);
                     }
-                    string tmp1("");
-                    lp->addProjectField(tmp, tmp1);
                 }
             }
         }
@@ -504,7 +506,8 @@ namespace Simpledb {
         if (exprType == hsql::ExprType::kExprLiteralInt
             || exprType == hsql::ExprType::kExprLiteralFloat
             || exprType == hsql::ExprType::kExprLiteralNull
-            || exprType == hsql::ExprType::kExprLiteralString)
+            || exprType == hsql::ExprType::kExprLiteralString
+            || exprType == hsql::ExprType::kExprStar)
             return true;
         return false;
     }
