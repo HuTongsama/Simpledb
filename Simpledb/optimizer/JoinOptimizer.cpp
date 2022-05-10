@@ -125,18 +125,30 @@ namespace Simpledb {
         //Replace the following
         size_t sz = _joins.size();
         shared_ptr<PlanCache> cache = make_shared<PlanCache>();
+        vector<shared_ptr<LogicalJoinNode>> result;
         for (int i = 1; i <= sz; ++i) {
             set<set<shared_ptr<LogicalJoinNode>>> subSets = enumerateSubsets<shared_ptr<LogicalJoinNode>>(_joins, i);
             for (auto& set : subSets) {
                 double bestCostSoFar = DBL_MAX;
+                shared_ptr<CostCard> bestCostCard = nullptr;
                 for (auto& node : set) {
                     shared_ptr<CostCard> costCard = computeCostAndCardOfSubplan(stats, filterSelectivities, node, set, bestCostSoFar, cache);
                     if (costCard == nullptr)
                         continue;
-
+                    if (costCard->cost < bestCostSoFar) {
+                        bestCostSoFar = costCard->cost;
+                        bestCostCard = costCard;
+                    }
+                }
+                if (bestCostCard != nullptr) {
+                    cache->addPlan(set, bestCostCard->cost, bestCostCard->card, bestCostCard->plan);
                 }
             }
+            if (i == sz && !subSets.empty()) {
+                result = cache->getOrder(*(subSets.begin()));
+            }
         }
+        return result;
     }
     shared_ptr<CostCard> JoinOptimizer::computeCostAndCardOfSubplan(ConcurrentMap<string, shared_ptr<TableStats>>& stats,
         map<string, double>& filterSelectivities, shared_ptr<LogicalJoinNode> joinToRemove,
@@ -212,7 +224,7 @@ namespace Simpledb {
                 rightPkey = j->t2Alias != "" && isPkey(j->t2Alias,
                     j->f2PureName);
             }
-            else if (doesJoin(prevBest, j->t2Alias)) { // j.t2 is in prevbest
+            else if (doesJoin(prevBest, table2Alias)) { // j.t2 is in prevbest
                                                      // (both shouldn't be)
                 t2cost = prevBestCost; // left side just has cost of whatever
                                        // left subtree is

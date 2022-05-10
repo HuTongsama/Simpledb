@@ -7,6 +7,7 @@
 #include"SystemTestUtil.h"
 #include"JoinOptimizer.h"
 #include"Parser.h"
+#include"ConcurrentMap.h"
 #include<algorithm>
 using namespace Simpledb;
 class JoinOptimizerTest : public SimpleDbTestBase {
@@ -238,7 +239,7 @@ TEST_F(JoinOptimizerTest, OrderJoinsTest) {
     shared_ptr<JoinOptimizer> j;
     vector<shared_ptr<LogicalJoinNode>> result;
     vector<shared_ptr<LogicalJoinNode>> nodes;
-    map<string, shared_ptr<TableStats>> stats;
+    ConcurrentMap<string, shared_ptr<TableStats>> stats;
     map<string, double> filterSelectivities;
 
     // Create all of the tables, and add them to the catalog
@@ -263,17 +264,17 @@ TEST_F(JoinOptimizerTest, OrderJoinsTest) {
     Database::getCatalog()->addTable(hobbies, "hobbies");
 
     // Get TableStats objects for each of the tables that we just generated.
-    stats["emp"] = make_shared<TableStats>(
-        Database::getCatalog()->getTableId("emp"), IO_COST);
-    stats["dept"] =
+    stats.setValue("emp", make_shared<TableStats>(
+        Database::getCatalog()->getTableId("emp"), IO_COST));
+    stats.setValue("dept",
         make_shared<TableStats>(Database::getCatalog()->getTableId("dept"),
-            IO_COST);
-    stats["hobby"] =
+            IO_COST));
+    stats.setValue("hobby",
         make_shared<TableStats>(Database::getCatalog()->getTableId("hobby"),
-            IO_COST);
-    stats["hobbies"] =
+            IO_COST));
+    stats.setValue("hobbies",
         make_shared<TableStats>(Database::getCatalog()->getTableId("hobbies"),
-            IO_COST);
+            IO_COST));
 
     // Note that your code shouldn't re-compute selectivities.
     // If you get statistics numbers, even if they're wrong (which they are
@@ -339,7 +340,7 @@ TEST_F(JoinOptimizerTest, BigOrderJoinsTest) {
     clock_t start, end;
     start = clock();
     shared_ptr<JoinOptimizer> j;
-    map<string, shared_ptr<TableStats>> stats;
+    ConcurrentMap<string, shared_ptr<TableStats>> stats;
     vector<shared_ptr<LogicalJoinNode>> result;
     vector<shared_ptr<LogicalJoinNode>> nodes;
     map<string, double> filterSelectivities;
@@ -402,21 +403,21 @@ TEST_F(JoinOptimizerTest, BigOrderJoinsTest) {
     Database::getCatalog()->addTable(smallHeapFileN, "n");
 
     // Come up with join statistics for the tables
-    stats.emplace("bigTable", new TableStats(bigHeapFile->getId(), IO_COST));
-    stats.emplace("a", new TableStats(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("b", new TableStats(smallHeapFileB->getId(), IO_COST));
-    stats.emplace("c", new TableStats(smallHeapFileC->getId(), IO_COST));
-    stats.emplace("d", new TableStats(smallHeapFileD->getId(), IO_COST));
-    stats.emplace("e", new TableStats(smallHeapFileE->getId(), IO_COST));
-    stats.emplace("f", new TableStats(smallHeapFileF->getId(), IO_COST));
-    stats.emplace("g", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("h", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("i", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("j", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("k", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("l", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("m", new TableStats(smallHeapFileG->getId(), IO_COST));
-    stats.emplace("n", new TableStats(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("bigTable", make_shared<TableStats>(bigHeapFile->getId(), IO_COST));
+    stats.setValue("a", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("b", make_shared<TableStats>(smallHeapFileB->getId(), IO_COST));
+    stats.setValue("c", make_shared<TableStats>(smallHeapFileC->getId(), IO_COST));
+    stats.setValue("d", make_shared<TableStats>(smallHeapFileD->getId(), IO_COST));
+    stats.setValue("e", make_shared<TableStats>(smallHeapFileE->getId(), IO_COST));
+    stats.setValue("f", make_shared<TableStats>(smallHeapFileF->getId(), IO_COST));
+    stats.setValue("g", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("h", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("i", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("j", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("k", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("l", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("m", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
+    stats.setValue("n", make_shared<TableStats>(smallHeapFileG->getId(), IO_COST));
 
     // Put in some filter selectivities
     filterSelectivities.emplace("bigTable", 1.0);
@@ -483,7 +484,7 @@ TEST_F(JoinOptimizerTest, NonequalityOrderJoinsTest) {
     static const int IO_COST = 103;
 
     shared_ptr<JoinOptimizer> j;
-    map<string, shared_ptr<TableStats>> stats;
+    ConcurrentMap<string, shared_ptr<TableStats>> stats;
     vector<shared_ptr<LogicalJoinNode>> result;
     vector<shared_ptr<LogicalJoinNode>> nodes;
     map<string, double> filterSelectivities;
@@ -522,15 +523,15 @@ TEST_F(JoinOptimizerTest, NonequalityOrderJoinsTest) {
     Database::getCatalog()->addTable(smallHeapFileI, "i");
 
     // Come up with join statistics for the tables
-    stats.emplace("a", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("b", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("c", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("d", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("e", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("f", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("g", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("h", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
-    stats.emplace("i", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("a", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("b", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("c", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("d", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("e", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("f", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("g", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("h", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
+    stats.setValue("i", make_shared<TableStats>(smallHeapFileA->getId(), IO_COST));
 
     // Put in some filter selectivities
     filterSelectivities.emplace("a", 1.0);

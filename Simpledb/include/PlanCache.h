@@ -14,7 +14,7 @@ namespace Simpledb {
         @param card the estimatied cardinality of the specified plan
         @param order the ordering of the joins in the plan
     */
-        void addPlan(set<shared_ptr<LogicalJoinNode>>& s, double cost, int card, vector<shared_ptr<LogicalJoinNode>>& order) {
+        void addPlan(const set<shared_ptr<LogicalJoinNode>>& s, double cost, int card, vector<shared_ptr<LogicalJoinNode>>& order) {
             _bestOrders.emplace(s, order);
             _bestCosts.emplace(s, cost);
             _bestCardinalities.emplace(s, card);
@@ -24,7 +24,7 @@ namespace Simpledb {
             @param s the set of joins to look up the best order for
             @return the best order for s in the cache
         */
-        vector<shared_ptr<LogicalJoinNode>> getOrder(set<shared_ptr<LogicalJoinNode>>& s) {
+        vector<shared_ptr<LogicalJoinNode>> getOrder(const set<shared_ptr<LogicalJoinNode>>& s) {
             return _bestOrders.at(s);
         }
 
