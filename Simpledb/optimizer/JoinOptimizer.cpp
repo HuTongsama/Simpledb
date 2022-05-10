@@ -118,16 +118,29 @@ namespace Simpledb {
         }
         return card;
     }
-    vector<shared_ptr<LogicalJoinNode>> JoinOptimizer::orderJoins(map<string, 
+    vector<shared_ptr<LogicalJoinNode>> JoinOptimizer::orderJoins(ConcurrentMap<string,
         shared_ptr<TableStats>>& stats, map<string, double>& filterSelectivities, bool explain)
     {
         // some code goes here
         //Replace the following
-        return _joins;
+        size_t sz = _joins.size();
+        shared_ptr<PlanCache> cache = make_shared<PlanCache>();
+        for (int i = 1; i <= sz; ++i) {
+            set<set<shared_ptr<LogicalJoinNode>>> subSets = enumerateSubsets<shared_ptr<LogicalJoinNode>>(_joins, i);
+            for (auto& set : subSets) {
+                double bestCostSoFar = DBL_MAX;
+                for (auto& node : set) {
+                    shared_ptr<CostCard> costCard = computeCostAndCardOfSubplan(stats, filterSelectivities, node, set, bestCostSoFar, cache);
+                    if (costCard == nullptr)
+                        continue;
+
+                }
+            }
+        }
     }
     shared_ptr<CostCard> JoinOptimizer::computeCostAndCardOfSubplan(ConcurrentMap<string, shared_ptr<TableStats>>& stats,
         map<string, double>& filterSelectivities, shared_ptr<LogicalJoinNode> joinToRemove,
-        set<shared_ptr<LogicalJoinNode>>& joinSet, double bestCostSoFar, shared_ptr<PlanCache> pc)
+        const set<shared_ptr<LogicalJoinNode>>& joinSet, double bestCostSoFar, shared_ptr<PlanCache> pc)
     {
         shared_ptr<LogicalJoinNode> j = joinToRemove;     
         try

@@ -123,7 +123,7 @@ namespace Simpledb {
 		 *             when stats or filter selectivities is missing a table in the
 		 *             join, or or when another internal error occurs
 		 */
-		vector<shared_ptr<LogicalJoinNode>> orderJoins(map<string, shared_ptr<TableStats>>& stats,
+		vector<shared_ptr<LogicalJoinNode>> orderJoins(ConcurrentMap<string, shared_ptr<TableStats>>& stats,
 			map<string, double>& filterSelectivities, bool explain);
 	private:
 		/**
@@ -159,7 +159,7 @@ namespace Simpledb {
 		shared_ptr<CostCard> computeCostAndCardOfSubplan(
 			ConcurrentMap<string, shared_ptr<TableStats>>& stats,
 			map<string, double>& filterSelectivities,
-			shared_ptr<LogicalJoinNode> joinToRemove, set<shared_ptr<LogicalJoinNode>>& joinSet,
+			shared_ptr<LogicalJoinNode> joinToRemove, const set<shared_ptr<LogicalJoinNode>>& joinSet,
 			double bestCostSoFar, shared_ptr<PlanCache> pc);
 		/**
 		 * Return true if the specified table is in the list of joins, false
