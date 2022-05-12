@@ -127,23 +127,24 @@ namespace Simpledb {
         shared_ptr<PlanCache> cache = make_shared<PlanCache>();
         vector<shared_ptr<LogicalJoinNode>> result;
         for (int i = 1; i <= sz; ++i) {
-            set<set<shared_ptr<LogicalJoinNode>>> subSets = enumerateSubsets<shared_ptr<LogicalJoinNode>>(_joins, i);
+            set<set<shared_ptr<LogicalJoinNode>>> subSets = enumerateSubsets<shared_ptr<LogicalJoinNode>>(_joins, i);          
             for (auto& set : subSets) {
                 double bestCostSoFar = DBL_MAX;
-                shared_ptr<CostCard> bestCostCard = nullptr;
+                shared_ptr<CostCard> bestCostCard;
                 for (auto& node : set) {
                     shared_ptr<CostCard> costCard = computeCostAndCardOfSubplan(stats, filterSelectivities, node, set, bestCostSoFar, cache);
                     if (costCard == nullptr)
                         continue;
                     if (costCard->cost < bestCostSoFar) {
-                        bestCostSoFar = costCard->cost;
                         bestCostCard = costCard;
+                        bestCostSoFar = costCard->cost;
                     }
                 }
                 if (bestCostCard != nullptr) {
                     cache->addPlan(set, bestCostCard->cost, bestCostCard->card, bestCostCard->plan);
                 }
             }
+            
             if (i == sz && !subSets.empty()) {
                 result = cache->getOrder(*(subSets.begin()));
             }

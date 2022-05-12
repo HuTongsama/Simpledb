@@ -25,7 +25,9 @@ namespace Simpledb {
             @return the best order for s in the cache
         */
         vector<shared_ptr<LogicalJoinNode>> getOrder(const set<shared_ptr<LogicalJoinNode>>& s) {
-            return _bestOrders.at(s);
+            if (_bestOrders.find(s) != _bestOrders.end())
+                return _bestOrders.at(s);
+            return vector<shared_ptr<LogicalJoinNode>>();
         }
 
         /** Find the cost of the best join order in the cache for the specified plan

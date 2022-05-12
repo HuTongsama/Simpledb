@@ -216,7 +216,7 @@ namespace Simpledb {
 			set<set<T>> newels;
 			for (const set<T>& s : els) {
 				for (T& t : v) {
-					set<T> news;
+					set<T> news(s);
 					if (news.emplace(t).second)
 						newels.emplace(news);
 				}

@@ -34,7 +34,8 @@ namespace Simpledb {
     void Parser::processExpression(shared_ptr<TransactionId> tid, hsql::Expr* expr, shared_ptr<LogicalPlan> lp)
     {
         if (expr->isType(hsql::ExprType::kExprOperator) && expr->opType == hsql::OperatorType::kOpAnd) {
-            if (expr->exprList != nullptr) {
+            
+            /*if (expr->exprList != nullptr) {
                 size_t sz = expr->exprList->size();
                 for (int i = 0; i < sz; ++i) {
                     hsql::Expr* subExpr = expr->exprList->at(i);
@@ -46,7 +47,14 @@ namespace Simpledb {
             }
             else {
                 throw runtime_error("empty exprList");
-            }         
+            }*/    
+            if (expr->expr != nullptr && expr->expr2 != nullptr) {
+                processExpression(tid, expr->expr, lp);
+                processExpression(tid, expr->expr2, lp);
+            }
+            else {
+                throw runtime_error("error AND operands");
+            }
         }
         else if (expr->isType(hsql::ExprType::kExprOperator) && expr->opType == hsql::OperatorType::kOpOr) {
             throw runtime_error("OR expressions currently unsupported.");
@@ -106,14 +114,23 @@ namespace Simpledb {
                 }
                 else {// select node
                     string column, compValue;
+                    hsql::Expr* columnExpr = nullptr;
+                    hsql::Expr* valExpr = nullptr;
                     if (expr1->type == hsql::ExprType::kExprColumnRef) {
-                        column = expr1->getName();
-                        compValue = expr2->getName();
+                        columnExpr = expr1;
+                        valExpr = expr2;
                     }
                     else {
-                        column = expr2->getName();
-                        compValue = expr1->getName();
+                        columnExpr = expr2;
+                        valExpr = expr1;
                     }
+                    column = columnExpr->getName();
+                    if (valExpr->type == hsql::ExprType::kExprLiteralInt)
+                        compValue = to_string(valExpr->ival);
+                    else if (valExpr->type == hsql::ExprType::kExprLiteralFloat)
+                        compValue = to_string(valExpr->fval);
+                    else
+                        compValue = valExpr->getName();
                     lp->addFilter(column, op, compValue);
                 }
             }
