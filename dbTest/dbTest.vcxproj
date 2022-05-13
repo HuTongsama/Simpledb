@@ -62,6 +62,7 @@
     <ClInclude Include="SysFilterTest.h" />
     <ClInclude Include="SysInsertTest.h" />
     <ClInclude Include="SysJoinTest.h" />
+    <ClInclude Include="SysQueryTest.h" />
     <ClInclude Include="SystemTestUtil.h" />
     <ClInclude Include="TableStatsTest.h" />
     <ClInclude Include="TestUtil.h" />

@@ -31,3 +31,4 @@
 #include "IntHistogramTest.h"
 #include "TableStatsTest.h"
 #include "JoinOptimizerTest.h"
+#include "SysQueryTest.h"
