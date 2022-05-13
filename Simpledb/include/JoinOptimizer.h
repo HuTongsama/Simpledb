@@ -224,6 +224,5 @@ namespace Simpledb {
 			els = newels;
 		}
 		return els;
-		return set<set<T>>();
 	}
 }
