@@ -29,17 +29,17 @@ namespace Simpledb
 		_idToPageInfo[pidHashCode]._lastGetTime = clock();
 		return _idToPageInfo[pidHashCode]._page;
 	}
-	void BufferPool::unsafeReleasePage(const TransactionId& tid, const PageId& pid)
+	void BufferPool::unsafeReleasePage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 	}
-	bool BufferPool::holdsLock(const TransactionId& tid, const PageId& p)
+	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, const PageId& p)
 	{
 		return false;
 	}
-	void BufferPool::transactionComplete(const TransactionId& tid, bool commit)
+	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
 	}
 	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, size_t tableId, shared_ptr<Tuple> t)

@@ -48,7 +48,7 @@ namespace Simpledb {
                 }
 
                 // Release locks and flush pages if needed
-                Database::getBufferPool()->transactionComplete(*_tid, !abort); // release locks
+                Database::getBufferPool()->transactionComplete(_tid, !abort); // release locks
 
                 // write commit log record
                 if (!abort) {

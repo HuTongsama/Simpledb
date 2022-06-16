@@ -7,6 +7,12 @@
 #include"Utility.h"
 #include"HeapFile.h"
 #include"File.h"
+#include"Permissions.h"
+#include"Database.h"
+#include<thread>
+#include<Windows.h>
+#include<processthreadsapi.h>
+
 using namespace Simpledb;
 class TestUtil {
 public:
@@ -274,7 +280,78 @@ public:
         shared_ptr<Tuple> _t;
     };
 
-    /** JUnit fixture that creates a heap file and cleans it up afterward. */
+    /**
+     * Helper class that attempts to acquire a lock on a given page in a new
+     * thread.
+     *
+     * @return a handle to the Thread that will attempt lock acquisition after it
+     *   has been started
+     */
+    class LockGrabber {
+    public:
+        /**
+         * @param tid the transaction on whose behalf we want to acquire the lock
+         * @param pid the page over which we want to acquire the lock
+         * @param perm the desired lock permissions
+         */
+        LockGrabber(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm) {
+            _tid = tid;
+            _pid = pid;
+            _perm = perm;
+            _acquired = false;
+        }
+
+        //call run in a new thread
+        thread::native_handle_type start() {
+            thread t(&LockGrabber::run,this);
+            auto test = t.native_handle();
+            return test;
+        }
+        void stop(thread::native_handle_type handle) {
+            TerminateThread(handle, 0);
+            
+        }
+        void run() {
+            try{
+                Database::getBufferPool()->getPage(_tid, _pid, _perm);
+                lock_guard<mutex> lock(_alock);
+                _acquired = true;
+            }
+            catch (const std::exception& e){               
+                lock_guard<mutex> lock(_elock);
+                _error = e.what();
+                Database::getBufferPool()->transactionComplete(_tid, false);
+            }
+        }
+
+        /**
+         * @return true if we successfully acquired the specified lock
+         */
+        bool acquired() {
+            lock_guard<mutex> lock(_alock);
+            return _acquired;
+        }
+
+        /**
+         * @return an error string if one occured during lock acquisition;
+         *   null otherwise
+         */
+        string getError() {
+            lock_guard<mutex> lock(_elock);
+            return _error;
+            
+        }
+    private:
+        shared_ptr<TransactionId> _tid;
+        shared_ptr<PageId> _pid;
+        Permissions _perm;
+        bool _acquired;
+        string _error;
+        mutex _alock;
+        mutex _elock;
+        
+    };
+
     class CreateHeapFile {
     protected:
         CreateHeapFile() {

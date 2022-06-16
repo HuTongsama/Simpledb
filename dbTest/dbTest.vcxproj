@@ -51,6 +51,7 @@
     <ClInclude Include="JoinOptimizerTest.h" />
     <ClInclude Include="JoinPredicateTest.h" />
     <ClInclude Include="JoinTest.h" />
+    <ClInclude Include="LockingTest.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="PredicateTest.h" />
     <ClInclude Include="RecordIdTest.h" />

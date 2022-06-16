@@ -71,15 +71,15 @@ namespace Simpledb {
 		* @param tid the ID of the transaction requesting the unlock
 		* @param pid the ID of the page to unlock
 		*/
-		void unsafeReleasePage(const TransactionId& tid,const PageId& pid);// not necessary for lab1|lab2
+		void unsafeReleasePage(shared_ptr<TransactionId> tid,shared_ptr<PageId> pid);
 		/**
 		* Release all locks associated with a given transaction.
 		*
 		* @param tid the ID of the transaction requesting the unlock
 		*/
-		void transactionComplete(shared_ptr<TransactionId> tid);// not necessary for lab1|lab2
+		void transactionComplete(shared_ptr<TransactionId> tid);
 		/** Return true if the specified transaction has a lock on the specified page */
-		bool holdsLock(const TransactionId& tid, const PageId& p);// not necessary for lab1|lab2
+		bool holdsLock(shared_ptr<TransactionId> tid, const PageId& p);
 		/**
 		* Commit or abort a given transaction; release all locks associated to
 		* the transaction.
@@ -87,7 +87,7 @@ namespace Simpledb {
 		* @param tid the ID of the transaction requesting the unlock
 		* @param commit a flag indicating whether we should commit or abort
 		*/
-		void transactionComplete(const TransactionId& tid, bool commit);// not necessary for lab1|lab2
+		void transactionComplete(shared_ptr<TransactionId> tid, bool commit);
 		/**
 		* Add a tuple to the specified table on behalf of transaction tid.  Will
 		* acquire a write lock on the page the tuple is added to and any other
@@ -139,7 +139,7 @@ namespace Simpledb {
 		*/
 		void flushPage(const PageId& pid);
 		/** Write all pages of the specified transaction to disk.*/
-		void flushPages(const TransactionId& tid);//synchronized , not necessary for lab1 | lab2
+		void flushPages(const TransactionId& tid);//synchronized
 		/**
 		* Discards a page from the buffer pool.
 		* Flushes the page to disk to ensure dirty pages are updated on disk.
