@@ -51,7 +51,7 @@ namespace Simpledb {
 	{
 		shared_ptr<OpIterator> iter = _children[0];
 		int count = 0;
-		BufferPool* pBufferPool = Database::getBufferPool();
+		shared_ptr<BufferPool> pBufferPool = Database::getBufferPool();
 		while (iter->hasNext()) {
 			Tuple& t1 = iter->next();
 			shared_ptr<Tuple> t2 = make_shared<Tuple>(_td);

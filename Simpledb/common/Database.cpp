@@ -2,13 +2,9 @@
 namespace Simpledb {
 	string Database::LOGFILENAME = "log";
 	Database* Database::_instance = new Database();
-	BufferPool* Database::resetBufferPool(int pages)
+	shared_ptr<BufferPool> Database::resetBufferPool(int pages)
 	{
-		BufferPool* p = _instance->_pBufferPool;
-		if (p) {
-			delete p;
-		}
-		_instance->_pBufferPool = new BufferPool(pages);
+		_instance->_pBufferPool = make_shared<BufferPool>(pages);
 		return _instance->_pBufferPool;
 	}
 	void Database::reset()
@@ -16,25 +12,12 @@ namespace Simpledb {
 		if (_instance) {
 			delete _instance;
 		}
-
 		_instance = new Database();
 	}
 	Database::Database()
 	{
-		_pLogFile = new LogFile(LOGFILENAME);
-		_pCatalog = new Catalog();
-		_pBufferPool = new BufferPool(BufferPool::DEFAULT_PAGES);	
-	}
-	Database::~Database()
-	{
-		if (_pLogFile) {
-			delete _pLogFile;
-		}
-		if (_pCatalog) {
-			delete _pCatalog;
-		}
-		if (_pBufferPool) {
-			delete _pBufferPool;
-		}
+		_pLogFile = make_shared<LogFile>(LOGFILENAME);
+		_pCatalog = make_shared<Catalog>();
+		_pBufferPool = make_shared<BufferPool>(BufferPool::DEFAULT_PAGES);	
 	}
 }
