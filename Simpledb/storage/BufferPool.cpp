@@ -14,6 +14,10 @@ namespace Simpledb
 	}
 	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
+		if (perm == Permissions::READ_ONLY) {
+			
+		}
+
 		lock_guard<mutex> lock(_mutex);
 		if (tid == nullptr || pid == nullptr)
 			return nullptr;
@@ -31,13 +35,16 @@ namespace Simpledb
 	}
 	void BufferPool::unsafeReleasePage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
+		_lockManager.unlock(Permissions::READ_ONLY, tid, pid);
+		_lockManager.unlock(Permissions::READ_WRITE, tid, pid);
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 	}
-	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, const PageId& p)
+	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
-		return false;
+		return _lockManager.isLock(Permissions::READ_ONLY, tid, pid)
+			|| _lockManager.isLock(Permissions::READ_WRITE, tid, pid);
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{

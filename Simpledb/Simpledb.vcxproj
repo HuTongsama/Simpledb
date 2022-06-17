@@ -193,6 +193,7 @@
     <ClInclude Include="include\Join.h" />
     <ClInclude Include="include\JoinOptimizer.h" />
     <ClInclude Include="include\JoinPredicate.h" />
+    <ClInclude Include="include\LockManager.h" />
     <ClInclude Include="include\LogFile.h" />
     <ClInclude Include="include\LogicalFilterNode.h" />
     <ClInclude Include="include\LogicalJoinNode.h" />
@@ -266,6 +267,7 @@
     <ClCompile Include="storage\HeapPage.cpp" />
     <ClCompile Include="storage\HeapPageId.cpp" />
     <ClCompile Include="storage\IntField.cpp" />
+    <ClCompile Include="storage\LockManager.cpp" />
     <ClCompile Include="storage\LogFile.cpp" />
     <ClCompile Include="storage\RecordId.cpp" />
     <ClCompile Include="storage\StringField.cpp" />

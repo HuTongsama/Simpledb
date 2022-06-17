@@ -2,6 +2,7 @@
 #include"Page.h"
 #include"Permissions.h"
 #include"Tuple.h"
+#include"LockManager.h"
 #include<mutex>
 #include<map>
 using namespace std;
@@ -79,7 +80,7 @@ namespace Simpledb {
 		*/
 		void transactionComplete(shared_ptr<TransactionId> tid);
 		/** Return true if the specified transaction has a lock on the specified page */
-		bool holdsLock(shared_ptr<TransactionId> tid, const PageId& p);
+		bool holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		/**
 		* Commit or abort a given transaction; release all locks associated to
 		* the transaction.
@@ -161,5 +162,6 @@ namespace Simpledb {
 		size_t _numPages;
 		map<size_t, PageInfo> _idToPageInfo;
 		mutex _mutex;
+		LockManager _lockManager;
 	};
 }

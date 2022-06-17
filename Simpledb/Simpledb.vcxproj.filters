@@ -221,6 +221,9 @@
     <ClInclude Include="include\HashEquiJoin.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\LockManager.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -357,6 +360,9 @@
     </ClCompile>
     <ClCompile Include="optimizer\OperatorCardinality.cpp">
       <Filter>optimizer</Filter>
+    </ClCompile>
+    <ClCompile Include="storage\LockManager.cpp">
+      <Filter>storage</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
