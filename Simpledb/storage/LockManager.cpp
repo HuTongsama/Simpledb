@@ -3,42 +3,25 @@
 namespace Simpledb {
 	void LockManager::lock(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
-		shared_ptr<PageLock> pLock = getLock(tid, pid);
+		shared_ptr<PageLock> plock = getLock(tid, pid);	
 		lock_guard<mutex> lock(_managerLock);
-		auto pCode = pid->hashCode();
-		auto tCode = tid->getId();
-		shared_ptr<PageMutex> pageMutex = _pidToMutex[pCode];
-		if (pLock == nullptr) {
-			vector<size_t>& pids = _tidToPids[tCode];
-			vector<shared_ptr<PageLock>>& pageLocks = _tidToLocks[tCode];
-			shared_ptr<PageLock> plock = make_shared<PageLock>(pageMutex->_r, pageMutex->_w);
-			pageLocks.push_back(plock);
-			pids.push_back()
-
-		}
-		
-		size_t t = tid->getId();
-		size_t pCode = pid->hashCode();
-		vector<size_t>& pids = _tidToPids[t];
-
 		bool repeatLock = false;
-		PageLock& plock = _pidToLock[pCode];
 		switch (p)
 		{
 		case Simpledb::Permissions::READ_ONLY:
-			if (plock._rLock.owns_lock()) {
-				repeatLock = true;
+			if (!plock->_rlock.owns_lock()) {
+				plock->_rlock.lock();
 			}
 			else {
-				plock._rLock.lock();
+				repeatLock = true;
 			}
 			break;
 		case Simpledb::Permissions::READ_WRITE:
-			if (plock._wLock.owns_lock()) {
-				repeatLock = true;
+			if (!plock->_wlock.owns_lock()) {
+				plock->_wlock.lock();
 			}
 			else {
-				plock._wLock.lock();
+				repeatLock = true;
 			}
 			break;
 		default:
@@ -50,23 +33,18 @@ namespace Simpledb {
 	}
 	void LockManager::unlock(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
+		shared_ptr<PageLock> plock = getLock(tid, pid);
 		lock_guard<mutex> lock(_managerLock);
-		size_t t = tid->getId();
-		size_t pCode = pid->hashCode();
-		vector<size_t>& pids = _tidToPids[t];
-
-		bool repeatLock = false;
-		PageLock& plock = _pidToLock[pCode];
 		switch (p)
 		{
 		case Simpledb::Permissions::READ_ONLY:
-			if (plock._rLock.owns_lock()) {
-				plock._rLock.unlock();
+			if (plock->_rlock.owns_lock()) {
+				plock->_rlock.unlock();
 			}
 			break;
 		case Simpledb::Permissions::READ_WRITE:
-			if (plock._wLock.owns_lock()) {
-				plock._wLock.unlock();
+			if (plock->_wlock.owns_lock()) {
+				plock->_wlock.unlock();
 			}
 			break;
 		default:
@@ -74,19 +52,15 @@ namespace Simpledb {
 		}
 
 	}
+	
 	bool LockManager::isLock(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
+		shared_ptr<PageLock> plock = getLock(tid, pid);
 		lock_guard<mutex> lock(_managerLock);
-		size_t t = tid->getId();
-		size_t pCode = pid->hashCode();
-		vector<size_t>& pids = _tidToPids[t];
-
-		bool repeatLock = false;
-		PageLock& plock = _pidToLock[pCode];
 		switch (p)
 		{
 		case Simpledb::Permissions::READ_ONLY:
-			if (plock._rLock.owns_lock()) {
+			if (plock->_rlock.owns_lock()) {
 				return true;
 			}
 			else{
@@ -94,8 +68,8 @@ namespace Simpledb {
 			}
 			break;
 		case Simpledb::Permissions::READ_WRITE:
-			if (plock._wLock.owns_lock()) {
-				plock._wLock.unlock();
+			if (plock->_wlock.owns_lock()) {
+				return true;
 			}
 			else {
 				return false;
@@ -106,29 +80,34 @@ namespace Simpledb {
 		}
 	}
 
+	void LockManager::accessPage(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
+	{
+		auto pageId = pid->hashCode();
+		auto t = tid->getId();
+		lock_guard<mutex> lock(_managerLock);
+		shared_ptr<TransactionLockInfo> pInfo = _tidToInfo[t];
+		if (pInfo == nullptr || pInfo->getLock(pageId) != nullptr)
+			return;
+		shared_ptr<PageMutex> pMutex = _pidToMutex[pageId];
+		if (pMutex == nullptr)
+			return;
+		if (p == Permissions::READ_ONLY) {
+			shared_lock<shared_mutex> tmp(pMutex->_r);
+			return;
+		}
+		else if (p == Permissions::READ_WRITE) {
+			unique_lock<shared_mutex> tmp(pMutex->_w);
+			return;
+		}
+	}
+
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_managerLock);
 		auto pCode = pid->hashCode();
-		for (auto& p : _tidToPids) {
-			vector<size_t>& pids = p.second;
-			auto sz = pids.size();
-			for (int i = 0; i < sz; ++i) {
-				if (pCode == pids[i]) {
-					vector<PageLock>& pageLocks = _tidToLocks[p.first];
-					PageLock& l = pageLocks[i];
-					if (l._rlock.owns_lock()
-						|| l._wlock.owns_lock()) {
-						throw runtime_error("delete failed transaction " +
-							to_string(p.first) + " still lock page " + to_string(pCode));
-					}
-					else {
-						pageLocks.erase(pageLocks.begin() + i);
-						pids.erase(pids.begin() + i);
-						break;
-					}
-				}
-			}
+		for (auto iter : _tidToInfo) {
+			shared_ptr<TransactionLockInfo> pInfo = iter.second;
+			pInfo->deleteLock(pCode);
 		}
 		auto iter = _pidToMutex.find(pCode);
 		if (iter != _pidToMutex.end()) {
@@ -140,16 +119,26 @@ namespace Simpledb {
 	{
 		lock_guard<mutex> lock(_managerLock);
 		auto t = tid->getId();
-		auto p = pid->hashCode();
-
-		auto& pids = _tidToPids[t];
-		auto sz = pids.size();
-		for (int i = 0; i < sz; ++i) {
-			if (pids[i] == p) {
-				return _tidToLocks[t][i];
-			}
+		shared_ptr<TransactionLockInfo> pInfo = _tidToInfo[t];
+		if (pInfo == nullptr) {
+			pInfo = make_shared<TransactionLockInfo>();
+			_tidToInfo[t] = pInfo;
 		}
-		return nullptr;
+		auto p = pid->hashCode();
+		auto plock = pInfo->getLock(p);
+		if (plock == nullptr) {
+			shared_ptr<PageMutex> pMutex = _pidToMutex[p];
+			if (pMutex == nullptr) {
+				pMutex = make_shared<PageMutex>();
+				_pidToMutex[p] = pMutex;
+			}
+			pInfo->addLock(p, pMutex);
+			plock = pInfo->getLock(p);		
+		}
+		if (plock == nullptr)
+			throw runtime_error("getLock failed");
+			
+		return plock;
 	}
 	
 	void TransactionLockInfo::addLock(size_t pid, shared_ptr<PageMutex> pageMutex)
@@ -169,9 +158,33 @@ namespace Simpledb {
 		bool flag = false;
 		for (int i = 0; i < sz; i++) {
 			if (_pids[i] == pid) {
-				
+				shared_ptr<PageLock> lock = _locks[i];
+				if (lock->_rlock.owns_lock()
+					|| lock->_wlock.owns_lock()) {
+					throw runtime_error("delete failed transaction still lock page " + to_string(pid));
+				}
+			}
+			else {
+				_pids.erase(_pids.begin() + i);
+				_locks.erase(_locks.begin() + i);
+				flag = true;
+				break;
 			}
 		}
+		if (!flag) {
+			throw runtime_error("delte failed");
+		}
+	}
+
+	shared_ptr<PageLock> TransactionLockInfo::getLock(size_t pid)
+	{
+		auto sz = _pids.size();
+		for (int i = 0; i < sz; i++) {
+			if (_pids[i] == pid) {
+				return _locks[i];
+			}
+		}
+		return nullptr;
 	}
 
 }
