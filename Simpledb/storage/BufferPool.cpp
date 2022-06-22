@@ -27,25 +27,18 @@ namespace Simpledb
 			_idToPageInfo[pidHashCode]._page = dbFile->readPage(pid);
 		}
 		_idToPageInfo[pidHashCode]._lastGetTime = clock();
-		
-		if (!_lockManager.isLock(perm, tid, pid)) {
-			_lockManager.lock(perm, tid, pid);
-		}
-		_lockManager.accessPage(perm, tid, pid);
 		return _idToPageInfo[pidHashCode]._page;
 	}
 	void BufferPool::unsafeReleasePage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
-		_lockManager.unlock(Permissions::READ_ONLY, tid, pid);
-		_lockManager.unlock(Permissions::READ_WRITE, tid, pid);
+		_lockManager.unlockPage(tid, pid);
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 	}
 	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
-		return _lockManager.isLock(Permissions::READ_ONLY, tid, pid)
-			|| _lockManager.isLock(Permissions::READ_WRITE, tid, pid);
+		return _lockManager.holdsLock(tid, pid);
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
