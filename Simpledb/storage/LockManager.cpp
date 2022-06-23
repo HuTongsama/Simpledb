@@ -26,6 +26,53 @@ namespace Simpledb {
 	void LockManager::accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> guard(_managerLock);
+		auto tCode = tid->getId();
+		auto pCode = pid->hashCode();
+
+		auto pInfo = _tidToInfo[tCode];
+		if (pInfo == nullptr) {
+			pInfo = make_shared<TransactionLockInfo>();
+			_tidToInfo[tCode] = pInfo;
+		}
+		if (!pInfo->holdsLock(pCode)) {
+			auto pMutex = _pidToMutex[pCode];
+			if (pMutex == nullptr) {
+				pMutex = make_shared<shared_mutex>();
+				_pidToMutex[pCode] = pMutex;
+			}
+			pInfo->addLock(pCode, pMutex, p);
+		}
+		else {
+			if (p == Permissions::READ_WRITE) {
+				if (pInfo->isLocked(pCode, Permissions::READ_ONLY)) {
+					bool findFlag = false;
+					for (auto iter : _tidToInfo) {
+						if (iter.first != tCode) {
+							auto tmpInfo = iter.second;
+							if (tmpInfo->holdsLock(pCode) &&
+								tmpInfo->isLocked(pCode, Permissions::READ_ONLY)) {
+								findFlag = true;
+								break;
+							}
+						}
+					}
+					if (!findFlag) {
+						pInfo->unlock(pCode, Permissions::READ_ONLY);
+					}
+				}
+			}
+			else if (p == Permissions::READ_ONLY) {
+				if (pInfo->isLocked(pCode, Permissions::READ_WRITE))
+					return;
+			}
+			if (pInfo->isLocked(pCode, p)) {
+				return;
+			}
+			else {
+				pInfo->lock(pCode, p);
+			}
+		}
+		
 
 	}
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
@@ -101,6 +148,17 @@ namespace Simpledb {
 		return false;
 	}
 
+	bool TransactionLockInfo::holdsLock(size_t pid)
+	{
+		auto iter = find_if(_locks.begin(), _locks.end(),
+			[pid](shared_ptr<PageLock> plock) {
+				return plock->getPageId() == pid;
+			});
+		if (iter == _locks.end())
+			return false;
+		return true;
+	}
+
 	void TransactionLockInfo::deleteLock(size_t pid)
 	{
 		auto iter = find_if(_locks.begin(), _locks.end(),
@@ -122,16 +180,6 @@ namespace Simpledb {
 		}
 	}
 
-	shared_ptr<PageLock> TransactionLockInfo::getLock(size_t pid)
-	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
-		if (iter == _locks.end())
-			return nullptr;
-		return *iter;
-	}
 
 	void PageLock::lock(Permissions perm)
 	{

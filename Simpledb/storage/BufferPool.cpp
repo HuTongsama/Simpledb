@@ -14,6 +14,7 @@ namespace Simpledb
 	}
 	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
+		_lockManager.accessPermission(perm, tid, pid);
 		lock_guard<mutex> lock(_mutex);
 		if (tid == nullptr || pid == nullptr)
 			return nullptr;

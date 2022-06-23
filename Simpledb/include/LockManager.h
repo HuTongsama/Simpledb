@@ -31,8 +31,8 @@ namespace Simpledb {
 		void lock(size_t pid, Permissions perm);
 		void unlock(size_t pid, Permissions perm);
 		bool isLocked(size_t pid, Permissions perm);
+		bool holdsLock(size_t pid);
 		void deleteLock(size_t pid);
-		shared_ptr<PageLock> getLock(size_t pid);
 	private:
 		vector<shared_ptr<PageLock>> _locks;
 	};

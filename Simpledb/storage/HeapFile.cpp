@@ -165,7 +165,7 @@ namespace Simpledb {
 		}
 		shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(_tableId, _pageNo);
 		shared_ptr<HeapPage> _curPage = dynamic_pointer_cast<HeapPage>
-			(Database::getBufferPool()->getPage(_tid, pid, Permissions::READ_WRITE));
+			(Database::getBufferPool()->getPage(_tid, pid, Permissions::READ_ONLY));
 		if (_curPage != nullptr) {
 			_iter = _curPage->iterator();
 			_iter->open();

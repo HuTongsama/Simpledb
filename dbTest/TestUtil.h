@@ -333,6 +333,7 @@ public:
             catch (const std::exception& e){               
                 lock_guard<mutex> lock(_elock);
                 _error = e.what();
+                cout << _error << endl;
                 Database::getBufferPool()->transactionComplete(_tid, false);
             }
         }
