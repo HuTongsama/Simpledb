@@ -84,6 +84,14 @@ namespace Simpledb {
 		_tidToInfo.erase(tid->getId());
 		
 	}
+	vector<size_t> LockManager::getRelatedPageIds(shared_ptr<TransactionId> tid)
+	{
+		lock_guard<mutex> lock(_managerLock);
+		auto pInfo = _tidToInfo[tid->getId()];
+		if (!pInfo)
+			return {};
+		return pInfo->getAllPageIds();
+	}
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_managerLock);
@@ -178,15 +186,18 @@ namespace Simpledb {
 			throw runtime_error("delte lock that is not exist");
 		}
 		else {
-			shared_ptr<PageLock> plock = *iter;
-			if (plock->isLocked(Permissions::READ_ONLY)
-				|| plock->isLocked(Permissions::READ_WRITE)) {
-				throw runtime_error("delete lock that is still locked");
-			}
-			else {
-				_locks.erase(iter);
-			}
+			_locks.erase(iter);
+			
 		}
+	}
+
+	vector<size_t> TransactionLockInfo::getAllPageIds()
+	{
+		vector<size_t> result;
+		for (auto& lock : _locks) {
+			result.push_back(lock->getPageId());
+		}
+		return result;
 	}
 
 

@@ -33,6 +33,7 @@ namespace Simpledb {
 		bool isLocked(size_t pid, Permissions perm);
 		bool holdsLock(size_t pid);
 		void deleteLock(size_t pid);
+		vector<size_t> getAllPageIds();
 	private:
 		vector<shared_ptr<PageLock>> _locks;
 	};
@@ -42,6 +43,7 @@ namespace Simpledb {
 		void unlockPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		void accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		void transactionComplete(shared_ptr<TransactionId> tid);
+		vector<size_t> getRelatedPageIds(shared_ptr<TransactionId> tid);
 		void deletePageLock(shared_ptr<PageId> pid);
 
 	private:

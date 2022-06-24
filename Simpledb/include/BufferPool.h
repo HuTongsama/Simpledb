@@ -133,12 +133,12 @@ namespace Simpledb {
 		Also used by B+ tree files to ensure that deleted pages
 		are removed from the cache so they can be reused safely
 		*/
-		void discardPage(const PageId& pid);
+		void discardPage(shared_ptr<PageId> pid);
 		/**
 		* Flushes a certain page to disk
 		* @param pid an ID indicating the page to flush
 		*/
-		void flushPage(const PageId& pid);
+		void flushPage(shared_ptr<PageId> pid);
 		/** Write all pages of the specified transaction to disk.*/
 		void flushPages(const TransactionId& tid);//synchronized
 		/**
@@ -154,7 +154,7 @@ namespace Simpledb {
 		};
 
 		
-		void flushPageInner(const PageId& pid);
+		void flushPageInner(shared_ptr<PageId> pid);
 		void flushPageInner(shared_ptr<Page> p);
 		void evictPageInner();
 

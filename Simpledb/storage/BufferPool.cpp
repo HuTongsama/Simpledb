@@ -44,6 +44,10 @@ namespace Simpledb
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
+		lock_guard<mutex> guard(_mutex);
+		if (commit) {
+			auto pids = _lockManager.getRelatedPageIds(tid);
+		}
 	}
 	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, size_t tableId, shared_ptr<Tuple> t)
 	{
@@ -86,17 +90,17 @@ namespace Simpledb
 			}
 		}
 	}
-	void BufferPool::discardPage(const PageId& pid)
+	void BufferPool::discardPage(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_mutex);
 		for (auto& iter : _idToPageInfo) {
-			if (iter.second._page->getId()->equals(pid)) {
+			if (iter.second._page->getId()->equals(*pid)) {
 				_idToPageInfo.erase(iter.first);
 				break;
 			}
 		}
 	}
-	void BufferPool::flushPage(const PageId& pid)
+	void BufferPool::flushPage(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_mutex);
 		flushPageInner(pid);
@@ -109,12 +113,12 @@ namespace Simpledb
 		lock_guard<mutex> lock(_mutex);
 		evictPageInner();
 	}
-	void BufferPool::flushPageInner(const PageId& pid)
+	void BufferPool::flushPageInner(shared_ptr<PageId> pid)
 	{
 		
 		shared_ptr<Page> p = nullptr;
 		for (auto& iter : _idToPageInfo) {
-			if (iter.second._page->getId()->equals(pid))
+			if (iter.second._page->getId()->equals(*pid))
 			{
 				p = iter.second._page;
 				break;
@@ -135,6 +139,8 @@ namespace Simpledb
 		clock_t t = -1;
 		size_t id = 0;
 		for (auto& iter : _idToPageInfo) {
+			if (_idToPageInfo[iter.first]._page->isDirty())
+				continue;
 			if (-1 == t) {
 				id = iter.first;
 				t = iter.second._lastGetTime;
@@ -149,8 +155,7 @@ namespace Simpledb
 		}
 		if (t != -1) {
 			PageInfo& info = _idToPageInfo[id];
-			if (info._page->isDirty())
-				flushPageInner(info._page);
+			_lockManager.deletePageLock(info._page->getId());
 			_idToPageInfo.erase(id);
 		}
 	}
