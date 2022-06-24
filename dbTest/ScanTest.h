@@ -34,33 +34,33 @@ protected:
 
 	default_random_engine _r;
 };
-//TEST_F(ScanTest, TestSmall) {
-//    vector<int> columnSizes{ 1, 2, 3, 4 };
-//    vector<int> rowSizes = {0, 1, 2, 511, 512, 513, 1023, 1024, 1025, int(4096 + _r()%4096 + 1)};
-//    validateScan(columnSizes, rowSizes);
-//}
-//TEST_F(ScanTest, TestRewind) {
-//    vector<vector<int>> tuples;
-//    shared_ptr<HeapFile> f = SystemTestUtil::createRandomHeapFile(2, 1000, map<int, int>(), tuples);
-//
-//    shared_ptr<TransactionId> tid = make_shared<TransactionId>();
-//    shared_ptr<SeqScan> scan = make_shared<SeqScan>(tid, f->getId(), "table");
-//    scan->open();
-//    for (int i = 0; i < 100; ++i) {
-//        EXPECT_TRUE(scan->hasNext());
-//        Tuple& t = scan->next();
-//        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
-//    }
-//
-//    scan->rewind();
-//    for (int i = 0; i < 100; ++i) {
-//        EXPECT_TRUE(scan->hasNext());
-//        Tuple& t = scan->next();
-//        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
-//    }
-//    scan->close();
-//    Database::getBufferPool()->transactionComplete(tid);
-//}
+TEST_F(ScanTest, TestSmall) {
+    vector<int> columnSizes{ 1, 2, 3, 4 };
+    vector<int> rowSizes = {0, 1, 2, 511, 512, 513, 1023, 1024, 1025, int(4096 + _r()%4096 + 1)};
+    validateScan(columnSizes, rowSizes);
+}
+TEST_F(ScanTest, TestRewind) {
+    vector<vector<int>> tuples;
+    shared_ptr<HeapFile> f = SystemTestUtil::createRandomHeapFile(2, 1000, map<int, int>(), tuples);
+
+    shared_ptr<TransactionId> tid = make_shared<TransactionId>();
+    shared_ptr<SeqScan> scan = make_shared<SeqScan>(tid, f->getId(), "table");
+    scan->open();
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_TRUE(scan->hasNext());
+        Tuple& t = scan->next();
+        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
+    }
+
+    scan->rewind();
+    for (int i = 0; i < 100; ++i) {
+        EXPECT_TRUE(scan->hasNext());
+        Tuple& t = scan->next();
+        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
+    }
+    scan->close();
+    Database::getBufferPool()->transactionComplete(tid);
+}
 TEST_F(ScanTest, TestCache) {
     int PAGES = 30;
     vector<vector<int>> tuples;

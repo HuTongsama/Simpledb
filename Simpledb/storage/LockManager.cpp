@@ -75,6 +75,15 @@ namespace Simpledb {
 		
 
 	}
+	void LockManager::transactionComplete(shared_ptr<TransactionId> tid)
+	{
+		lock_guard<mutex> lock(_managerLock);
+		auto pInfo = _tidToInfo[tid->getId()];
+		if (!pInfo)
+			return;
+		_tidToInfo.erase(tid->getId());
+		
+	}
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_managerLock);

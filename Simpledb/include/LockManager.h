@@ -41,6 +41,7 @@ namespace Simpledb {
 		bool holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		void unlockPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		void accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
+		void transactionComplete(shared_ptr<TransactionId> tid);
 		void deletePageLock(shared_ptr<PageId> pid);
 
 	private:

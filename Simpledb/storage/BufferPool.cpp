@@ -36,6 +36,7 @@ namespace Simpledb
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
+		_lockManager.transactionComplete(tid);
 	}
 	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
@@ -51,6 +52,9 @@ namespace Simpledb
 		for (auto& page : pages) {
 			dbFile->writePage(page);
 		}
+		for (auto& page : pages) {
+			_lockManager.unlockPage(tid, page->getId());
+		}
 	}
 	void BufferPool::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
@@ -63,6 +67,9 @@ namespace Simpledb
 			if (!pages.empty()) {
 				for (auto& page : pages) {
 					dbFile->writePage(page);
+				}
+				for (auto& page : pages) {
+					_lockManager.unlockPage(tid, page->getId());
 				}
 				break;
 			}
