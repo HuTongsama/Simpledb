@@ -5,6 +5,7 @@
 #include"DbFileIterator.h"
 #include"File.h"
 #include<vector>
+#include<mutex>
 #include<stdio.h>
 using namespace std;
 namespace Simpledb {	
@@ -91,5 +92,7 @@ namespace Simpledb {
 		* Returns the number of pages.
 		*/
 		virtual size_t numPages() = 0;
+	protected:
+		mutex _dbfileMutex;
 	};
 }

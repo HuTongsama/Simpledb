@@ -36,7 +36,7 @@ namespace Simpledb
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid)
 	{
-		_lockManager.transactionComplete(tid);
+		transactionComplete(tid, true);
 	}
 	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
@@ -44,10 +44,28 @@ namespace Simpledb
 	}
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
-		lock_guard<mutex> guard(_mutex);
+		auto pids = _lockManager.getRelatedPageIds(tid);
 		if (commit) {
-			auto pids = _lockManager.getRelatedPageIds(tid);
+			flushPages(tid);
 		}
+		else {
+			lock_guard<mutex> guard(_mutex);
+			for (auto id : pids) {
+				if (_idToPageInfo.find(id) != _idToPageInfo.end()) {
+					shared_ptr<Page> page = _idToPageInfo[id]._page;
+					if (page->isDirty()) {
+						shared_ptr<PageId> pid = page->getId();
+						size_t tableId = pid->getTableId();
+						shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
+						_idToPageInfo[id]._page = dbFile->readPage(pid);
+					}
+				}
+				else {
+					throw runtime_error("error page id");
+				}
+			}
+		}
+		_lockManager.transactionComplete(tid);
 	}
 	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, size_t tableId, shared_ptr<Tuple> t)
 	{
@@ -86,7 +104,6 @@ namespace Simpledb
 			shared_ptr<Page> p = iter.second._page;
 			if (p->isDirty()) {
 				flushPageInner(p);
-				p->markDirty(false, nullptr);
 			}
 		}
 	}
@@ -105,8 +122,21 @@ namespace Simpledb
 		lock_guard<mutex> lock(_mutex);
 		flushPageInner(pid);
 	}
-	void BufferPool::flushPages(const TransactionId& tid)
+	void BufferPool::flushPages(shared_ptr<TransactionId> tid)
 	{
+		lock_guard<mutex> lock(_mutex);
+		auto pids = _lockManager.getRelatedPageIds(tid);
+		for (auto id : pids) {
+			if (_idToPageInfo.find(id) != _idToPageInfo.end()) {
+				shared_ptr<Page> page = _idToPageInfo[id]._page;
+				if (page->isDirty()) {
+					flushPageInner(page);
+				}
+			}
+			else {
+				throw runtime_error("flush error page");
+			}
+		}
 	}
 	void BufferPool::evictPage()
 	{
@@ -133,6 +163,7 @@ namespace Simpledb
 		size_t tableId = p->getId()->getTableId();
 		shared_ptr<DbFile> dbfile = Database::getCatalog()->getDatabaseFile(tableId);
 		dbfile->writePage(p);
+		p->markDirty(false, nullptr);
 	}
 	void BufferPool::evictPageInner()
 	{
@@ -157,6 +188,9 @@ namespace Simpledb
 			PageInfo& info = _idToPageInfo[id];
 			_lockManager.deletePageLock(info._page->getId());
 			_idToPageInfo.erase(id);
+		}
+		else {
+			throw runtime_error("evict error");
 		}
 	}
 }

@@ -183,9 +183,12 @@ namespace Simpledb {
 				return plock->getPageId() == pid;
 			});
 		if (iter == _locks.end()) {
-			throw runtime_error("delte lock that is not exist");
+			return;
 		}
 		else {
+			if ((*iter)->isLocked(Permissions::READ_WRITE)) {
+				throw runtime_error("delete a lock that is still exclusive locked");
+			}
 			_locks.erase(iter);
 			
 		}

@@ -140,7 +140,7 @@ namespace Simpledb {
 		*/
 		void flushPage(shared_ptr<PageId> pid);
 		/** Write all pages of the specified transaction to disk.*/
-		void flushPages(const TransactionId& tid);//synchronized
+		void flushPages(shared_ptr<TransactionId> tid);//synchronized
 		/**
 		* Discards a page from the buffer pool.
 		* Flushes the page to disk to ensure dirty pages are updated on disk.
