@@ -67,6 +67,7 @@
     <ClInclude Include="SystemTestUtil.h" />
     <ClInclude Include="TableStatsTest.h" />
     <ClInclude Include="TestUtil.h" />
+    <ClInclude Include="TransactionTest.h" />
     <ClInclude Include="TupleDescTest.h" />
     <ClInclude Include="TupleTest.h" />
   </ItemGroup>

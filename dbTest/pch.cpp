@@ -33,3 +33,4 @@
 #include "JoinOptimizerTest.h"
 #include "SysQueryTest.h"
 #include "LockingTest.h"
+#include "TransactionTest.h"
