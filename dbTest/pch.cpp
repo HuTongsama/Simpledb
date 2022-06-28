@@ -34,3 +34,4 @@
 #include "SysQueryTest.h"
 #include "LockingTest.h"
 #include "TransactionTest.h"
+#include "AbortEvictionTest.h"

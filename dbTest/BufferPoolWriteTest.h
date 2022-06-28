@@ -23,11 +23,11 @@ protected:
 				vector<unsigned char> emptyData = HeapPage::createEmptyPageData();
 				shared_ptr<File> f = getFile();
 				f->writeBytes(emptyData.data(), emptyData.size());
-				shared_ptr<HeapPage> p = make_shared<HeapPage>(
-					make_shared<HeapPageId>(HeapFile::getId(), HeapFile::numPages() - 1),
-					emptyData);
-				p->insertTuple(t);
-				dirtypages.push_back(p);
+				shared_ptr<HeapPageId> pid = make_shared<HeapPageId>(HeapFile::getId(), HeapFile::numPages() - 1);
+				shared_ptr<HeapPage> hp = dynamic_pointer_cast<HeapPage>(
+					Database::getBufferPool()->getPage(tid, pid, Permissions::READ_WRITE));
+				hp->insertTuple(t);
+				dirtypages.push_back(hp);
 			}
 			return dirtypages;
 		}

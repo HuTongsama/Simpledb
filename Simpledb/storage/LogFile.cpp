@@ -31,33 +31,31 @@ namespace Simpledb {
     void LogFile::logAbort(const TransactionId& tid)
     {
         // must have buffer pool lock before proceeding, since this
-        // calls rollback
-        Database::getBufferPool()->lockBufferPool();
-        lock_guard<mutex> lock(_logFileMutex);
+        // calls rollback;
+        
         preAppend();
         //Debug.log("ABORT");
         //should we verify that this is a live transaction?
 
         // must do this here, since rollback only works for
-        // live transactions (needs tidToFirstLogRecord)
-        
+        // live transactions (needs tidToFirstLogRecord)   
         rollback(tid);
+        lock_guard<mutex> guard(_logFileMutex);
         _logFile.writeInt(ABORT_RECORD);
         _logFile.writeInt64(tid.getId());
         _logFile.writeInt64(_currentOffset);
         _currentOffset = _logFile.position();
         force();
         _tidToFirstLogRecord.erase(tid.getId());
-        Database::getBufferPool()->unlockBufferPool();
     }
     
     void LogFile::logCommit(const TransactionId& tid)
     {
-        lock_guard<mutex> lock(_logFileMutex);
+        
         preAppend();
         //Debug.log("COMMIT " + tid.getId());
         //should we verify that this is a live transaction?
-
+        lock_guard<mutex> lock(_logFileMutex);
         _logFile.writeInt(COMMIT_RECORD);
         _logFile.writeInt64(tid.getId());
         _logFile.writeInt64(_currentOffset);
@@ -249,7 +247,6 @@ namespace Simpledb {
     {
         Database::getBufferPool()->lockBufferPool();
         {
-            lock_guard<mutex> lock(_logFileMutex);
             preAppend();
             // some code goes here
         }
@@ -355,6 +352,7 @@ namespace Simpledb {
     }
     void LogFile::preAppend()
     {
+        lock_guard<mutex> lock(_logFileMutex);
         _totalRecords++;
         if (_recoveryUndecided) {
             _recoveryUndecided = false;

@@ -72,7 +72,7 @@ namespace Simpledb
 		shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
 		vector<shared_ptr<Page>> pages = dbFile->insertTuple(tid, t);
 		for (auto& page : pages) {
-			dbFile->writePage(page);
+			page->markDirty(true, tid);
 		}
 		for (auto& page : pages) {
 			_lockManager.unlockPage(tid, page->getId());
@@ -88,7 +88,7 @@ namespace Simpledb
 			vector<shared_ptr<Page>> pages = dbFile->deleteTuple(tid, t);
 			if (!pages.empty()) {
 				for (auto& page : pages) {
-					dbFile->writePage(page);
+					page->markDirty(true, tid);
 				}
 				for (auto& page : pages) {
 					_lockManager.unlockPage(tid, page->getId());

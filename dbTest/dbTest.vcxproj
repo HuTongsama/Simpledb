@@ -33,6 +33,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClInclude Include="AbortEvictionTest.h" />
     <ClInclude Include="AggregateTest.h" />
     <ClInclude Include="BufferPoolWriteTest.h" />
     <ClInclude Include="CatalogTest.h" />

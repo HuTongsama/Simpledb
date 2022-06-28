@@ -61,7 +61,6 @@ namespace Simpledb {
 		vector<shared_ptr<Page>> pages;
 		if (nullptr == t)
 			return pages;
-		size_t curPageNum = numPages();
 		size_t num = 0;
 		size_t tableId = getId();
 		while (true) {
@@ -70,14 +69,15 @@ namespace Simpledb {
 				Database::getBufferPool()->getPage(tid, pid, Permissions::READ_WRITE));
 
 			if (hp->getNumEmptySlots() > 0) {
-				hp->markDirty(true, tid);
 				hp->insertTuple(t);
 				pages.push_back(hp);
 				break;
 			}
 			else {
 				lock_guard<mutex> guard(_dbfileMutex);
+				Database::getBufferPool()->unsafeReleasePage(tid, pid);
 				num++;
+				size_t curPageNum = numPages();
 				if (num >= curPageNum) {
 					size_t byteCount = BufferPool::getPageSize();
 					vector<unsigned char> bytes(byteCount, 0);
@@ -99,7 +99,6 @@ namespace Simpledb {
 				Database::getBufferPool()->getPage(tid, pid, Permissions::READ_WRITE));
 			try
 			{
-				hp->markDirty(true, tid);
 				hp->deleteTuple(t);
 				pages.push_back(hp);
 				break;

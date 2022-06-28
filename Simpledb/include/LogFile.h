@@ -50,7 +50,7 @@ namespace Simpledb {
         /** Truncate any unneeded portion of the log to reduce its space
         consumption */
         void logTruncate();
-        /** Rollback the specified transaction, setting the state of any
+        /** Rollback the specified transaction, setting the state of any 
         of pages it updated to their pre-updated state.  To preserve
         transaction semantics, this should not be called on
         transactions that have already committed (though this may not

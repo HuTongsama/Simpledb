@@ -45,8 +45,12 @@ namespace Simpledb {
 		void resetPageSize() {
 			_pageSize = DEFAULT_PAGE_SIZE;
 		}
-		void lockBufferPool() {}
-		void unlockBufferPool() {}
+		void lockBufferPool() {
+			_mutex.lock();
+		}
+		void unlockBufferPool() {
+			_mutex.unlock();
+		}
 		/**
 		* Retrieve the specified page with the associated permissions.
 		* Will acquire a lock and may block if that lock is held by another 
@@ -66,7 +70,7 @@ namespace Simpledb {
 		/**
 		* Releases the lock on a page.
 		* Calling this is very risky, and may result in wrong behavior. Think hard
-		* about who needs to call this and why, and why they can run the risk of
+		* about who needs to call this and why, and why they can run the risk of 
 		* calling it.
 		*
 		* @param tid the ID of the transaction requesting the unlock
