@@ -83,8 +83,6 @@ namespace Simpledb {
 		* @param tid the ID of the transaction requesting the unlock
 		*/
 		void transactionComplete(shared_ptr<TransactionId> tid);
-		/** Return true if the specified transaction has a lock on the specified page */
-		bool holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		/**
 		* Commit or abort a given transaction; release all locks associated to
 		* the transaction.
@@ -93,6 +91,8 @@ namespace Simpledb {
 		* @param commit a flag indicating whether we should commit or abort
 		*/
 		void transactionComplete(shared_ptr<TransactionId> tid, bool commit);
+		/** Return true if the specified transaction has a lock on the specified page */
+		bool holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid);
 		/**
 		* Add a tuple to the specified table on behalf of transaction tid.  Will
 		* acquire a write lock on the page the tuple is added to and any other

@@ -38,10 +38,7 @@ namespace Simpledb
 	{
 		transactionComplete(tid, true);
 	}
-	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
-	{
-		return _lockManager.holdsLock(tid, pid);
-	}
+
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
 		auto pids = _lockManager.getRelatedPageIds(tid);
@@ -67,6 +64,12 @@ namespace Simpledb
 		}
 		_lockManager.transactionComplete(tid);
 	}
+
+	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
+	{
+		return _lockManager.holdsLock(tid, pid);
+	}
+	
 	void BufferPool::insertTuple(shared_ptr<TransactionId> tid, size_t tableId, shared_ptr<Tuple> t)
 	{
 		shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
