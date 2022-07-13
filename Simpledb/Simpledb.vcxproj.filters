@@ -224,6 +224,9 @@
     <ClInclude Include="include\LockManager.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\DirectedGraph.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -363,6 +366,9 @@
     </ClCompile>
     <ClCompile Include="storage\LockManager.cpp">
       <Filter>storage</Filter>
+    </ClCompile>
+    <ClCompile Include="common\DirectedGraph.cpp">
+      <Filter>common</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

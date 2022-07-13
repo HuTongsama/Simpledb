@@ -180,6 +180,7 @@
     <ClInclude Include="include\DbFile.h" />
     <ClInclude Include="include\DbFileIterator.h" />
     <ClInclude Include="include\Delete.h" />
+    <ClInclude Include="include\DirectedGraph.h" />
     <ClInclude Include="Include\Field.h" />
     <ClInclude Include="include\BufferPool.h" />
     <ClInclude Include="include\File.h" />
@@ -237,6 +238,7 @@
     <ClCompile Include="common\Common.cpp" />
     <ClCompile Include="common\Database.cpp" />
     <ClCompile Include="common\DataStream.cpp" />
+    <ClCompile Include="common\DirectedGraph.cpp" />
     <ClCompile Include="common\File.cpp" />
     <ClCompile Include="common\PageFactory.cpp" />
     <ClCompile Include="common\PageIdFactory.cpp" />
