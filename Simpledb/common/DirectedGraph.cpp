@@ -1,6 +1,7 @@
 #include"DirectedGraph.h"
 #include<algorithm>
 #include<stdexcept>
+#include<queue>
 namespace Simpledb {
 	void DirectedGraph::addEdge(int64_t from, int64_t to)
 	{
@@ -8,6 +9,9 @@ namespace Simpledb {
 		iter = addVertex(from);
 		if (iter == _vertexs.end()) {
 			throw runtime_error("add edge failed");
+		}
+		if (_indegreeMap.find(from) == _indegreeMap.end()) {
+			_indegreeMap[from] = 0;
 		}
 		list<int64_t>& listRef = (*iter)->_adjacencyList;
 		auto listIter = find(listRef.begin(), listRef.end(), to);
@@ -49,6 +53,29 @@ namespace Simpledb {
 
 	bool DirectedGraph::isAcyclic()
 	{
+		queue<shared_ptr<Vertex>> vertexQueue;
+		for (auto iter : _indegreeMap) {
+			if (iter.second == 0) {
+				auto v = findVertex(iter.first);
+				vertexQueue.push(*v);
+			}
+		}
+		int count = 0;
+		while (!vertexQueue.empty()) {
+			auto v = vertexQueue.front();
+			vertexQueue.pop();
+			count++;
+			list<int64_t>& adjacencyList = v->_adjacencyList;
+			for (auto vertex : adjacencyList) {
+				_indegreeMap[vertex] -= 1;
+			}
+			for (auto iter : _indegreeMap) {
+				if (iter.second == 0) {
+					auto v = findVertex(iter.first);
+					vertexQueue.push(*v);
+				}
+			}
+		}
 		return false;
 	}
 

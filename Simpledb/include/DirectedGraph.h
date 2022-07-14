@@ -20,6 +20,8 @@ namespace Simpledb {
 	private:
 		vector<shared_ptr<Vertex>>::iterator findVertex(int64_t v);
 		vector<shared_ptr<Vertex>>::iterator addVertex(int64_t v);
+		void updateVertexQueue();
+
 
 		vector<shared_ptr<Vertex>> _vertexs;
 		map<int64_t, size_t> _indegreeMap;
