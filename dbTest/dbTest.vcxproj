@@ -37,6 +37,7 @@
     <ClInclude Include="AggregateTest.h" />
     <ClInclude Include="BufferPoolWriteTest.h" />
     <ClInclude Include="CatalogTest.h" />
+    <ClInclude Include="DeadlockTest.h" />
     <ClInclude Include="EvictionTest.h" />
     <ClInclude Include="FilterBase.h" />
     <ClInclude Include="FilterTest.h" />
