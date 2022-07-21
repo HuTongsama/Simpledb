@@ -2,6 +2,7 @@
 #include<vector>
 #include<list>
 #include<map>
+#include<queue>
 #include<memory>
 using namespace std;
 namespace Simpledb {
@@ -20,7 +21,7 @@ namespace Simpledb {
 	private:
 		vector<shared_ptr<Vertex>>::iterator findVertex(int64_t v);
 		vector<shared_ptr<Vertex>>::iterator addVertex(int64_t v);
-		void updateVertexQueue();
+		void updateVertexQueue(queue<shared_ptr<Vertex>>& vertexQueue,map<int64_t, size_t>& indegreeMap);
 
 
 		vector<shared_ptr<Vertex>> _vertexs;

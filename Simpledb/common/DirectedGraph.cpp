@@ -1,7 +1,7 @@
 #include"DirectedGraph.h"
 #include<algorithm>
 #include<stdexcept>
-#include<queue>
+
 namespace Simpledb {
 	void DirectedGraph::addEdge(int64_t from, int64_t to)
 	{
@@ -54,12 +54,8 @@ namespace Simpledb {
 	bool DirectedGraph::isAcyclic()
 	{
 		queue<shared_ptr<Vertex>> vertexQueue;
-		for (auto iter : _indegreeMap) {
-			if (iter.second == 0) {
-				auto v = findVertex(iter.first);
-				vertexQueue.push(*v);
-			}
-		}
+		map<int64_t, size_t> indegreeMap = _indegreeMap;
+		updateVertexQueue(vertexQueue, indegreeMap);
 		int count = 0;
 		while (!vertexQueue.empty()) {
 			auto v = vertexQueue.front();
@@ -69,12 +65,10 @@ namespace Simpledb {
 			for (auto vertex : adjacencyList) {
 				_indegreeMap[vertex] -= 1;
 			}
-			for (auto iter : _indegreeMap) {
-				if (iter.second == 0) {
-					auto v = findVertex(iter.first);
-					vertexQueue.push(*v);
-				}
-			}
+			updateVertexQueue(vertexQueue, indegreeMap);
+		}
+		if (count == _vertexs.size()) {
+			return true;
 		}
 		return false;
 	}
@@ -95,6 +89,20 @@ namespace Simpledb {
 		shared_ptr<Vertex> p = make_shared<Vertex>(v);
 		iter = _vertexs.emplace(_vertexs.end(), p);
 		return iter;
+	}
+
+	void DirectedGraph::updateVertexQueue(queue<shared_ptr<Vertex>>& vertexQueue,map<int64_t, size_t>& indegreeMap)
+	{
+		for (auto iter = indegreeMap.begin(); iter != indegreeMap.end();) {
+			if (iter->second == 0) {
+				auto v = findVertex(iter->first);
+				vertexQueue.push(*v);
+				iter = indegreeMap.erase(iter);
+			}
+			else {
+				iter++;
+			}
+		}
 	}
 
 }

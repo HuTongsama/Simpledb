@@ -3,6 +3,7 @@
 #include"TransactionId.h"
 #include"PageId.h"
 #include"Permissions.h"
+#include"DirectedGraph.h"
 #include<mutex>
 #include<shared_mutex>
 #include<map>
@@ -47,8 +48,11 @@ namespace Simpledb {
 		void deletePageLock(shared_ptr<PageId> pid);
 
 	private:
+		void updateWaitforGraph(Permissions p, shared_ptr<TransactionId>& tid, shared_ptr<PageId> pid);
+
 		map<size_t, shared_ptr<TransactionLockInfo>> _tidToInfo;
 		map<size_t, shared_ptr<shared_mutex>> _pidToMutex;
 		mutex _managerLock;
+		DirectedGraph _waitforGraph;
 	};
 }

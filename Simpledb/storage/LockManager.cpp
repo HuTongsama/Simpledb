@@ -105,6 +105,33 @@ namespace Simpledb {
 			_pidToMutex.erase(iter);
 		}
 	}
+
+	void LockManager::updateWaitforGraph(Permissions p, shared_ptr<TransactionId>& tid, shared_ptr<PageId> pid)
+	{
+		auto t1 = tid->getId();
+		auto p1 = pid->hashCode();
+
+		for (auto iter : _tidToInfo) {
+			auto& info = iter.second;
+			auto pids = info->getAllPageIds();
+			auto findIter = find(pids.begin(), pids.end(), p1);
+			if (findIter == pids.end()) {
+				continue;
+			}
+			auto t2 = iter.first;
+			if (info->isLocked(p1, Permissions::READ_WRITE)) {
+				_waitforGraph.addEdge(t2, t1);
+			}
+			else if (info->isLocked(p1, Permissions::READ_ONLY)
+				&& p == Permissions::READ_WRITE) {
+				_waitforGraph.addEdge(t1, t2);
+			}
+		}
+
+		if (!_waitforGraph.isAcyclic()) {
+			throw runtime_error("wait for graph");
+		}
+	}
 	
 	void TransactionLockInfo::addLock(size_t pid, shared_ptr<shared_mutex> pageMutex, Permissions perm)
 	{
