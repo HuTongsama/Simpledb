@@ -4,6 +4,7 @@
 #include<map>
 #include<queue>
 #include<memory>
+#include<mutex>
 using namespace std;
 namespace Simpledb {
 	class DirectedGraph {
@@ -26,5 +27,6 @@ namespace Simpledb {
 
 		vector<shared_ptr<Vertex>> _vertexs;
 		map<int64_t, size_t> _indegreeMap;
+		mutex _graphMutex;
 	};
 }

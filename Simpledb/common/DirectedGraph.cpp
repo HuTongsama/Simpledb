@@ -5,6 +5,7 @@
 namespace Simpledb {
 	void DirectedGraph::addEdge(int64_t from, int64_t to)
 	{
+		lock_guard<mutex> guard(_graphMutex);
 		auto iter = addVertex(to);
 		iter = addVertex(from);
 		if (iter == _vertexs.end()) {
@@ -26,6 +27,7 @@ namespace Simpledb {
 
 	void DirectedGraph::deleteEdge(int64_t from, int64_t to)
 	{
+		lock_guard<mutex> guard(_graphMutex);
 		auto iter = findVertex(from);
 		if (iter != _vertexs.end()) {
 			list<int64_t>& listRef = (*iter)->_adjacencyList;
@@ -39,6 +41,7 @@ namespace Simpledb {
 
 	void DirectedGraph::deleteVertex(int64_t v)
 	{
+		lock_guard<mutex> guard(_graphMutex);
 		auto iter = findVertex(v);
 		if (iter != _vertexs.end()) {
 			for (auto vertex : _vertexs) {
@@ -53,6 +56,7 @@ namespace Simpledb {
 
 	bool DirectedGraph::isAcyclic()
 	{
+		lock_guard<mutex> guard(_graphMutex);
 		queue<shared_ptr<Vertex>> vertexQueue;
 		map<int64_t, size_t> indegreeMap = _indegreeMap;
 		updateVertexQueue(vertexQueue, indegreeMap);

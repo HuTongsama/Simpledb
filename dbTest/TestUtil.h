@@ -302,27 +302,17 @@ public:
         }
 
         //call run in a new thread
-        thread::native_handle_type start() {
-            shared_ptr<thread> t = make_shared<thread>(&LockGrabber::run,this);           
-            auto handle = t->native_handle();
-            lock_guard<mutex> lock(_veclock);
-            _threadVec.push_back(t);
-            return handle;
+        void start() {
+            _thread = make_shared<thread>(&LockGrabber::run,this);           
+            _handle = _thread->native_handle();
         }
         //for test clean up
-        void stop(thread::native_handle_type handle) {
-            lock_guard<mutex> lock(_veclock);
-            auto iter = find_if(_threadVec.begin(), _threadVec.end(),
-                [handle](shared_ptr<thread> t) {
-                    return t->native_handle() == handle;
-                });
-            if (iter != _threadVec.end()) {
+        void stop() {
 #ifdef _WINDOWS_
-                TerminateThread(handle, 0);
+            TerminateThread(_handle, 0);
+            _handle = nullptr;
 #endif // _WINDOWS_                
-                (*iter)->detach();
-                _threadVec.erase(iter);
-            }
+            _thread->detach();
         }
         void run() {
             try{
@@ -363,8 +353,8 @@ public:
         string _error;
         mutex _alock;
         mutex _elock;
-        vector<shared_ptr<thread>> _threadVec;
-        mutex _veclock;
+        shared_ptr<thread> _thread;
+        thread::native_handle_type _handle;
     };
 
     class CreateHeapFile {

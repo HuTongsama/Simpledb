@@ -25,6 +25,7 @@ namespace Simpledb {
 	}
 	void LockManager::accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
+		updateWaitforGraph(p, tid, pid);
 		lock_guard<mutex> guard(_managerLock);
 		auto tCode = tid->getId();
 		auto pCode = pid->hashCode();
