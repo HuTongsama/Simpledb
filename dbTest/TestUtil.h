@@ -303,8 +303,10 @@ public:
 
         //call run in a new thread
         void start() {
-            _thread = make_shared<thread>(&LockGrabber::run,this);           
-            _handle = _thread->native_handle();
+            thread t(&LockGrabber::run, this);
+            _handle = t.native_handle();
+            t.detach();
+            
         }
         //for test clean up
         void stop() {
@@ -312,7 +314,6 @@ public:
             TerminateThread(_handle, 0);
             _handle = nullptr;
 #endif // _WINDOWS_                
-            _thread->detach();
         }
         void run() {
             try{
@@ -353,7 +354,6 @@ public:
         string _error;
         mutex _alock;
         mutex _elock;
-        shared_ptr<thread> _thread;
         thread::native_handle_type _handle;
     };
 

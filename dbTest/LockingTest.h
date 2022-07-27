@@ -75,8 +75,7 @@ protected:
 
         TestUtil::LockGrabber t(tid, pid, perm);
         t.start();
-        // if we don't have the lock after TIMEOUT, we assume blocking.
-        
+        // if we don't have the lock after TIMEOUT, we assume blocking.     
         Sleep(TIMEOUT);
         EXPECT_EQ(expected, t.acquired());
         // TODO(ghuo): yes, stop() is evil, but this is unit test cleanup

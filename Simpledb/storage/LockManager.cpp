@@ -83,6 +83,7 @@ namespace Simpledb {
 		if (!pInfo)
 			return;
 		_tidToInfo.erase(tid->getId());
+		_waitforGraph.deleteVertex(tid->getId());
 		
 	}
 	vector<size_t> LockManager::getRelatedPageIds(shared_ptr<TransactionId> tid)
@@ -111,15 +112,18 @@ namespace Simpledb {
 	{
 		auto t1 = tid->getId();
 		auto p1 = pid->hashCode();
-
+		_waitforGraph.addVertex(t1);
 		for (auto iter : _tidToInfo) {
+			auto t2 = iter.first;
+			if (t2 == t1)
+				continue;
 			auto& info = iter.second;
 			auto pids = info->getAllPageIds();
 			auto findIter = find(pids.begin(), pids.end(), p1);
 			if (findIter == pids.end()) {
 				continue;
 			}
-			auto t2 = iter.first;
+
 			if (info->isLocked(p1, Permissions::READ_WRITE)) {
 				_waitforGraph.addEdge(t2, t1);
 			}
@@ -128,8 +132,8 @@ namespace Simpledb {
 				_waitforGraph.addEdge(t1, t2);
 			}
 		}
-
-		if (!_waitforGraph.isAcyclic()) {
+		bool log = false;
+		if (!_waitforGraph.isAcyclic(log)) {
 			throw runtime_error("wait for graph");
 		}
 	}

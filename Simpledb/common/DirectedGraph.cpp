@@ -1,26 +1,20 @@
 #include"DirectedGraph.h"
 #include<algorithm>
 #include<stdexcept>
-
+#include<iostream>
 namespace Simpledb {
 	void DirectedGraph::addEdge(int64_t from, int64_t to)
 	{
 		lock_guard<mutex> guard(_graphMutex);
-		auto iter = addVertex(to);
-		iter = addVertex(from);
+		auto iter = findVertex(from);
 		if (iter == _vertexs.end()) {
-			throw runtime_error("add edge failed");
+			throw runtime_error("invalid vertex");
 		}
-		if (_indegreeMap.find(from) == _indegreeMap.end()) {
-			_indegreeMap[from] = 0;
-		}
+
 		list<int64_t>& listRef = (*iter)->_adjacencyList;
 		auto listIter = find(listRef.begin(), listRef.end(), to);
 		if (listIter == listRef.end()) {
 			listRef.push_back(to);
-			if (_indegreeMap.find(to) == _indegreeMap.end()) {
-				_indegreeMap[to] = 0;
-			}
 			_indegreeMap[to] += 1;
 		}
 	}
@@ -39,6 +33,11 @@ namespace Simpledb {
 		}
 	}
 
+	void DirectedGraph::addVertex(int64_t v)
+	{
+		addVertexInner(v);
+	}
+
 	void DirectedGraph::deleteVertex(int64_t v)
 	{
 		lock_guard<mutex> guard(_graphMutex);
@@ -54,13 +53,18 @@ namespace Simpledb {
 		}
 	}
 
-	bool DirectedGraph::isAcyclic()
+	bool DirectedGraph::isAcyclic(bool log)
 	{
 		lock_guard<mutex> guard(_graphMutex);
 		queue<shared_ptr<Vertex>> vertexQueue;
 		map<int64_t, size_t> indegreeMap = _indegreeMap;
 		updateVertexQueue(vertexQueue, indegreeMap);
 		int count = 0;
+		if (log) {
+			for (auto iter : indegreeMap) {
+				cout << "tid :" << iter.first << ", count: " << iter.second << endl;
+			}
+		}
 		while (!vertexQueue.empty()) {
 			auto v = vertexQueue.front();
 			vertexQueue.pop();
@@ -72,8 +76,12 @@ namespace Simpledb {
 			updateVertexQueue(vertexQueue, indegreeMap);
 		}
 		if (count == _vertexs.size()) {
+			if (log)
+				cout << "true" << endl;
 			return true;
 		}
+		if (log)
+			cout << "false" << endl;
 		return false;
 	}
 
@@ -84,14 +92,16 @@ namespace Simpledb {
 				return vertex->_id == v; });
 	}
 
-	vector<shared_ptr<DirectedGraph::Vertex>>::iterator DirectedGraph::addVertex(int64_t v)
+	vector<shared_ptr<DirectedGraph::Vertex>>::iterator DirectedGraph::addVertexInner(int64_t v)
 	{
 		auto iter = findVertex(v);
 		if (iter != _vertexs.end()) {
 			return iter;
 		}
 		shared_ptr<Vertex> p = make_shared<Vertex>(v);
-		iter = _vertexs.emplace(_vertexs.end(), p);
+		iter = _vertexs.emplace(_vertexs.end(), p);	
+		_indegreeMap[v] = 0;
+		
 		return iter;
 	}
 
