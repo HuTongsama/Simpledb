@@ -1,11 +1,11 @@
 #include "LockManager.h"
-
+#include<iostream>
 namespace Simpledb {
 	bool LockManager::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{		
 		auto tCode = tid->getId();
 		lock_guard<mutex> guard(_managerLock);
-		auto pInfo = _tidToInfo[tCode];
+		auto pInfo = getInfo(tid->getId());
 		if (pInfo == nullptr)
 			return false;
 		auto pCode = pid->hashCode();
@@ -16,7 +16,7 @@ namespace Simpledb {
 	{
 		auto tCode = tid->getId();
 		lock_guard<mutex> guard(_managerLock);
-		auto pInfo = _tidToInfo[tCode];
+		auto pInfo = getInfo(tid->getId());
 		if (pInfo == nullptr)
 			return;
 		auto pCode = pid->hashCode();
@@ -26,60 +26,60 @@ namespace Simpledb {
 	void LockManager::accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
 		updateWaitforGraph(p, tid, pid);
-		lock_guard<mutex> guard(_managerLock);
+		
 		auto tCode = tid->getId();
 		auto pCode = pid->hashCode();
 
-		auto pInfo = _tidToInfo[tCode];
-		if (pInfo == nullptr) {
-			pInfo = make_shared<TransactionLockInfo>();
-			_tidToInfo[tCode] = pInfo;
-		}
-		if (!pInfo->holdsLock(pCode)) {
-			auto pMutex = _pidToMutex[pCode];
-			if (pMutex == nullptr) {
-				pMutex = make_shared<shared_mutex>();
-				_pidToMutex[pCode] = pMutex;
+		auto pInfo = getInfo(tid->getId());
+		{
+			lock_guard<mutex> guard(_managerLock);
+			if (pInfo == nullptr) {
+				pInfo = make_shared<TransactionLockInfo>();
+				_tidToInfo[tCode] = pInfo;
 			}
-			pInfo->addLock(pCode, pMutex, p);
-		}
-		else {
-			if (p == Permissions::READ_WRITE) {
-				if (pInfo->isLocked(pCode, Permissions::READ_ONLY)) {
-					bool findFlag = false;
-					for (auto iter : _tidToInfo) {
-						if (iter.first != tCode) {
-							auto tmpInfo = iter.second;
-							if (tmpInfo->holdsLock(pCode) &&
-								tmpInfo->isLocked(pCode, Permissions::READ_ONLY)) {
-								findFlag = true;
-								break;
-							}
-						}
-					}
-					if (!findFlag) {
-						pInfo->unlock(pCode, Permissions::READ_ONLY);
-					}
+			if (!pInfo->holdsLock(pCode)) {
+				auto pMutex = _pidToMutex[pCode];
+				if (pMutex == nullptr) {
+					pMutex = make_shared<shared_mutex>();
+					_pidToMutex[pCode] = pMutex;
 				}
+				pInfo->addLock(pCode, pMutex, p);
 			}
-			else if (p == Permissions::READ_ONLY) {
-				if (pInfo->isLocked(pCode, Permissions::READ_WRITE))
-					return;
-			}
-			if (pInfo->isLocked(pCode, p)) {
-				return;
-			}
-			else {
-				pInfo->lock(pCode, p);
-			}
+			
 		}
 		
-
+		if (p == Permissions::READ_WRITE) {
+			if (pInfo->isLocked(pCode, Permissions::READ_ONLY)) {
+				bool findFlag = false;
+				for (auto iter : _tidToInfo) {
+					if (iter.first != tCode) {
+						auto tmpInfo = iter.second;
+						if (tmpInfo->holdsLock(pCode) &&
+							tmpInfo->isLocked(pCode, Permissions::READ_ONLY)) {
+							findFlag = true;
+							break;
+						}
+					}
+				}
+				if (!findFlag) {
+					pInfo->unlock(pCode, Permissions::READ_ONLY);
+				}
+			}
+		}
+		else if (p == Permissions::READ_ONLY) {
+			if (pInfo->isLocked(pCode, Permissions::READ_WRITE))
+				return;
+		}
+		if (!pInfo->isLocked(pCode, p)) {
+			pInfo->lock(pCode, p);
+		}
+		
+		
 	}
 	void LockManager::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 		lock_guard<mutex> lock(_managerLock);
-		auto pInfo = _tidToInfo[tid->getId()];
+		auto pInfo = getInfo(tid->getId());
 		if (!pInfo)
 			return;
 		_tidToInfo.erase(tid->getId());
@@ -89,10 +89,11 @@ namespace Simpledb {
 	vector<size_t> LockManager::getRelatedPageIds(shared_ptr<TransactionId> tid)
 	{
 		lock_guard<mutex> lock(_managerLock);
-		auto pInfo = _tidToInfo[tid->getId()];
+		auto pInfo = getInfo(tid->getId());
 		if (!pInfo)
 			return {};
 		return pInfo->getAllPageIds();
+		
 	}
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
 	{
@@ -110,6 +111,7 @@ namespace Simpledb {
 
 	void LockManager::updateWaitforGraph(Permissions p, shared_ptr<TransactionId>& tid, shared_ptr<PageId> pid)
 	{
+		lock_guard<mutex> guard(_managerLock);
 		auto t1 = tid->getId();
 		auto p1 = pid->hashCode();
 		_waitforGraph.addVertex(t1);
@@ -132,10 +134,17 @@ namespace Simpledb {
 				_waitforGraph.addEdge(t1, t2);
 			}
 		}
-		bool log = false;
-		if (!_waitforGraph.isAcyclic(log)) {
-			throw runtime_error("wait for graph");
+		if (!_waitforGraph.isAcyclic()) {
+			throw runtime_error("waitforGraph exist cycle");
 		}
+	}
+
+	shared_ptr<TransactionLockInfo> LockManager::getInfo(int64_t tid)
+	{
+		if (_tidToInfo.find(tid) != _tidToInfo.end()) {
+			return _tidToInfo[tid];
+		}
+		return nullptr;
 	}
 	
 	void TransactionLockInfo::addLock(size_t pid, shared_ptr<shared_mutex> pageMutex, Permissions perm)
@@ -146,7 +155,7 @@ namespace Simpledb {
 			});
 		if (iter == _locks.end()) {
 			shared_ptr<PageLock> plock = make_shared<PageLock>(pid, pageMutex);
-			plock->lock(perm);
+			//plock->lock(perm);
 			_locks.push_back(plock);
 		}
 		else {

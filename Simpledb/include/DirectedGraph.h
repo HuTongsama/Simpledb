@@ -19,10 +19,11 @@ namespace Simpledb {
 		void deleteEdge(int64_t from, int64_t to);
 		void addVertex(int64_t v);
 		void deleteVertex(int64_t v);
-		bool isAcyclic(bool log = false);
+		bool isAcyclic();
 	private:
 		vector<shared_ptr<Vertex>>::iterator findVertex(int64_t v);
 		vector<shared_ptr<Vertex>>::iterator addVertexInner(int64_t v);
+		void deleteEdgeInner(int64_t from, int64_t to);
 		void updateVertexQueue(queue<shared_ptr<Vertex>>& vertexQueue,map<int64_t, size_t>& indegreeMap);
 
 

@@ -22,15 +22,7 @@ namespace Simpledb {
 	void DirectedGraph::deleteEdge(int64_t from, int64_t to)
 	{
 		lock_guard<mutex> guard(_graphMutex);
-		auto iter = findVertex(from);
-		if (iter != _vertexs.end()) {
-			list<int64_t>& listRef = (*iter)->_adjacencyList;
-			auto listIter = find(listRef.begin(), listRef.end(), to);
-			if (listIter != listRef.end()) {
-				listRef.erase(listIter);
-				_indegreeMap[to] -= 1;
-			}
-		}
+		deleteEdgeInner(from, to);
 	}
 
 	void DirectedGraph::addVertex(int64_t v)
@@ -46,42 +38,33 @@ namespace Simpledb {
 			for (auto vertex : _vertexs) {
 				if (vertex->_id == v)
 					continue;
-				deleteEdge(vertex->_id, v);
+				deleteEdgeInner(vertex->_id, v);
 			}
 			_indegreeMap.erase(v);
 			_vertexs.erase(iter);
 		}
 	}
 
-	bool DirectedGraph::isAcyclic(bool log)
+	bool DirectedGraph::isAcyclic()
 	{
 		lock_guard<mutex> guard(_graphMutex);
 		queue<shared_ptr<Vertex>> vertexQueue;
 		map<int64_t, size_t> indegreeMap = _indegreeMap;
 		updateVertexQueue(vertexQueue, indegreeMap);
 		int count = 0;
-		if (log) {
-			for (auto iter : indegreeMap) {
-				cout << "tid :" << iter.first << ", count: " << iter.second << endl;
-			}
-		}
 		while (!vertexQueue.empty()) {
 			auto v = vertexQueue.front();
 			vertexQueue.pop();
 			count++;
 			list<int64_t>& adjacencyList = v->_adjacencyList;
 			for (auto vertex : adjacencyList) {
-				_indegreeMap[vertex] -= 1;
+				indegreeMap[vertex] -= 1;
 			}
 			updateVertexQueue(vertexQueue, indegreeMap);
 		}
 		if (count == _vertexs.size()) {
-			if (log)
-				cout << "true" << endl;
 			return true;
 		}
-		if (log)
-			cout << "false" << endl;
 		return false;
 	}
 
@@ -94,6 +77,7 @@ namespace Simpledb {
 
 	vector<shared_ptr<DirectedGraph::Vertex>>::iterator DirectedGraph::addVertexInner(int64_t v)
 	{
+		lock_guard<mutex> guard(_graphMutex);
 		auto iter = findVertex(v);
 		if (iter != _vertexs.end()) {
 			return iter;
@@ -103,6 +87,19 @@ namespace Simpledb {
 		_indegreeMap[v] = 0;
 		
 		return iter;
+	}
+
+	void DirectedGraph::deleteEdgeInner(int64_t from, int64_t to)
+	{
+		auto iter = findVertex(from);
+		if (iter != _vertexs.end()) {
+			list<int64_t>& listRef = (*iter)->_adjacencyList;
+			auto listIter = find(listRef.begin(), listRef.end(), to);
+			if (listIter != listRef.end()) {
+				listRef.erase(listIter);
+				_indegreeMap[to] -= 1;
+			}
+		}
 	}
 
 	void DirectedGraph::updateVertexQueue(queue<shared_ptr<Vertex>>& vertexQueue,map<int64_t, size_t>& indegreeMap)

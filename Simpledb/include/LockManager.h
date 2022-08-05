@@ -49,6 +49,7 @@ namespace Simpledb {
 
 	private:
 		void updateWaitforGraph(Permissions p, shared_ptr<TransactionId>& tid, shared_ptr<PageId> pid);
+		shared_ptr<TransactionLockInfo> getInfo(int64_t tid);
 
 		map<size_t, shared_ptr<TransactionLockInfo>> _tidToInfo;
 		map<size_t, shared_ptr<shared_mutex>> _pidToMutex;

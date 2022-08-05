@@ -326,6 +326,7 @@ public:
                 _error = e.what();
                 cout << _error << endl;
                 Database::getBufferPool()->transactionComplete(_tid, false);
+
             }
         }
 

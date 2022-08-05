@@ -80,14 +80,11 @@ TEST_F(DeadlockTest, TestReadWriteDeadlock) {
     this_thread::sleep_for(std::chrono::milliseconds(POLL_INTERVAL));
     auto lg1Write = startGrabber(_tid1, _p1, Permissions::READ_WRITE);
     auto lg2Write = startGrabber(_tid2, _p0, Permissions::READ_WRITE);
-
     while (true) {
         this_thread::sleep_for(std::chrono::milliseconds(POLL_INTERVAL));
-
         EXPECT_FALSE(lg1Write->acquired() && lg2Write->acquired());
         if (lg1Write->acquired() && !lg2Write->acquired()) break;
         if (!lg1Write->acquired() && lg2Write->acquired()) break;
-
         if (lg1Write->getError() != "") {
             lg1Read->stop();
             lg1Write->stop();
@@ -98,7 +95,7 @@ TEST_F(DeadlockTest, TestReadWriteDeadlock) {
             lg1Read = startGrabber(_tid1, _p0, Permissions::READ_ONLY);
             lg1Write = startGrabber(_tid1, _p1, Permissions::READ_WRITE);
         }
-
+        
         if (lg2Write->getError() != "") {
             lg2Read->stop();
             lg2Write->stop();
@@ -109,6 +106,7 @@ TEST_F(DeadlockTest, TestReadWriteDeadlock) {
             lg2Read = startGrabber(_tid2, _p1, Permissions::READ_ONLY);
             lg2Write = startGrabber(_tid2, _p0, Permissions::READ_WRITE);
         }
+       
     }
 
     cout << "testReadWriteDeadlock resolved deadlock" << endl;
