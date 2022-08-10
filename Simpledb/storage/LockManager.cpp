@@ -22,7 +22,9 @@ namespace Simpledb {
 		auto pCode = pid->hashCode();
 		pInfo->unlock(pCode, Permissions::READ_ONLY);
 		pInfo->unlock(pCode, Permissions::READ_WRITE);
+		deleteTid(tCode);
 	}
+	
 	void LockManager::accessPermission(Permissions p, shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
 	{
 		updateWaitforGraph(p, tid, pid);
@@ -35,7 +37,7 @@ namespace Simpledb {
 			lock_guard<mutex> guard(_managerLock);
 			if (pInfo == nullptr) {
 				pInfo = make_shared<TransactionLockInfo>();
-				_tidToInfo[tCode] = pInfo;
+				_tidToInfo[tCode] = pInfo;			
 			}
 			if (!pInfo->holdsLock(pCode)) {
 				auto pMutex = _pidToMutex[pCode];
@@ -44,6 +46,7 @@ namespace Simpledb {
 					_pidToMutex[pCode] = pMutex;
 				}
 				pInfo->addLock(pCode, pMutex, p);
+				addTid(pCode, tCode);
 			}
 			
 		}
@@ -64,6 +67,9 @@ namespace Simpledb {
 				if (!findFlag) {
 					pInfo->unlock(pCode, Permissions::READ_ONLY);
 				}
+				else {
+					pInfo->setUpgradeLock(pCode, true);
+				}
 			}
 		}
 		else if (p == Permissions::READ_ONLY) {
@@ -76,16 +82,33 @@ namespace Simpledb {
 		
 		
 	}
+	
 	void LockManager::transactionComplete(shared_ptr<TransactionId> tid)
 	{
 		lock_guard<mutex> lock(_managerLock);
 		auto pInfo = getInfo(tid->getId());
 		if (!pInfo)
 			return;
-		_tidToInfo.erase(tid->getId());
+		auto tCode = tid->getId();
+		_tidToInfo.erase(tCode);
 		_waitforGraph.deleteVertex(tid->getId());
+		deleteTid(tCode);
+
+		for (auto iter : _tidToInfo) {
+			auto tid = iter.first;
+			auto info = iter.second;
+			auto pids = info->getAllPageIds();
+
+			for (auto pid : pids) {
+				auto& tidVec = _pidToTids[pid];
+				if (tidVec.size() == 1 && tidVec[0] == tid) {
+					info->upgradeLock(pid);
+				}
+			}
+		}
 		
 	}
+	
 	vector<size_t> LockManager::getRelatedPageIds(shared_ptr<TransactionId> tid)
 	{
 		lock_guard<mutex> lock(_managerLock);
@@ -95,6 +118,7 @@ namespace Simpledb {
 		return pInfo->getAllPageIds();
 		
 	}
+	
 	void LockManager::deletePageLock(shared_ptr<PageId> pid)
 	{
 		lock_guard<mutex> lock(_managerLock);
@@ -146,13 +170,29 @@ namespace Simpledb {
 		}
 		return nullptr;
 	}
+
+	void LockManager::addTid(size_t pid, size_t tid)
+	{
+		auto& vec = _pidToTids[pid];
+		if (find(vec.begin(), vec.end(), tid) == vec.end()) {
+			vec.push_back(tid);
+		}
+	}
+
+	void LockManager::deleteTid(size_t tid)
+	{
+		for (auto iter : _pidToTids) {
+			auto& vec = iter.second;
+			auto tIter = find(vec.begin(), vec.end(), tid);
+			if (tIter != vec.end()) {
+				vec.erase(tIter);
+			}
+		}
+	}
 	
 	void TransactionLockInfo::addLock(size_t pid, shared_ptr<shared_mutex> pageMutex, Permissions perm)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter == _locks.end()) {
 			shared_ptr<PageLock> plock = make_shared<PageLock>(pid, pageMutex);
 			//plock->lock(perm);
@@ -165,10 +205,7 @@ namespace Simpledb {
 
 	void TransactionLockInfo::lock(size_t pid, Permissions perm)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter != _locks.end()) {
 			(*iter)->lock(perm);
 		}
@@ -179,10 +216,7 @@ namespace Simpledb {
 
 	void TransactionLockInfo::unlock(size_t pid, Permissions perm)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter != _locks.end()) {
 			(*iter)->unlock(perm);
 		}
@@ -193,10 +227,7 @@ namespace Simpledb {
 
 	bool TransactionLockInfo::isLocked(size_t pid, Permissions perm)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter != _locks.end()) {
 			return (*iter)->isLocked(perm);
 		}
@@ -208,10 +239,7 @@ namespace Simpledb {
 
 	bool TransactionLockInfo::holdsLock(size_t pid)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter == _locks.end())
 			return false;
 		return true;
@@ -219,10 +247,7 @@ namespace Simpledb {
 
 	void TransactionLockInfo::deleteLock(size_t pid)
 	{
-		auto iter = find_if(_locks.begin(), _locks.end(),
-			[pid](shared_ptr<PageLock> plock) {
-				return plock->getPageId() == pid;
-			});
+		auto iter = findLock(pid);
 		if (iter == _locks.end()) {
 			return;
 		}
@@ -235,6 +260,28 @@ namespace Simpledb {
 		}
 	}
 
+	void TransactionLockInfo::setUpgradeLock(size_t pid, bool flag)
+	{
+		auto iter = findLock(pid);
+		if (iter == _locks.end()) {
+			return;
+		}
+
+		(*iter)->setTryUpgradeLock(flag);
+	}
+
+	void TransactionLockInfo::upgradeLock(size_t pid)
+	{
+		auto iter = findLock(pid);
+		if (iter == _locks.end()) {
+			return;
+		}
+		if ((*iter)->getTryUpgradeLock()
+			&& (*iter)->isLocked(Permissions::READ_ONLY)) {
+			(*iter)->unlock(Permissions::READ_ONLY);
+		}
+	}
+
 	vector<size_t> TransactionLockInfo::getAllPageIds()
 	{
 		vector<size_t> result;
@@ -244,6 +291,13 @@ namespace Simpledb {
 		return result;
 	}
 
+	vector<shared_ptr<PageLock>>::iterator TransactionLockInfo::findLock(size_t pid)
+	{
+		return find_if(_locks.begin(), _locks.end(),
+			[pid](shared_ptr<PageLock> plock) {
+				return plock->getPageId() == pid;
+			});
+	}
 
 	void PageLock::lock(Permissions perm)
 	{
