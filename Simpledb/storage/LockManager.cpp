@@ -181,7 +181,7 @@ namespace Simpledb {
 
 	void LockManager::deleteTid(size_t tid)
 	{
-		for (auto iter : _pidToTids) {
+		for (auto& iter : _pidToTids) {
 			auto& vec = iter.second;
 			auto tIter = find(vec.begin(), vec.end(), tid);
 			if (tIter != vec.end()) {

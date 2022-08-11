@@ -205,6 +205,5 @@ TEST_F(DeadlockTest, TestUpgradeWriteDeadlock) {
             lg2Write = startGrabber(_tid2, _p0, Permissions::READ_WRITE);
         }
     }
-
     cout << "testUpgradeWriteDeadlock resolved deadlock" << endl;
 }
