@@ -10,6 +10,8 @@
 #include"Permissions.h"
 #include"Database.h"
 #include<thread>
+#include<condition_variable>
+#include<mutex>
 #include<Windows.h>
 #include<processthreadsapi.h>
 
@@ -91,7 +93,6 @@ public:
         result->open();
         return result;
     }
-
 
     /**
      * @return true if the tuples have the same number of fields and
@@ -388,4 +389,30 @@ public:
     private:
         shared_ptr<File> _emptyFile;
     };
+
+    class CountDownLatch : public Noncopyable {
+    public:
+        CountDownLatch(int count) :_count(count) {}
+
+        bool await() {
+           unique_lock<mutex> lk(_mutex);          
+           _cv.wait(lk, [this] {return _count == 0; });
+           return true;
+        }
+        void countDown() {
+            lock_guard<mutex> lk(_mutex);
+            if (_count == 0)
+                return;
+            _count--;
+            if (_count == 0) {
+                _cv.notify_all();
+            }
+        }
+    private:
+        int _count;
+        mutex _mutex;
+        condition_variable _cv;
+    };
+
+    class CyclicBarrier : public Noncopyable {};
 };

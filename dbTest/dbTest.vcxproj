@@ -67,6 +67,7 @@
     <ClInclude Include="SysJoinTest.h" />
     <ClInclude Include="SysQueryTest.h" />
     <ClInclude Include="SystemTestUtil.h" />
+    <ClInclude Include="SysTransactionTest.h" />
     <ClInclude Include="TableStatsTest.h" />
     <ClInclude Include="TestUtil.h" />
     <ClInclude Include="TransactionTest.h" />
