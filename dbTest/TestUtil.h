@@ -12,6 +12,7 @@
 #include<thread>
 #include<condition_variable>
 #include<mutex>
+#include<functional>
 #include<Windows.h>
 #include<processthreadsapi.h>
 
@@ -413,6 +414,18 @@ public:
         mutex _mutex;
         condition_variable _cv;
     };
+    template<typename R, typename... Args>
+    class CyclicBarrier : public Noncopyable {
+    public:
+        CyclicBarrier(int count,std::function<R(Args...)> func)
+        :_count(count),_func(func) {}
+        int await() {
+        }
 
-    class CyclicBarrier : public Noncopyable {};
+    private:
+        int _count;
+        mutex _mutex;
+        condition_variable _cv;
+        std::function<R(Args...)> _func;
+    };
 };
