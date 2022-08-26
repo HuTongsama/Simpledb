@@ -414,16 +414,16 @@ public:
         mutex _mutex;
         condition_variable _cv;
     };
-    template<typename R, typename... Args>
+    template<typename... Args>
     class CyclicBarrier : public Noncopyable {
     public:
-        CyclicBarrier(int count, std::function<R(Args...)> func)
+        CyclicBarrier(int count, std::function<void(Args...)> func)
             :_count(count), _curCount(count), _func(func) {}
         void await(Args... args) {
             unique_lock<mutex> lock(_mutex);
             _curCount--;
             if (_curCount == 0) {
-                R result = _func(args...);               
+                _func(args...);               
                 _cv.notify_all();
                 _curCount = _count;
             }
