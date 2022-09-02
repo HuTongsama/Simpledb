@@ -15,7 +15,8 @@ namespace Simpledb {
 	{
 		hash<string> str_hash;
 		string fileName = _file != nullptr ? _file->fileName() : "";
-		return str_hash(fileName);
+		auto result = str_hash(fileName);
+		return result;
 		
 
 	}

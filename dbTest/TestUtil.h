@@ -414,16 +414,16 @@ public:
         mutex _mutex;
         condition_variable _cv;
     };
-    template<typename... Args>
+    template<typename Callable,typename... Args>
     class CyclicBarrier : public Noncopyable {
     public:
-        CyclicBarrier(int count, std::function<void(Args...)> func)
-            :_count(count), _curCount(count), _func(func) {}
+        CyclicBarrier(int count, shared_ptr<Callable> pCallable)
+            :_count(count), _curCount(count), _pCallable(pCallable) {}
         void await(Args... args) {
             unique_lock<mutex> lock(_mutex);
             _curCount--;
             if (_curCount == 0) {
-                _func(args...);               
+                (*_pCallable)(args...);
                 _cv.notify_all();
                 _curCount = _count;
             }
@@ -437,6 +437,6 @@ public:
         int _curCount;
         mutex _mutex;
         condition_variable _cv;
-        std::function<R(Args...)> _func;
+        shared_ptr<Callable> _pCallable;
     };
 };
