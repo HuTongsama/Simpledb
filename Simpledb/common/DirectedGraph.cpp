@@ -39,6 +39,7 @@ namespace Simpledb {
 				if (vertex->_id == v)
 					continue;
 				deleteEdgeInner(vertex->_id, v);
+				deleteEdgeInner(v, vertex->_id);
 			}
 			_indegreeMap.erase(v);
 			_vertexs.erase(iter);

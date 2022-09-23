@@ -31,10 +31,9 @@ namespace Simpledb {
 		
 		auto tCode = tid->getId();
 		auto pCode = pid->hashCode();
-
+		unique_lock<mutex> guard(_managerLock);
 		auto pInfo = getInfo(tid->getId());
 		{
-			lock_guard<mutex> guard(_managerLock);
 			if (pInfo == nullptr) {
 				pInfo = make_shared<TransactionLockInfo>();
 				_tidToInfo[tCode] = pInfo;			
@@ -77,6 +76,7 @@ namespace Simpledb {
 				return;
 		}
 		if (!pInfo->isLocked(pCode, p)) {
+			guard.unlock();
 			pInfo->lock(pCode, p);
 		}
 		
@@ -198,9 +198,9 @@ namespace Simpledb {
 			//plock->lock(perm);
 			_locks.push_back(plock);
 		}
-		else {
-			(*iter)->lock(perm);
-		}
+		//else {
+		//	(*iter)->lock(perm);
+		//}
 	}
 
 	void TransactionLockInfo::lock(size_t pid, Permissions perm)

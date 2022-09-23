@@ -14,6 +14,12 @@ namespace Simpledb
 	}
 	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
+		{
+			lock_guard<mutex> lock(_printMutex);
+			string s = to_string(tid->getId()) + " " + to_string(pid->hashCode()) + " " + (perm == Permissions::READ_ONLY ? "read" : "write");
+			printf("%s\n", s.c_str());
+		}
+
 		_lockManager.accessPermission(perm, tid, pid);
 		lock_guard<mutex> lock(_mutex);
 		if (tid == nullptr || pid == nullptr)
@@ -41,6 +47,7 @@ namespace Simpledb
 
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
 	{
+		_lockManager.transactionComplete(tid);
 		auto pids = _lockManager.getRelatedPageIds(tid);
 		if (commit) {
 			flushPages(tid);
@@ -62,7 +69,8 @@ namespace Simpledb
 				}
 			}
 		}
-		_lockManager.transactionComplete(tid);
+		lock_guard<mutex> guard(_printMutex);
+		cout << "transactionComplete: " << tid->getId() << endl;
 	}
 
 	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)
