@@ -12,14 +12,10 @@ namespace Simpledb
 	public:
 		TransactionId()
 		{
-			_id = _counter;
+			_id = ++_counter;
 			if (_counter == INT64_MAX)
 			{
 				_counter = 0;
-			}
-			else
-			{
-				_counter++;
 			}
 		}
 		int64_t getId()const { return _id; }

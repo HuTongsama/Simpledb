@@ -109,6 +109,7 @@ protected:
             {
                 unique_lock<mutex> lock(_joinMutex);
                 _isAlive = true;
+                _completed = false;
             }        
             try {
                 // Try to increment the value until we manage to successfully commit
@@ -118,8 +119,8 @@ protected:
                     shared_ptr<Transaction> tr = make_shared<Transaction>();
                     try {
                         {
-                            lock_guard<mutex> lock(_printMutex);
-                            printf("t %s start loop\n", to_string(tr->getId()->getId()).c_str());
+                           lock_guard<mutex> lock(_printMutex);
+                           printf("%s start loop\n", to_string(tr->getId()->getId()).c_str());
                         }
                         tr->start();
                         shared_ptr<SeqScan> ss1 = make_shared<SeqScan>(tr->getId(), _tableId, "");
@@ -130,8 +131,9 @@ protected:
                         q1->start();
                         Tuple& tup = q1->next();
                         shared_ptr<IntField> intf = dynamic_pointer_cast<IntField>(tup.getField(0));
+                       
                         int i = intf->getValue();
-
+                        //printf("i %d\n", i);
                         // create a Tuple so that Insert can insert this new value
                         // into the table.
                         shared_ptr<Tuple> t = make_shared<Tuple>(SystemTestUtil::SINGLE_INT_DESCRIPTOR);
@@ -172,7 +174,7 @@ protected:
                         // give someone else a chance: abort the transaction
                         {
                             lock_guard<mutex> lock(_printMutex);
-                            printf("t %s throw %s\n", to_string(tr->getId()->getId()).c_str(), e.what());
+                            printf("%s throw %s\n", to_string(tr->getId()->getId()).c_str(),e.what());
                         }
                         tr->transactionComplete(true);
                         _latch->stillParticipating();
@@ -193,6 +195,7 @@ protected:
             }
             unique_lock<mutex> lock(_joinMutex);
             _completed = true;
+            _isAlive = false;
             _joinCond.notify_all();
             
         }
@@ -281,12 +284,18 @@ TEST_F(SysTransactionTest, TestTwoThreads) {
     //validateTransactions(2);
 }
 
-TEST_F(SysTransactionTest, TestFiveThreads) {
-    validateTransactions(5);
+TEST_F(SysTransactionTest, TestFiveThreads) {   
+   
+    for (int i = 0; i < 10; ++i) {
+        Database::reset();
+        validateTransactions(10);
+    }
+        
 }
 
 TEST_F(SysTransactionTest, TestTenThreads) {
     //validateTransactions(10);
+    
 }
 
 TEST_F(SysTransactionTest, TestAllDirtyFails) {

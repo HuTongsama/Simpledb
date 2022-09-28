@@ -409,7 +409,7 @@ public:
                 _cv.notify_all();
             }
         }
-    private:
+    public:
         int _count;
         mutex _mutex;
         condition_variable _cv;
@@ -423,16 +423,26 @@ public:
             unique_lock<mutex> lock(_mutex);
             _curCount--;
             if (_curCount == 0) {
-                (*_pCallable)(args...);
+                (*_pCallable)(args...);              
                 _cv.notify_all();
-                _curCount = _count;
             }
             else {
                 _cv.wait(lock);
             }
+            _curCount += 1;
+            lock.unlock();
+            while (_curCount != _count)continue;
+            //_cv.wait(lock, [this]() { return _curCount == _count; });
+            this_thread::sleep_for(chrono::milliseconds(100));
         }
 
     private:
+        void awaitFinish() {
+            unique_lock<mutex> lock(_mutex);
+           
+        }
+
+
         int _count;
         int _curCount;
         mutex _mutex;

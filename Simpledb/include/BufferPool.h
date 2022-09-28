@@ -167,6 +167,5 @@ namespace Simpledb {
 		map<size_t, PageInfo> _idToPageInfo;
 		mutex _mutex;
 		LockManager _lockManager;
-		mutex _printMutex;
 	};
 }

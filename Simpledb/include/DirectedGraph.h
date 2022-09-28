@@ -20,7 +20,7 @@ namespace Simpledb {
 		void addVertex(int64_t v);
 		void deleteVertex(int64_t v);
 		bool isAcyclic();
-	private:
+	public:
 		vector<shared_ptr<Vertex>>::iterator findVertex(int64_t v);
 		vector<shared_ptr<Vertex>>::iterator addVertexInner(int64_t v);
 		void deleteEdgeInner(int64_t from, int64_t to);
