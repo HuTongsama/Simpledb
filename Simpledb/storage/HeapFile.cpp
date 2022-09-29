@@ -175,6 +175,7 @@ namespace Simpledb {
 			_pageNo++;
 		}
 		else {
+			printf("null page tid: %s\n", to_string(_tid->getId()).c_str());
 			_iter = nullptr;
 		}
 		return;

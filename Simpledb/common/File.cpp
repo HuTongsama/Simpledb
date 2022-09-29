@@ -27,6 +27,7 @@ namespace Simpledb {
 	}
 	size_t File::length()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		size_t oldPos = ftell(_pFile);
 		fseek(_pFile, 0, SEEK_END);
 		size_t len = ftell(_pFile);
@@ -35,52 +36,64 @@ namespace Simpledb {
 	}
 	size_t File::position()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		return ftell(_pFile);
 	}
 	void File::flush()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		fflush(_pFile);
 	}
 	void File::seek(size_t pos)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		fseek(_pFile, pos, SEEK_SET);
 	}
 	void File::writeChar(char c)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		writeBaseType(c);
 	}
 	void File::writeInt(int value)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		writeBaseType(value);
 	}
 	void File::writeInt64(int64_t value)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		writeBaseType(value);
 	}
 	void File::writeUTF8(const string& str)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		size_t byteCount = str.length();
 		writeInt64(byteCount);
 		writeBytes((const unsigned char*)str.c_str(), byteCount);
 	}
 	void File::writeBytes(const unsigned char* bytes, size_t byteCount)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		size_t w = fwrite(bytes, 1, byteCount, _pFile);		
 	}
 	char File::readChar()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		return readBaseType<char>();
 	}
 	int File::readInt()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		return readBaseType<int>();
 	}
 	int64_t File::readInt64()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		return readBaseType<int64_t>();
 	}
 	string File::readUTF8()
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		int64_t readLen = readInt64();
 		vector<unsigned char> byteVec = readBytes(readLen);
 		string s(byteVec.begin(), byteVec.end());
@@ -88,6 +101,7 @@ namespace Simpledb {
 	}
 	vector<unsigned char> File::readBytes(size_t readLen)
 	{
+		lock_guard<mutex> lock(_fileMutex);
 		unsigned char* buffer = (unsigned char*)malloc(sizeof(unsigned char) * readLen);
 		if (buffer == nullptr) {
 			return vector<unsigned char>();

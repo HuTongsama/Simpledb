@@ -4,6 +4,7 @@
 #include<vector>
 #include<stdexcept>
 #include<memory>
+#include<mutex>
 using namespace std;
 namespace Simpledb {
 
@@ -47,6 +48,7 @@ namespace Simpledb {
 		string _mode;
 		FILE* _pFile = nullptr;
 		bool _deleteOnExit = false;
+		mutex _fileMutex;
 	};
 	template<typename T>
 	inline T File::readBaseType()

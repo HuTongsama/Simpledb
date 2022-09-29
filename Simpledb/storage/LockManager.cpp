@@ -31,8 +31,6 @@ namespace Simpledb {
 		auto tCode = tid->getId();
 		auto pCode = pid->hashCode();
 		
-		string s = to_string(tCode) + " " + (p == Permissions::READ_ONLY ? "read" : "write") + "\n";
-		//printf("%s", s.c_str());
 		auto pInfo = getInfo(tid->getId());
 		if (pInfo == nullptr) {
 			pInfo = make_shared<TransactionLockInfo>();
@@ -56,6 +54,7 @@ namespace Simpledb {
 				}
 				else if (readlockCount > 0) {
 					needWait = true;
+					pInfo->setWaitWriting(pCode, true);
 				}
 			}
 		}
@@ -80,6 +79,7 @@ namespace Simpledb {
 				&& p == Permissions::READ_WRITE) {
 				pInfo->unlock(pCode, Permissions::READ_ONLY);
 			}
+			pInfo->setWaitWriting(pCode, false);
 		}
 		pInfo->lock(pCode, p);
 		updateWaitforGraph(p, tid, pid);
@@ -134,19 +134,14 @@ namespace Simpledb {
 				continue;
 			}
 
-			if (info->isLocked(p1, Permissions::READ_WRITE)) {
+			if (info->isLocked(p1, Permissions::READ_WRITE)
+				|| info->getWaitWriting(p1)) {
 				_waitforGraph.addEdge(t2, t1);
 			}
-			else if (info->isLocked(p1, Permissions::READ_ONLY)
-				&& p == Permissions::READ_WRITE) {
+			if (p == Permissions::READ_WRITE) {
 				_waitforGraph.addEdge(t1, t2);
 			}
 		}
-		string s = "graph: \n";
-		for (auto p : _waitforGraph._indegreeMap) {
-			s += "t :" + to_string(p.first) + " ,indegree: " + to_string(p.second) + "\n";
-		}
-		//printf("%s", s.c_str());
 		if (!_waitforGraph.isAcyclic()) {
 			throw runtime_error("waitforGraph exist cycle");
 		}
@@ -211,6 +206,21 @@ namespace Simpledb {
 		if (_lockMap.find(pid) != _lockMap.end()) {
 			_lockMap.erase(pid);
 		}
+	}
+
+	void TransactionLockInfo::setWaitWriting(size_t pid, bool flag)
+	{
+		if (_lockMap.find(pid) != _lockMap.end()) {
+			_lockMap[pid]->setWaitWriting(flag);
+		}
+	}
+
+	bool TransactionLockInfo::getWaitWriting(size_t pid)
+	{
+		if (_lockMap.find(pid) != _lockMap.end()) {
+			return _lockMap[pid]->getWaitWriting();
+		}
+		return false;
 	}
 
 	vector<size_t> TransactionLockInfo::getAllPageIds()

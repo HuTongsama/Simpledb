@@ -118,10 +118,6 @@ protected:
                     _latch->await();
                     shared_ptr<Transaction> tr = make_shared<Transaction>();
                     try {
-                        {
-                           lock_guard<mutex> lock(_printMutex);
-                           printf("%s start loop\n", to_string(tr->getId()->getId()).c_str());
-                        }
                         tr->start();
                         shared_ptr<SeqScan> ss1 = make_shared<SeqScan>(tr->getId(), _tableId, "");
                         shared_ptr<SeqScan> ss2 = make_shared<SeqScan>(tr->getId(), _tableId, "");
@@ -149,7 +145,7 @@ protected:
                         shared_ptr<Delete> delOp = make_shared<Delete>(tr->getId(), ss2);
 
                         shared_ptr<Query> q2 = make_shared<Query>(delOp, tr->getId());
-
+                        //printf("%s start delete\n", to_string(tr->getId()->getId()).c_str());
                         q2->start();
                         q2->next();
                         q2->close();
@@ -172,10 +168,6 @@ protected:
                     catch (const std::exception& e) {
                         //System.out.println("thread " + tr.getId() + " killed");
                         // give someone else a chance: abort the transaction
-                        {
-                            lock_guard<mutex> lock(_printMutex);
-                            printf("%s throw %s\n", to_string(tr->getId()->getId()).c_str(),e.what());
-                        }
                         tr->transactionComplete(true);
                         _latch->stillParticipating();
                     }
@@ -222,7 +214,6 @@ protected:
         string _exception = "";
         bool _completed = false;
         bool _isAlive;
-        mutex _printMutex;
     };
 
 	static const int TIMEOUT_MILLIS = 10 * 60 * 1000;
@@ -277,48 +268,43 @@ protected:
 
 };
 TEST_F(SysTransactionTest, TestSingleThread) {
-    //validateTransactions(1);
+    validateTransactions(1);
 }
 
 TEST_F(SysTransactionTest, TestTwoThreads) { 
-    //validateTransactions(2);
+    validateTransactions(2);
 }
 
-TEST_F(SysTransactionTest, TestFiveThreads) {   
-   
-    for (int i = 0; i < 10; ++i) {
-        Database::reset();
-        validateTransactions(10);
-    }
-        
+TEST_F(SysTransactionTest, TestFiveThreads) {     
+   validateTransactions(5);      
 }
 
 TEST_F(SysTransactionTest, TestTenThreads) {
-    //validateTransactions(10);
+    validateTransactions(10);
     
 }
 
 TEST_F(SysTransactionTest, TestAllDirtyFails) {
-    //// Allocate a file with ~10 pages of data
-    //shared_ptr<HeapFile> f = SystemTestUtil::createRandomHeapFile(2, 512 * 10, map<int,int>(), vector<vector<int>>());
-    //Database::resetBufferPool(1);
+    // Allocate a file with ~10 pages of data
+    shared_ptr<HeapFile> f = SystemTestUtil::createRandomHeapFile(2, 512 * 10, map<int,int>(), vector<vector<int>>());
+    Database::resetBufferPool(1);
 
-    //// BEGIN TRANSACTION
-    //shared_ptr<Transaction> t = make_shared<Transaction>();
-    //t->start();
-    //
-    //// Insert a new row
-    //AbortEvictionTest::insertRow(f, t);
-    //// Scanning the table must fail because it can't evict the dirty page
-    //try
-    //{
-    //    AbortEvictionTest::findMagicTuple(f, t);
-    //    FAIL() << "Expected scan to run out of available buffer pages" << endl;
-    //}
-    //catch (const std::exception&)
-    //{
-    //    //ignore
-    //}
-    //t->commit();
+    // BEGIN TRANSACTION
+    shared_ptr<Transaction> t = make_shared<Transaction>();
+    t->start();
+    
+    // Insert a new row
+    AbortEvictionTest::insertRow(f, t);
+    // Scanning the table must fail because it can't evict the dirty page
+    try
+    {
+        AbortEvictionTest::findMagicTuple(f, t);
+        FAIL() << "Expected scan to run out of available buffer pages" << endl;
+    }
+    catch (const std::exception&)
+    {
+        //ignore
+    }
+    t->commit();
 
 }
