@@ -276,7 +276,7 @@ TEST_F(SysTransactionTest, TestTwoThreads) {
 }
 
 TEST_F(SysTransactionTest, TestFiveThreads) {     
-   validateTransactions(5);      
+    validateTransactions(5);      
 }
 
 TEST_F(SysTransactionTest, TestTenThreads) {

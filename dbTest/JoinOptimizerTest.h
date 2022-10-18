@@ -204,7 +204,7 @@ TEST_F(JoinOptimizerTest, EstimateJoinCardinality) {
 
     double cardinality;
     cardinality = j->estimateJoinCardinality(make_shared<LogicalJoinNode>("t1", "t2",
-        "c" + 3, "c" + 4,
+        "c3", "c4",
         Predicate::Op::EQUALS), _stats1->estimateTableCardinality(0.8),
         _stats2->estimateTableCardinality(0.2), true, false, TableStats::getStatsMap());
 
@@ -215,7 +215,7 @@ TEST_F(JoinOptimizerTest, EstimateJoinCardinality) {
     EXPECT_TRUE(cardinality == 800 || cardinality == 2000);
 
     cardinality = j->estimateJoinCardinality(make_shared<LogicalJoinNode>("t1", "t2",
-        "c" + 3, "c" + 4,
+        "c3", "c4",
         Predicate::Op::EQUALS), _stats1->estimateTableCardinality(0.8),
         _stats2->estimateTableCardinality(0.2), false, true, TableStats::getStatsMap());
 

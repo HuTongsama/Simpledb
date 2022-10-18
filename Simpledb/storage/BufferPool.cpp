@@ -5,6 +5,7 @@ namespace Simpledb
 	int BufferPool::DEFAULT_PAGE_SIZE = 4096;
 	int BufferPool::DEFAULT_PAGES = 50;
 	int BufferPool::_pageSize = BufferPool::DEFAULT_PAGE_SIZE;
+	static mutex printMutex;
 	BufferPool::BufferPool(int numPages)
 	{
 		_numPages = numPages;
@@ -14,6 +15,12 @@ namespace Simpledb
 	}
 	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
+		{
+			/*lock_guard<mutex> lock(printMutex);
+			string s = string("tid: ") + to_string(tid->getId()) + " pid: " + to_string(pid->hashCode()) + " " + 
+				(perm == Permissions::READ_ONLY ? "read" : "write");
+			printf("%s\n", s.c_str());*/
+		}
 		_lockManager.accessPermission(perm, tid, pid);
 		lock_guard<mutex> lock(_mutex);
 		if (tid == nullptr || pid == nullptr)
@@ -21,7 +28,16 @@ namespace Simpledb
 		size_t pidHashCode = pid->hashCode();
 		if (_idToPageInfo.find(pidHashCode) == _idToPageInfo.end()) {
 			if (_idToPageInfo.size() == _numPages) {
-				evictPageInner();
+				try
+				{
+					evictPageInner();
+				}
+				catch (const std::exception& e)
+				{
+					_lockManager.deletePageLock(pid);
+					throw e;
+				}
+				
 			}
 			size_t tableId = pid->getTableId();
 			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
@@ -40,14 +56,13 @@ namespace Simpledb
 	}
 
 	void BufferPool::transactionComplete(shared_ptr<TransactionId> tid, bool commit)
-	{
-		_lockManager.transactionComplete(tid);
-		auto pids = _lockManager.getRelatedPageIds(tid);
+	{			
 		if (commit) {
 			flushPages(tid);
 		}
-		else {
+		else {			
 			lock_guard<mutex> guard(_mutex);
+			auto pids = _lockManager.getRelatedPageIds(tid);
 			for (auto id : pids) {
 				if (_idToPageInfo.find(id) != _idToPageInfo.end()) {
 					shared_ptr<Page> page = _idToPageInfo[id]._page;
@@ -63,8 +78,9 @@ namespace Simpledb
 				}
 			}
 		}
-		//lock_guard<mutex> guard(_printMutex);
-		//cout << "transactionComplete: " << tid->getId() << endl;
+		_lockManager.transactionComplete(tid);
+		//lock_guard<mutex> guard(printMutex);
+		//printf("transactionComplete: %s\n", to_string(tid->getId()).c_str());
 	}
 
 	bool BufferPool::holdsLock(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid)

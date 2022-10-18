@@ -50,13 +50,15 @@ namespace Simpledb {
 	private:
 		void updateWaitforGraph(Permissions p, shared_ptr<TransactionId>& tid, shared_ptr<PageId> pid);
 		shared_ptr<TransactionLockInfo> getInfo(int64_t tid);
-		bool isLocked(size_t pid, Permissions perm);
+		bool isLocked(size_t pid, size_t tid, Permissions perm);
 		int countLock(size_t pid, Permissions perm);
+		int countWaiting(size_t pid);
 
 		map<size_t, shared_ptr<TransactionLockInfo>> _tidToInfo;
 		mutex _managerLock;
 		mutex _waitLock;
 		condition_variable _waitCond;
 		DirectedGraph _waitforGraph;
+		vector<size_t> _waitingQueue;
 	};
 }
