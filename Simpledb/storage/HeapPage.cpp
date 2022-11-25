@@ -136,7 +136,7 @@ namespace Simpledb {
 		size_t result = _numSlots - count;
 		return result;
 	}
-	bool HeapPage::isSlotUsed(int i)
+	bool HeapPage::isSlotUsed(size_t i)
 	{
 		size_t bytePos = i / 8;
 		size_t bitPos = i % 8;

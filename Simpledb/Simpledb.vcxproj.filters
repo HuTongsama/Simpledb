@@ -227,6 +227,15 @@
     <ClInclude Include="include\DirectedGraph.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\BTreePageId.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreePage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeRootPtrPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -369,6 +378,12 @@
     </ClCompile>
     <ClCompile Include="common\DirectedGraph.cpp">
       <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreePage.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeRootPtrPage.cpp">
+      <Filter>index</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

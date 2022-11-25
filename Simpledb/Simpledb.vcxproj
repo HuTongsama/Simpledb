@@ -170,6 +170,9 @@
     <ClInclude Include="include\AbstractDbFileIterator.h" />
     <ClInclude Include="include\Aggregate.h" />
     <ClInclude Include="include\Aggregator.h" />
+    <ClInclude Include="include\BTreePage.h" />
+    <ClInclude Include="include\BTreePageId.h" />
+    <ClInclude Include="include\BTreeRootPtrPage.h" />
     <ClInclude Include="include\Catalog.h" />
     <ClInclude Include="include\Collection.h" />
     <ClInclude Include="include\Common.h" />
@@ -258,6 +261,8 @@
     <ClCompile Include="execution\SeqScan.cpp" />
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
+    <ClCompile Include="index\BTreePage.cpp" />
+    <ClCompile Include="index\BTreeRootPtrPage.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="optimizer\IntHistogram.cpp" />
     <ClCompile Include="optimizer\JoinOptimizer.cpp" />

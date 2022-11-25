@@ -90,7 +90,7 @@ namespace Simpledb {
         /**
          * Returns true if associated slot on this page is filled.
          */
-        bool isSlotUsed(int i);
+        bool isSlotUsed(size_t i);
         /**
          * @return an iterator over all tuples on this page (calling remove on this iterator is invalid)
          * (note that this iterator shouldn't return tuples in empty slots!)
