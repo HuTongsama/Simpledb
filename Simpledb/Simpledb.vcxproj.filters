@@ -236,6 +236,9 @@
     <ClInclude Include="include\BTreeRootPtrPage.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="..\include\BTreeHeaderPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -383,6 +386,9 @@
       <Filter>index</Filter>
     </ClCompile>
     <ClCompile Include="index\BTreeRootPtrPage.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeHeaderPage.cpp">
       <Filter>index</Filter>
     </ClCompile>
   </ItemGroup>

@@ -167,6 +167,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\include\BTreeHeaderPage.h" />
     <ClInclude Include="include\AbstractDbFileIterator.h" />
     <ClInclude Include="include\Aggregate.h" />
     <ClInclude Include="include\Aggregator.h" />
@@ -261,6 +262,7 @@
     <ClCompile Include="execution\SeqScan.cpp" />
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
+    <ClCompile Include="index\BTreeHeaderPage.cpp" />
     <ClCompile Include="index\BTreePage.cpp" />
     <ClCompile Include="index\BTreeRootPtrPage.cpp" />
     <ClCompile Include="main.cpp" />
