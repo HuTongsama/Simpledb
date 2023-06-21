@@ -44,10 +44,10 @@ namespace Simpledb {
 		lock_guard<mutex> lock(_fileMutex);
 		fflush(_pFile);
 	}
-	void File::seek(size_t pos)
+	int File::seek(size_t pos)
 	{
 		lock_guard<mutex> lock(_fileMutex);
-		fseek(_pFile, pos, SEEK_SET);
+		return fseek(_pFile, pos, SEEK_SET);
 	}
 	void File::writeChar(char c)
 	{

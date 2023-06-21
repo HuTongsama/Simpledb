@@ -20,7 +20,7 @@ namespace Simpledb {
 		size_t position();
 		void deleteOnExit() { _deleteOnExit = true; }
 		void flush();
-		void seek(size_t pos);
+		int seek(size_t pos);
 		void writeChar(char c);
 		void writeInt(int value);
 		void writeInt64(int64_t value);

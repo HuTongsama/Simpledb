@@ -239,6 +239,18 @@
     <ClInclude Include="..\include\BTreeHeaderPage.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\BTreeInternalPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeEntry.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeLeafPage.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeFile.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -390,6 +402,21 @@
     </ClCompile>
     <ClCompile Include="index\BTreeHeaderPage.cpp">
       <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeEntry.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeInternalPage.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeLeafPage.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeFile.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="IndexPredicate.cpp">
+      <Filter>execution</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

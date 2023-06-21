@@ -171,6 +171,10 @@
     <ClInclude Include="include\AbstractDbFileIterator.h" />
     <ClInclude Include="include\Aggregate.h" />
     <ClInclude Include="include\Aggregator.h" />
+    <ClInclude Include="include\BTreeEntry.h" />
+    <ClInclude Include="include\BTreeFile.h" />
+    <ClInclude Include="include\BTreeInternalPage.h" />
+    <ClInclude Include="include\BTreeLeafPage.h" />
     <ClInclude Include="include\BTreePage.h" />
     <ClInclude Include="include\BTreePageId.h" />
     <ClInclude Include="include\BTreeRootPtrPage.h" />
@@ -262,7 +266,12 @@
     <ClCompile Include="execution\SeqScan.cpp" />
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
+    <ClCompile Include="IndexPredicate.cpp" />
+    <ClCompile Include="index\BTreeEntry.cpp" />
+    <ClCompile Include="index\BTreeFile.cpp" />
     <ClCompile Include="index\BTreeHeaderPage.cpp" />
+    <ClCompile Include="index\BTreeInternalPage.cpp" />
+    <ClCompile Include="index\BTreeLeafPage.cpp" />
     <ClCompile Include="index\BTreePage.cpp" />
     <ClCompile Include="index\BTreeRootPtrPage.cpp" />
     <ClCompile Include="main.cpp" />
