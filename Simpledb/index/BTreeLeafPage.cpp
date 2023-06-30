@@ -267,9 +267,9 @@ namespace Simpledb {
 	
 		return data;
 	}
-	void BTreeLeafPage::deleteTuple(shared_ptr<Tuple> t)
+	void BTreeLeafPage::deleteTuple(Tuple& t)
 	{
-		shared_ptr<RecordId> rid = t->getRecordId();
+		shared_ptr<RecordId> rid = t.getRecordId();
 		if (rid == nullptr)
 			throw runtime_error("tried to delete tuple with null rid");
 		if ((rid->getPageId()->getPageNumber() != _pid->getPageNumber()) ||
@@ -278,7 +278,7 @@ namespace Simpledb {
 		if (!isSlotUsed(rid->getTupleNumber()))
 			throw runtime_error("tried to delete null tuple.");
 		markSlotUsed(rid->getTupleNumber(), false);
-		t->setRecordId(nullptr);
+		t.setRecordId(nullptr);
 	}
 	void BTreeLeafPage::insertTuple(shared_ptr<Tuple> t)
 	{
