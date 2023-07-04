@@ -354,31 +354,68 @@ namespace Simpledb {
 	}
 	int BTreeInternalPage::getNumEntries()
 	{
-		return 0;
+		return _numSlots - getNumEmptySlots() - 1;
 	}
 	size_t BTreeInternalPage::getNumEmptySlots()
 	{
-		return size_t();
+		int cnt = 0;
+		// start from 1 because the first key slot is not used
+		// since a node with m keys has m+1 pointers
+		for (int i = 1; i < _numSlots; i++)
+			if (!isSlotUsed(i))
+				cnt++;
+		return cnt;
 	}
 	bool BTreeInternalPage::isSlotUsed(size_t i)
 	{
-		return false;
+		size_t headerbit = i % 8;
+		size_t headerbyte = (i - headerbit) / 8;
+		return (_header[headerbyte] & (1 << headerbit)) != 0;
 	}
 	shared_ptr<Iterator<shared_ptr<BTreeEntry>>> BTreeInternalPage::iterator()
 	{
-		return nullptr;
+		return make_shared<BTreeInternalPageIterator>(this);
 	}
 	shared_ptr<Iterator<shared_ptr<BTreeEntry>>> BTreeInternalPage::reverseIterator()
 	{
-		return nullptr;
+		return make_shared<BTreeInternalPageReverseIterator>(this);
 	}
 	shared_ptr<Field> BTreeInternalPage::getKey(int i)
 	{
-		return shared_ptr<Field>();
+		// key at slot 0 is not used
+		if (i <= 0 || i >= _keys.size())
+			throw runtime_error("BTreeInternalPage::getKey no such element.");
+		try {
+			if (!isSlotUsed(i)) {
+				//Debug.log(1, "BTreeInternalPage.getKey: slot %d in %d:%d is not used", i, pid.getTableId(), pid.getPageNumber());
+				return nullptr;
+			}
+			//Debug.log(1, "BTreeInternalPage.getKey: returning key %d", i);
+			return _keys[i];
+
+		}
+		catch (const std::exception& e) {
+			throw runtime_error("BTreeInternalPage::getKey no such element.");
+		}
 	}
 	shared_ptr<BTreePageId> BTreeInternalPage::getChildId(int i)
 	{
-		return shared_ptr<BTreePageId>();
+		if (i < 0 || i >= _children.size())
+			throw runtime_error("BTreeInternalPage::getChildId no such element.");
+
+		try {
+			if (!isSlotUsed(i)) {
+				//Debug.log(1, "BTreeInternalPage.getChildId: slot %d in %d:%d is not used", i, pid.getTableId(), pid.getPageNumber());
+				return nullptr;
+			}
+
+			//Debug.log(1, "BTreeInternalPage.getChildId: returning child id %d", i);
+			return make_shared<BTreePageId>(_pid->getTableId(), _children[i], _childCategory);
+
+		}
+		catch (const std::exception& e) {
+			throw runtime_error("BTreeInternalPage::getChildId no such element.");
+		}
 	}
 	int BTreeInternalPage::getHeaderSize()
 	{
@@ -479,30 +516,126 @@ namespace Simpledb {
 	}
 	void BTreeInternalPage::moveEntry(int from, int to)
 	{
+		if (!isSlotUsed(to) && isSlotUsed(from)) {
+			markSlotUsed(to, true);
+			_keys[to] = _keys[from];
+			_children[to] = _children[from];
+			markSlotUsed(from, false);
+		}
 	}
 	void BTreeInternalPage::markSlotUsed(int i, bool value)
 	{
+		int headerbit = i % 8;
+		int headerbyte = (i - headerbit) / 8;
+
+		//Debug.log(1, "BTreeInternalPage.setSlot: setting slot %d to %b", i, value);
+		if (value)
+			_header[headerbyte] |= 1 << headerbit;
+		else
+			_header[headerbyte] &= (0xFF ^ (1 << headerbit));
 	}
 	BTreeInternalPageIterator::BTreeInternalPageIterator(shared_ptr<BTreeInternalPage> p)
+		:_p(p)
 	{
 	}
 	bool BTreeInternalPageIterator::hasNext()
 	{
-		return false;
+		if (_nextToReturn != nullptr)
+			return true;
+
+		try {
+			if (_prevChildId == nullptr) {
+				_prevChildId = _p->getChildId(0);
+				if (_prevChildId == nullptr) {
+					return false;
+				}
+			}
+			while (true) {
+				int entry = _curEntry++;
+				shared_ptr<Field> key = _p->getKey(entry);
+				shared_ptr<BTreePageId> childId = _p->getChildId(entry);
+				if (key != nullptr && childId != nullptr) {
+					_nextToReturn = make_shared<BTreeEntry>(key, _prevChildId, childId);
+					_nextToReturn->setRecordId(make_shared<RecordId>(_p->getId(), entry));
+					_prevChildId = childId;
+					return true;
+				}
+			}
+		}
+		catch (const std::exception& e) {
+			return false;
+		}
 	}
 	shared_ptr<BTreeEntry>& BTreeInternalPageIterator::next()
 	{
-		// TODO: insert return statement here
+		shared_ptr<BTreeEntry> next = _nextToReturn;
+
+		if (next == nullptr) {
+			if (hasNext()) {
+				next = _nextToReturn;
+				_nextToReturn = nullptr;
+				return next;
+			}
+			else
+				throw runtime_error("BTreeInternalPageIterator::next no such element.");
+		}
+		else {
+			_nextToReturn = nullptr;
+			return next;
+		}
 	}
 	BTreeInternalPageReverseIterator::BTreeInternalPageReverseIterator(shared_ptr<BTreeInternalPage> p)
+		:_p(p)
 	{
+		_curEntry = p->getMaxEntries();
+		while (!p->isSlotUsed(_curEntry) && _curEntry > 0) {
+			--_curEntry;
+		}
 	}
 	bool BTreeInternalPageReverseIterator::hasNext()
 	{
-		return false;
+		if (_nextToReturn != nullptr)
+			return true;
+
+		try {
+			if (_nextChildId == nullptr) {
+				_nextChildId = _p->getChildId(_curEntry);
+				if (_nextChildId == nullptr) {
+					return false;
+				}
+			}
+			while (true) {
+				int entry = _curEntry--;
+				shared_ptr<Field> key = _p->getKey(entry);
+				shared_ptr<BTreePageId> childId = _p->getChildId(entry - 1);
+				if (key != nullptr && childId != nullptr) {
+					_nextToReturn = make_shared<BTreeEntry>(key, childId, _nextChildId);
+					_nextToReturn->setRecordId(make_shared<RecordId>(_p->getId(), entry));
+					_nextChildId = childId;
+					return true;
+				}
+			}
+		}
+		catch (const std::exception& e) {
+			return false;
+		}
 	}
 	shared_ptr<BTreeEntry>& BTreeInternalPageReverseIterator::next()
 	{
-		// TODO: insert return statement here
+		shared_ptr<BTreeEntry> next = _nextToReturn;
+
+		if (next == nullptr) {
+			if (hasNext()) {
+				next = _nextToReturn;
+				_nextToReturn = nullptr;
+				return next;
+			}
+			else
+				throw runtime_error("BTreeInternalPageReverseIterator::next no such element.");
+		}
+		else {
+			_nextToReturn = nullptr;
+			return next;
+		}
 	}
 }

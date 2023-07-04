@@ -4,6 +4,9 @@
 #include"BTreeInternalPage.h"
 #include"BTreeRootPtrPage.h"
 #include"Permissions.h"
+#include"AbstractDbFileIterator.h"
+#include"TupleIterator.h"
+#include"IndexPredicate.h"
 #include<map>
 namespace Simpledb {
 	class BTreeFile : public DbFile {
@@ -222,6 +225,22 @@ namespace Simpledb {
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage,
 			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry);
+
+		/**
+		 * Convenience method to find a leaf page when there is no dirtypages HashMap.
+		 * Used by the BTreeFile iterator.
+		 * @see #findLeafPage(TransactionId, Map, BTreePageId, Permissions, Field)
+		 *
+		 * @param tid - the transaction id
+		 * @param pid - the current page being searched
+		 * @param f - the field to search for
+		 * @return the left-most leaf page possibly containing the key field f
+		 *
+		 */
+		shared_ptr<BTreeLeafPage> findLeafPage(
+			shared_ptr<TransactionId> tid,
+			shared_ptr<BTreePageId> pid,
+			shared_ptr<Field> f);
 		/**
 		 * Delete a tuple from this BTreeFile.
 		 * May cause pages to merge or redistribute entries/tuples if the pages
@@ -257,6 +276,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void setEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int emptyPageNo);
+
 	private:
 		/**
 		 * Recursive function which finds and locks the leaf page in the B+ tree corresponding to
@@ -279,22 +299,6 @@ namespace Simpledb {
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pid, Permissions perm,
 			shared_ptr<Field> f);
-		/**
-		 * Convenience method to find a leaf page when there is no dirtypages HashMap.
-		 * Used by the BTreeFile iterator.
-		 * @see #findLeafPage(TransactionId, Map, BTreePageId, Permissions, Field)
-		 *
-		 * @param tid - the transaction id
-		 * @param pid - the current page being searched
-		 * @param f - the field to search for
-		 * @return the left-most leaf page possibly containing the key field f
-		 *
-		 */
-		shared_ptr<BTreeLeafPage> findLeafPage(
-			shared_ptr<TransactionId> tid,
-			shared_ptr<BTreePageId> pid,
-			shared_ptr<Field> f);
-
 		/**
 		 * Method to encapsulate the process of getting a parent page ready to accept new entries.
 		 * This may mean creating a page to become the new root of the tree, splitting the existing
@@ -472,5 +476,87 @@ namespace Simpledb {
 		shared_ptr<Page> getEmptyPage(
 			shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int pgcateg);
+	};
+
+	/**
+	 * Helper class that implements the Iterator for tuples on a BTreeFile
+	 */
+	class BTreeFileIterator : public AbstractDbFileIterator {
+	private:
+		shared_ptr<TupleIterator> _it;
+		shared_ptr<BTreeLeafPage> _curp;
+		shared_ptr<TransactionId> _tid;
+		shared_ptr<BTreeFile> _f;
+
+	public:
+		/**
+		 * Constructor for this iterator
+		 * @param f - the BTreeFile containing the tuples
+		 * @param tid - the transaction id
+		 */
+		BTreeFileIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid);
+		/**
+		 * Open this iterator by getting an iterator on the first leaf page
+		 */
+		void open();
+		/**
+		 * rewind this iterator back to the beginning of the tuples
+		 */
+		void rewind();
+		/**
+		 * close the iterator
+		 */
+		void close()override;
+	protected:
+		/**
+		 * Read the next tuple either from the current page if it has more tuples or
+		 * from the next page by following the right sibling pointer.
+		 *
+		 * @return the next tuple, or null if none exists
+		 */
+		Tuple* readNext()override;
+	};
+
+	/**
+	 * Helper class that implements the DbFileIterator for search tuples on a
+	 * B+ Tree File
+	 */
+	class BTreeSearchIterator : public AbstractDbFileIterator {
+	private:
+		shared_ptr<TupleIterator> _it;
+		shared_ptr<BTreeLeafPage> _curp;
+		shared_ptr<TransactionId> _tid;
+		shared_ptr<BTreeFile> _f;
+		IndexPredicate _ipred;
+
+	public:
+		/**
+		 * Constructor for this iterator
+		 * @param f - the BTreeFile containing the tuples
+		 * @param tid - the transaction id
+		 * @param ipred - the predicate to filter on
+		 */
+		BTreeSearchIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid, IndexPredicate ipred);
+		/**
+		 * Open this iterator by getting an iterator on the first leaf page applicable
+		 * for the given predicate operation
+		 */
+		void open();
+		/**
+		 * rewind this iterator back to the beginning of the tuples
+		 */
+		void rewind();
+		/**
+		 * close the iterator
+		 */
+		void close()override;
+	protected:
+		/**
+		 * Read the next tuple either from the current page if it has more tuples matching
+		 * the predicate or from the next page by following the right sibling pointer.
+		 *
+		 * @return the next tuple matching the predicate, or null if none exists
+		 */
+		Tuple* readNext()override;
 	};
 }

@@ -279,6 +279,40 @@ namespace Simpledb {
         int emptySlot = emptyPageNo - headerPageCount * BTreeHeaderPage::getNumSlots();
         headerPage->markSlotUsed(emptySlot, false);
     }
+    shared_ptr<BTreeInternalPage> BTreeFile::getParentWithEmptySlots(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> parentId, shared_ptr<Field> field)
+    {
+        shared_ptr<BTreeInternalPage> parent = nullptr;
+
+        // create a parent node if necessary
+        // this will be the new root of the tree
+        if (parentId->pgcateg() == BTreePageId::ROOT_PTR) {
+            parent = dynamic_pointer_cast<BTreeInternalPage>(getEmptyPage(tid, dirtypages, BTreePageId::INTERNAL));
+
+            // update the root pointer
+            shared_ptr<BTreeRootPtrPage> rootPtr = 
+                dynamic_pointer_cast<BTreeRootPtrPage>(getPage(tid, dirtypages,
+                BTreeRootPtrPage::getId(_tableid), Permissions::READ_WRITE));
+            shared_ptr<BTreePageId> prevRootId = rootPtr->getRootId(); //save prev id before overwriting.
+            rootPtr->setRootId(dynamic_pointer_cast<BTreePageId>(parent->getId()));
+
+            // update the previous root to now point to this new root.
+            shared_ptr<BTreePage> prevRootPage = dynamic_pointer_cast<BTreePage>
+                (getPage(tid, dirtypages, prevRootId, Permissions::READ_WRITE));
+            prevRootPage->setParentId(dynamic_pointer_cast<BTreePageId>(parent->getId()));
+        }
+        else {
+            // lock the parent page
+            parent = dynamic_pointer_cast<BTreeInternalPage>
+                (getPage(tid, dirtypages, parentId, Permissions::READ_WRITE));
+        }
+
+        // split the parent if needed
+        if (parent->getNumEmptySlots() == 0) {
+            parent = splitInternalPage(tid, dirtypages, parent, field);
+        }
+
+        return parent;
+    }
     void BTreeFile::updateParentPointer(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>,
         shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, shared_ptr<BTreePageId> child)
     {
@@ -480,5 +514,127 @@ namespace Simpledb {
         dirtypages.erase(newPageId);
 
         return getPage(tid, dirtypages, newPageId, Permissions::READ_WRITE);
+    }
+
+    BTreeFileIterator::BTreeFileIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid)
+    {
+        _f = f;
+        _tid = tid;
+    }
+
+    void BTreeFileIterator::open()
+    {
+        shared_ptr<BTreeRootPtrPage> rootPtr =
+            dynamic_pointer_cast<BTreeRootPtrPage>(Database::getBufferPool()->getPage(
+                _tid, BTreeRootPtrPage::getId(_f->getId()), Permissions::READ_ONLY));
+        shared_ptr<BTreePageId> root = rootPtr->getRootId();
+        _curp = _f->findLeafPage(_tid, root, nullptr);
+        _it = _curp->iterator();
+    }
+
+    void BTreeFileIterator::rewind()
+    {
+        close();
+        open();
+    }
+
+    void BTreeFileIterator::close()
+    {
+        AbstractDbFileIterator::close();
+        _it = nullptr;
+        _curp = nullptr;
+    }
+
+    Tuple* BTreeFileIterator::readNext()
+    {
+        if (_it != nullptr && !_it->hasNext())
+            _it = nullptr;
+
+        while (_it == nullptr && _curp != nullptr) {
+            shared_ptr<BTreePageId> nextp = _curp->getRightSiblingId();
+            if (nextp == nullptr) {
+                _curp = nullptr;
+            }
+            else {
+                _curp = dynamic_pointer_cast<BTreeLeafPage>(
+                    Database::getBufferPool()->getPage(_tid, nextp, Permissions::READ_ONLY));
+                _it = _curp->iterator();
+                if (!_it->hasNext())
+                    _it = nullptr;
+            }
+        }
+
+        if (_it == nullptr)
+            return nullptr;
+        return &(_it->next());
+    }
+
+
+    BTreeSearchIterator::BTreeSearchIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid, IndexPredicate ipred)
+        :_f(f), _tid(tid), _ipred(ipred)
+    {
+    
+    }
+    void BTreeSearchIterator::open()
+    {
+        shared_ptr<BTreeRootPtrPage> rootPtr = dynamic_pointer_cast<BTreeRootPtrPage>
+            (Database::getBufferPool()->getPage(_tid, BTreeRootPtrPage::getId(_f->getId()), Permissions::READ_ONLY));
+        shared_ptr<BTreePageId> root = rootPtr->getRootId();
+        if (_ipred.getOp() == Predicate::Op::EQUALS ||
+            _ipred.getOp() == Predicate::Op::GREATER_THAN ||
+            _ipred.getOp() == Predicate::Op::GREATER_THAN_OR_EQ) {
+            _curp = _f->findLeafPage(_tid, root, _ipred.getField());
+        }
+        else {
+            _curp = _f->findLeafPage(_tid, root, nullptr);
+        }
+        _it = _curp->iterator();
+    }
+    void BTreeSearchIterator::rewind()
+    {
+        close();
+        open();
+    }
+    void BTreeSearchIterator::close()
+    {
+        AbstractDbFileIterator::close();
+        _it = nullptr;
+    }
+    Tuple* BTreeSearchIterator::readNext()
+    {
+        while (_it != nullptr) {
+
+            while (_it->hasNext()) {
+                Tuple& t = _it->next();
+                if (t.getField(_f->keyField())->compare(_ipred.getOp(), *(_ipred.getField()))) {
+                    return &t;
+                }
+                else if (_ipred.getOp() == Predicate::Op::LESS_THAN || _ipred.getOp() == Predicate::Op::LESS_THAN_OR_EQ) {
+                    // if the predicate was not satisfied and the operation is less than, we have
+                    // hit the end
+                    return nullptr;
+                }
+                else if (_ipred.getOp() == Predicate::Op::EQUALS &&
+                    t.getField(_f->keyField())->compare(Predicate::Op::GREATER_THAN, *(_ipred.getField()))) {
+                    // if the tuple is now greater than the field passed in and the operation
+                    // is equals, we have reached the end
+                    return nullptr;
+                }
+            }
+
+            shared_ptr<BTreePageId> nextp = _curp->getRightSiblingId();
+            // if there are no more pages to the right, end the iteration
+            if (nextp == nullptr) {
+                return nullptr;
+            }
+            else {
+                _curp = dynamic_pointer_cast<BTreeLeafPage>
+                    (Database::getBufferPool()->getPage(_tid,
+                    nextp, Permissions::READ_ONLY));
+                _it = _curp->iterator();
+            }
+        }
+
+        return nullptr;
     }
 }

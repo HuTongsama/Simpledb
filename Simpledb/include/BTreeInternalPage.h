@@ -117,7 +117,6 @@ namespace Simpledb {
 		 */
 		shared_ptr<Iterator<shared_ptr<BTreeEntry>>> iterator();
 		shared_ptr<Iterator<shared_ptr<BTreeEntry>>> reverseIterator();
-	protected:
 		/**
 		 * protected method used by the iterator to get the ith key out of this page
 		 * @param i - the index of the key
@@ -195,7 +194,7 @@ namespace Simpledb {
 		shared_ptr<BTreeEntry>& next()override;
 	private:
 		int _curEntry = 1;
-		shared_ptr<BTreePageId> _prevChildId = nullptr;
+		shared_ptr<BTreePageId> _nextChildId = nullptr;
 		shared_ptr<BTreeEntry> _nextToReturn = nullptr;
 		shared_ptr<BTreeInternalPage> _p;
 	};
