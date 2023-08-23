@@ -104,6 +104,14 @@ namespace Simpledb {
     {
         return _keyField;
     }
+    shared_ptr<BTreeLeafPage> BTreeFile::splitLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> page, shared_ptr<Field> field)
+    {
+        return shared_ptr<BTreeLeafPage>();
+    }
+    shared_ptr<BTreeInternalPage> BTreeFile::splitInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<Field> field)
+    {
+        return shared_ptr<BTreeInternalPage>();
+    }
     vector<shared_ptr<Page>> BTreeFile::insertTuple(shared_ptr<TransactionId> tid, shared_ptr<Tuple> t)
     {
         map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
@@ -133,6 +141,25 @@ namespace Simpledb {
             result.push_back(pagePair.second);
         }
         return result;
+    }
+    void BTreeFile::stealFromLeafPage(shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeLeafPage> sibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* entry, bool isRightSibling)
+    {
+    }
+    void BTreeFile::stealFromLeftInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    {
+    }
+    void BTreeFile::stealFromRightInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    {
+    }
+    void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    {
+    }
+    void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    {
+    }
+    shared_ptr<BTreeLeafPage> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, shared_ptr<BTreePageId> pid, shared_ptr<Field> f)
+    {
+        return shared_ptr<BTreeLeafPage>();
     }
     vector<shared_ptr<Page>> BTreeFile::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
     {
@@ -286,6 +313,10 @@ namespace Simpledb {
     shared_ptr<DbFileIterator> BTreeFile::iterator(shared_ptr<TransactionId> tid)
     {
         return make_shared<BTreeFileIterator>(this, tid);
+    }
+    shared_ptr<BTreeLeafPage> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, Permissions perm, shared_ptr<Field> f)
+    {
+        return shared_ptr<BTreeLeafPage>();
     }
     shared_ptr<BTreeInternalPage> BTreeFile::getParentWithEmptySlots(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> parentId, shared_ptr<Field> field)
     {

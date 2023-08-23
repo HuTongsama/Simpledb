@@ -4,7 +4,7 @@
 #include"IntField.h"
 #include"BufferPool.h"
 namespace Simpledb {
-	const int INDEX_SIZE = Int_Type::INT_TYPE()->getLen();
+	const int BTreeHeaderPage::INDEX_SIZE = Int_Type::INT_TYPE()->getLen();
 
 	BTreeHeaderPage::BTreeHeaderPage(shared_ptr<BTreePageId> id, const vector<unsigned char>& data) 
 	{

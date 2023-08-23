@@ -77,9 +77,6 @@ namespace Simpledb {
         if (!tuples.empty()) {
             tuples.clear();
         }
-        else {
-            tuples = vector<vector<int>>(rows);
-        }
 
         generateRandomTuples(columns, rows, maxValue, columnSpecification, tuples);
 
@@ -89,13 +86,10 @@ namespace Simpledb {
 
         shared_ptr<File> bFile = File::createTempFile("table_index.dat");
         bFile->deleteOnExit();
-        return nullptr;
-       /* vector<shared_ptr<Type>> typeAr(columns);
-        for (int i = 0; i < columns; ++i) typeAr[i] = dynamic_pointer_cast<Type>(Int_Type::INT_TYPE);
-        Type[] typeAr = new Type[columns];
-        Arrays.fill(typeAr, Type.INT_TYPE);
-        return BTreeFileEncoder.convert(tuples, hFile, bFile, BufferPool.getPageSize(),
-            columns, typeAr, ',', keyField);*/
+        vector<shared_ptr<Type>> typeAr(columns,Int_Type::INT_TYPE());
+   
+        return BTreeFileEncoder::convert(tuples, hFile, bFile, BufferPool::getPageSize(),
+            columns, typeAr, ',', keyField);
     }
     void BTreeUtility::generateRandomTuples(int columns, int rows, int maxValue,
         const map<int, int>& columnSpecification, vector<vector<int>>& tuples)
@@ -113,7 +107,7 @@ namespace Simpledb {
 
         // Fill the tuples list with generated values
         for (int i = 0; i < rows; ++i) {
-            vector<int> tuple(columns,0);
+            vector<int> tuple;
             for (int j = 0; j < columns; ++j) {
                 // Generate random values, or use the column specification
                 int columnValue = 0;
