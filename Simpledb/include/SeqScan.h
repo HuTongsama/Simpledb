@@ -65,7 +65,7 @@ namespace Simpledb {
 		*/
 		shared_ptr<TupleDesc> getTupleDesc()override;
 		bool hasNext()override;
-		Tuple& next()override;
+		Tuple* next()override;
 		void close()override;
 		void rewind()override;
 

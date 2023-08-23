@@ -1,5 +1,6 @@
 #pragma once
 #include"Noncopyable.h"
+#include<vector>
 namespace Simpledb {
 	class DataStream : public Noncopyable {
 	public:
@@ -19,6 +20,7 @@ namespace Simpledb {
 		void writeFloat(float f);
 		int readInt();
 		void writeInt(int i);
+		std::vector<unsigned char> toByteArray();
 	private:
 		void release();
 		template<typename T>

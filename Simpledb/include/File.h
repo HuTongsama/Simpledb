@@ -37,7 +37,7 @@ namespace Simpledb {
 		void reset();
 		void close();
 
-		static shared_ptr<File> createTempFile();
+		static shared_ptr<File> createTempFile(const string& fileName = "");
 	private:
 		template<typename T>
 		T readBaseType();

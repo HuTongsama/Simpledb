@@ -9,7 +9,7 @@ namespace Simpledb {
 			:_next(nullptr), _open(false), _estimatedCardinality(0) {
 		}
 		bool hasNext()override;
-		Tuple& next()override;
+		Tuple* next()override;
 		/**
 		* Closes this iterator. If overridden by a subclass, they should call
 		* Operator::close() in order for Operator's internal state to be consistent.

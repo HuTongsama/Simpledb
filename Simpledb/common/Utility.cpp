@@ -25,7 +25,7 @@ namespace Simpledb {
 		return shared_ptr<TupleDesc>(
 			new TupleDesc(getTypes(n), getStrings(n, name)));
 	}
-	shared_ptr<TupleDesc> Utility::getTupleDesc(int n)
+	shared_ptr<TupleDesc> Utility::getTupleDesc(size_t n)
 	{
 		return shared_ptr<TupleDesc>(new TupleDesc(getTypes(n)));
 	}

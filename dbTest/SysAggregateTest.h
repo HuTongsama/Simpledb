@@ -19,7 +19,7 @@ protected:
 
     int computeAggregate(vector<int>& values, Aggregator::Op operation) {
         if (operation == Aggregator::Op::COUNT)
-            return values.size();
+            return static_cast<int>(values.size());
 
         int value = 0;
         if (operation == Aggregator::Op::MIN)
@@ -46,7 +46,7 @@ protected:
         }
 
         if (operation == Aggregator::Op::AVG)
-            value /= values.size();
+            value /= static_cast<int>(values.size());
         return value;
     }
     

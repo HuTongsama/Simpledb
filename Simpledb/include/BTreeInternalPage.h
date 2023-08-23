@@ -115,8 +115,8 @@ namespace Simpledb {
 		 * @return an iterator over all entries on this page (calling remove on this iterator throws an UnsupportedOperationException)
 		 * (note that this iterator shouldn't return entries in empty slots!)
 		 */
-		shared_ptr<Iterator<shared_ptr<BTreeEntry>>> iterator();
-		shared_ptr<Iterator<shared_ptr<BTreeEntry>>> reverseIterator();
+		shared_ptr<Iterator<BTreeEntry>> iterator();
+		shared_ptr<Iterator<BTreeEntry>> reverseIterator();
 		/**
 		 * protected method used by the iterator to get the ith key out of this page
 		 * @param i - the index of the key
@@ -174,28 +174,27 @@ namespace Simpledb {
 		int _childCategory; // either leaf or internal
 	};
 
-	class BTreeInternalPageIterator : public Iterator<shared_ptr<BTreeEntry>> {
-	
+	class BTreeInternalPageIterator : public Iterator<BTreeEntry> {	
 	public:
-		BTreeInternalPageIterator(shared_ptr<BTreeInternalPage> p);
+		BTreeInternalPageIterator(BTreeInternalPage* p);
 		bool hasNext()override;
-		shared_ptr<BTreeEntry>& next()override;
+		BTreeEntry* next()override;
 	private:
 		int _curEntry = 1;
 		shared_ptr<BTreePageId> _prevChildId = nullptr;
 		shared_ptr<BTreeEntry> _nextToReturn = nullptr;
-		shared_ptr<BTreeInternalPage> _p;
+		BTreeInternalPage* _p;
 	};
 
-	class BTreeInternalPageReverseIterator : public Iterator<shared_ptr<BTreeEntry>> {
+	class BTreeInternalPageReverseIterator : public Iterator<BTreeEntry> {
 	public:
-		BTreeInternalPageReverseIterator(shared_ptr<BTreeInternalPage> p);
+		BTreeInternalPageReverseIterator(BTreeInternalPage* p);
 		bool hasNext()override;
-		shared_ptr<BTreeEntry>& next()override;
+		BTreeEntry* next()override;
 	private:
 		int _curEntry = 1;
 		shared_ptr<BTreePageId> _nextChildId = nullptr;
 		shared_ptr<BTreeEntry> _nextToReturn = nullptr;
-		shared_ptr<BTreeInternalPage> _p;
+		BTreeInternalPage* _p;
 	};
 }

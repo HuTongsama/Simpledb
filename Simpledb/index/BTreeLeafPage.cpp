@@ -132,10 +132,10 @@ namespace Simpledb {
 		assert(dynamic_pointer_cast<BTreePageId>(getId())->pgcateg()
 			== BTreePageId::LEAF);
 	
-		shared_ptr<Iterator<shared_ptr<Tuple>>> it = this->iterator();
+		shared_ptr<Iterator<Tuple>> it = this->iterator();
 		
 		while (it->hasNext()) {
-			shared_ptr<Tuple> t = it->next();
+			Tuple* t = it->next();
 			assert(nullptr == prev || prev->compare(Predicate::Op::LESS_THAN_OR_EQ, *(t->getField(fieldid))));
 			prev = t->getField(fieldid);
 			assert(t->getRecordId()->getPageId()->equals(*(this->getId())));
@@ -393,11 +393,11 @@ namespace Simpledb {
 		int headerbyte = (i - headerbit) / 8;
 		return (_header[headerbyte] & (1 << headerbit)) != 0;
 	}
-	shared_ptr<Iterator<shared_ptr<Tuple>>> BTreeLeafPage::iterator()
+	shared_ptr<Iterator<Tuple>> BTreeLeafPage::iterator()
 	{
 		return make_shared<BTreeLeafPageIterator>(this);
 	}
-	shared_ptr<Iterator<shared_ptr<Tuple>>> BTreeLeafPage::reverseIterator()
+	shared_ptr<Iterator<Tuple>> BTreeLeafPage::reverseIterator()
 	{
 		return make_shared<BTreeLeafPageReverseIterator>(this);
 	}
@@ -409,7 +409,7 @@ namespace Simpledb {
 		try
 		{
 			if (!isSlotUsed(i)) {
-				printf("BTreeLeafPage.getTuple: slot %d in %d:%d is not used", i, _pid->getTableId(), _pid->getPageNumber());
+				printf("BTreeLeafPage.getTuple: slot %d in %I64u:%I64u is not used", i, _pid->getTableId(), _pid->getPageNumber());
 				return nullptr;
 			}
 
@@ -422,8 +422,7 @@ namespace Simpledb {
 		}
 
 	}
-	BTreeLeafPageIterator::BTreeLeafPageIterator(shared_ptr<BTreeLeafPage> p)
-		:_p(p), _nextToReturn(nullptr)
+	BTreeLeafPageIterator::BTreeLeafPageIterator(BTreeLeafPage* p) :_p(p)
 	{
 	}
 	bool BTreeLeafPageIterator::hasNext()
@@ -434,14 +433,14 @@ namespace Simpledb {
 		
 
 	}
-	shared_ptr<Tuple>& BTreeLeafPageIterator::next()
+	Tuple* BTreeLeafPageIterator::next()
 	{
-		_nextToReturn = _p->getTuple(_position);
+		auto tuple = _p->getTuple(_position);
+		_items.push_back(tuple);
 		_position++;
-		return _nextToReturn;
+		return tuple.get();
 	}
-	BTreeLeafPageReverseIterator::BTreeLeafPageReverseIterator(shared_ptr<BTreeLeafPage> p)
-		:_p(p), _nextToReturn(nullptr)
+	BTreeLeafPageReverseIterator::BTreeLeafPageReverseIterator(BTreeLeafPage* p) :_p(p)
 	{
 		_position = _p->getMaxTuples() - 1;
 	}
@@ -451,10 +450,11 @@ namespace Simpledb {
 			return true;
 		return false;
 	}
-	shared_ptr<Tuple>& BTreeLeafPageReverseIterator::next()
+	Tuple* BTreeLeafPageReverseIterator::next()
 	{
-		_nextToReturn = _p->getTuple(_position);
+		auto tuple = _p->getTuple(_position);
+		_items.push_back(tuple);
 		_position--;
-		return _nextToReturn;
+		return tuple.get();
 	}
 }

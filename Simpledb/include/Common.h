@@ -4,6 +4,7 @@
 #include<memory>
 #include<sstream>
 #include<type_traits>
+#include<mutex>
 using namespace std;
 namespace Simpledb {
 	using Unique_File = unique_ptr<FILE, decltype(&fclose)>;
@@ -38,4 +39,26 @@ namespace Simpledb {
 		memcpy_s(buffer, sz, &value, sz);
 		return vector<unsigned char>(buffer, buffer + sz);
 	}
+
+	class Thread {
+	private:
+		condition_variable _joinCond;
+		mutex _joinMutex;		
+		bool _isCompleted = false;
+		bool _isAlive = false;
+
+		void run();
+	public:
+		bool isCompleted();
+		const string& exception();
+		bool isAlive();
+		void start();
+		void join(int milliseconds = 0);
+		
+
+	protected:
+		string _error = "";
+		//will be called in run method
+		virtual void runInner() = 0;
+	};
 }

@@ -60,11 +60,11 @@ namespace Simpledb {
 		Tuple* pNext = nullptr;
 		while (_children[0]->hasNext() || _lhs != nullptr){
 			if (_lhs == nullptr) {
-				_lhs = &(_children[0]->next());
+				_lhs = _children[0]->next();
 			}
 			while (_children[1]->hasNext()) {
 				if (_rhs == nullptr) {
-					_rhs = &(_children[1]->next());
+					_rhs = _children[1]->next();
 				}
 				if (_p->filter(*_lhs, *_rhs)) {
 					_tuple = make_shared<Tuple>(_td);

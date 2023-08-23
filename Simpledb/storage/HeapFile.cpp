@@ -146,7 +146,7 @@ namespace Simpledb {
 			return nullptr;
 		}
 		if (_iter != nullptr && _iter->hasNext()) {
-			return &(_iter->next());
+			return _iter->next();
 		}
 		else {
 			if (_iter != nullptr) {

@@ -5,7 +5,7 @@ namespace Simpledb {
 		_op->open();
 		_started = true;
 	}
-	Tuple& Query::next()
+	Tuple* Query::next()
 	{
 		if (!_started)
 			throw runtime_error("Database not started.");
@@ -31,8 +31,8 @@ namespace Simpledb {
         start();
         int cnt = 0;
         while (hasNext()) {
-            Tuple& tup = next();
-            cout << tup.toString() << endl;
+            Tuple* tup = next();
+            cout << tup->toString() << endl;
             cnt++;
         }
         cout << ("\n " + to_string(cnt) + " rows.") << endl;

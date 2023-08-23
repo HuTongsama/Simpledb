@@ -129,12 +129,12 @@ namespace Simpledb {
 		 * @return an iterator over all tuples on this page (calling remove on this iterator throws an UnsupportedOperationException)
 		 * (note that this iterator shouldn't return tuples in empty slots!)
 		 */
-		shared_ptr<Iterator<shared_ptr<Tuple>>> iterator();
+		shared_ptr<Iterator<Tuple>> iterator();
 		/**
 		 * @return a reverse iterator over all tuples on this page (calling remove on this iterator throws an UnsupportedOperationException)
 		 * (note that this iterator shouldn't return tuples in empty slots!)
 		 */
-		shared_ptr<Iterator<shared_ptr<Tuple>>> reverseIterator();
+		shared_ptr<Iterator<Tuple>> reverseIterator();
 		/**
 		 * protected method used by the iterator to get the ith tuple out of this page
 		 * @param i - the index of the tuple
@@ -145,25 +145,23 @@ namespace Simpledb {
 
 	};
 
-	class BTreeLeafPageIterator :public Iterator<shared_ptr<Tuple>> {
+	class BTreeLeafPageIterator :public Iterator<Tuple> {
 	private:
-		shared_ptr<Tuple> _nextToReturn;
-		shared_ptr<BTreeLeafPage> _p;
+		BTreeLeafPage* _p;
 	public:
-		BTreeLeafPageIterator(shared_ptr<BTreeLeafPage> p);
+		BTreeLeafPageIterator(BTreeLeafPage* p);
 		bool hasNext()override;
-		shared_ptr<Tuple>& next()override;
+		Tuple* next()override;
 		
 	};
 
-	class BTreeLeafPageReverseIterator :public Iterator<shared_ptr<Tuple>> {
+	class BTreeLeafPageReverseIterator :public Iterator<Tuple> {
 	private:
-		shared_ptr<Tuple> _nextToReturn;
-		shared_ptr<BTreeLeafPage> _p;
+		BTreeLeafPage* _p;
 	public:
-		BTreeLeafPageReverseIterator(shared_ptr<BTreeLeafPage> p);
+		BTreeLeafPageReverseIterator(BTreeLeafPage* p);
 		bool hasNext()override;
-		shared_ptr<Tuple>& next()override;
+		Tuple* next()override;
 
 	};
 }

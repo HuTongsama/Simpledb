@@ -141,7 +141,7 @@ namespace Simpledb {
 		 * @throws DbException
 		 */
 		void stealFromLeafPage(shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeLeafPage> sibling,
-			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> entry, bool isRightSibling);
+			shared_ptr<BTreeInternalPage> parent, BTreeEntry* entry, bool isRightSibling);
 		/**
 		 * Steal entries from the left sibling and copy them to the given page so that both pages are at least
 		 * half full. Keys can be thought of as rotating through the parent entry, so the original key in the
@@ -162,7 +162,7 @@ namespace Simpledb {
 		void stealFromLeftInternalPage(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling,
-			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry);
+			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
 		 * Steal entries from the right sibling and copy them to the given page so that both pages are at least
 		 * half full. Keys can be thought of as rotating through the parent entry, so the original key in the
@@ -182,7 +182,7 @@ namespace Simpledb {
 		void stealFromRightInternalPage(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling,
-			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry);
+			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
 		 * Merge two leaf pages by moving all tuples from the right page to the left page.
 		 * Delete the corresponding key and right child pointer from the parent, and recursively
@@ -202,7 +202,7 @@ namespace Simpledb {
 		void mergeLeafPages(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage,
-			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry);
+			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
 		 * Merge two internal pages by moving all entries from the right page to the left page
 		 * and "pulling down" the corresponding key from the parent entry.
@@ -224,7 +224,7 @@ namespace Simpledb {
 		void mergeInternalPages(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage,
-			shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry);
+			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 
 		/**
 		 * Convenience method to find a leaf page when there is no dirtypages HashMap.
@@ -276,7 +276,26 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void setEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int emptyPageNo);
-
+		/**
+		 * get the specified tuples from the file based on its IndexPredicate value on
+		 * behalf of the specified transaction. This method will acquire a read lock on
+		 * the affected pages of the file, and may block until the lock can be
+		 * acquired.
+		 *
+		 * @param tid - the transaction id
+		 * @param ipred - the index predicate value to filter on
+		 * @return an iterator for the filtered tuples
+		 */
+		shared_ptr<DbFileIterator> indexIterator(shared_ptr<TransactionId> tid, IndexPredicate ipred);
+		/**
+		 * Get an iterator for all tuples in this B+ tree file in sorted order. This method
+		 * will acquire a read lock on the affected pages of the file, and may block until
+		 * the lock can be acquired.
+		 *
+		 * @param tid - the transaction id
+		 * @return an iterator for all the tuples in this file
+		 */
+		shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid)override;
 	private:
 		/**
 		 * Recursive function which finds and locks the leaf page in the B+ tree corresponding to
@@ -403,7 +422,7 @@ namespace Simpledb {
 		void handleMinOccupancyLeafPage(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeInternalPage> parent,
-			shared_ptr<BTreeEntry> leftEntry, shared_ptr<BTreeEntry> rightEntry);
+			BTreeEntry* leftEntry, BTreeEntry* rightEntry);
 		/**
 		 * Handle the case when an internal page becomes less than half full due to deletions.
 		 * If one of its siblings has extra entries, redistribute those entries.
@@ -424,7 +443,7 @@ namespace Simpledb {
 		void handleMinOccupancyInternalPage(shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> parent,
-			shared_ptr<BTreeEntry> leftEntry, shared_ptr<BTreeEntry> rightEntry);
+			BTreeEntry* leftEntry, BTreeEntry* rightEntry);
 		/**
 		 * Method to encapsulate the process of deleting an entry (specifically the key and right child)
 		 * from a parent node.  If the parent becomes empty (no keys remaining), that indicates that it
@@ -483,10 +502,10 @@ namespace Simpledb {
 	 */
 	class BTreeFileIterator : public AbstractDbFileIterator {
 	private:
-		shared_ptr<TupleIterator> _it;
+		shared_ptr<Iterator<Tuple>> _it;
 		shared_ptr<BTreeLeafPage> _curp;
 		shared_ptr<TransactionId> _tid;
-		shared_ptr<BTreeFile> _f;
+		BTreeFile* _f;
 
 	public:
 		/**
@@ -494,7 +513,7 @@ namespace Simpledb {
 		 * @param f - the BTreeFile containing the tuples
 		 * @param tid - the transaction id
 		 */
-		BTreeFileIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid);
+		BTreeFileIterator(BTreeFile* f, shared_ptr<TransactionId> tid);
 		/**
 		 * Open this iterator by getting an iterator on the first leaf page
 		 */
@@ -523,10 +542,10 @@ namespace Simpledb {
 	 */
 	class BTreeSearchIterator : public AbstractDbFileIterator {
 	private:
-		shared_ptr<TupleIterator> _it;
+		shared_ptr<Iterator<Tuple>> _it;
 		shared_ptr<BTreeLeafPage> _curp;
 		shared_ptr<TransactionId> _tid;
-		shared_ptr<BTreeFile> _f;
+		BTreeFile* _f;
 		IndexPredicate _ipred;
 
 	public:
@@ -536,7 +555,7 @@ namespace Simpledb {
 		 * @param tid - the transaction id
 		 * @param ipred - the predicate to filter on
 		 */
-		BTreeSearchIterator(shared_ptr<BTreeFile> f, shared_ptr<TransactionId> tid, IndexPredicate ipred);
+		BTreeSearchIterator(BTreeFile* f, shared_ptr<TransactionId> tid, IndexPredicate ipred);
 		/**
 		 * Open this iterator by getting an iterator on the first leaf page applicable
 		 * for the given predicate operation

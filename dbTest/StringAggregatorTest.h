@@ -39,7 +39,7 @@ TEST_F(StringAggregatorTest, MergeCount) {
     StringAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::COUNT);
 
     for (auto& step : _count) {
-        agg.mergeTupleIntoGroup(_scan1->next());
+        agg.mergeTupleIntoGroup(*(_scan1->next()));
         shared_ptr<OpIterator> it = agg.iterator();
         it->open();
         TestUtil::matchAllTuples(TestUtil::createTupleList(_width1, step), it);
@@ -56,7 +56,7 @@ TEST_F(StringAggregatorTest, TestIterator) {
     try
     {
         while (true)
-            agg.mergeTupleIntoGroup(_scan1->next());
+            agg.mergeTupleIntoGroup(*(_scan1->next()));
     }
     catch (const std::exception&)
     {

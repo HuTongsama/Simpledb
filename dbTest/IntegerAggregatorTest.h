@@ -61,7 +61,7 @@ TEST_F(IntegerAggregatorTest, MergeSum) {
     IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::SUM);
 
     for (auto& step : _sum) {
-        agg.mergeTupleIntoGroup(_scan1->next());
+        agg.mergeTupleIntoGroup(*(_scan1->next()));
         shared_ptr<OpIterator> it = agg.iterator();
         it->open();
         TestUtil::matchAllTuples(TestUtil::createTupleList(_width1, step), it);
@@ -76,7 +76,7 @@ TEST_F(IntegerAggregatorTest, MergeMin) {
     IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::MIN);
 
     for (auto& step : _min) {
-        agg.mergeTupleIntoGroup(_scan1->next());
+        agg.mergeTupleIntoGroup(*(_scan1->next()));
         shared_ptr<OpIterator> it = agg.iterator();
         it->open();
         TestUtil::matchAllTuples(TestUtil::createTupleList(_width1, step), it);
@@ -90,7 +90,7 @@ TEST_F(IntegerAggregatorTest, MergeMax) {
     _scan1->open();
     IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::MAX);
     for (auto& step : _max) {
-        agg.mergeTupleIntoGroup(_scan1->next());
+        agg.mergeTupleIntoGroup(*(_scan1->next()));
         shared_ptr<OpIterator> it = agg.iterator();
         it->open();
         TestUtil::matchAllTuples(TestUtil::createTupleList(_width1, step), it);
@@ -104,7 +104,7 @@ TEST_F(IntegerAggregatorTest, MergeAvg) {
     _scan1->open();
     IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::AVG);
     for (auto& step : _avg) {
-        agg.mergeTupleIntoGroup(_scan1->next());
+        agg.mergeTupleIntoGroup(*(_scan1->next()));
         shared_ptr<OpIterator> it = agg.iterator();
         it->open();
         TestUtil::matchAllTuples(TestUtil::createTupleList(_width1, step), it);
@@ -120,7 +120,7 @@ TEST_F(IntegerAggregatorTest, TestIterator) {
     IntegerAggregator agg(0, Int_Type::INT_TYPE(), 1, Aggregator::Op::SUM);
     try {
         while (true)
-            agg.mergeTupleIntoGroup(_scan1->next());
+            agg.mergeTupleIntoGroup(*(_scan1->next()));
     }
     catch (const std::exception&) {
         // explicitly ignored

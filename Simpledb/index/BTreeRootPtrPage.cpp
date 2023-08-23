@@ -1,7 +1,7 @@
 #include"BTreeRootPtrPage.h"
 #include"DataStream.h"
 namespace Simpledb {
-	shared_ptr<BTreePageId> BTreeRootPtrPage::getId(int tableid)
+	shared_ptr<BTreePageId> BTreeRootPtrPage::getId(size_t tableid)
 	{
 		return make_shared<BTreePageId>(tableid, 0, BTreePageId::ROOT_PTR);
 	}
@@ -106,8 +106,8 @@ namespace Simpledb {
 			if (id->pgcateg() != BTreePageId::INTERNAL && id->pgcateg() != BTreePageId::LEAF) {
 				throw new runtime_error("root must be an internal node or leaf node");
 			}
-			_root = id->getPageNumber();
-			_rootCategory = id->pgcateg();
+			_root = static_cast<int>(id->getPageNumber());
+			_rootCategory = static_cast<int>(id->pgcateg());
 		}
 	}
 	shared_ptr<BTreePageId> BTreeRootPtrPage::getHeaderId()
@@ -129,7 +129,7 @@ namespace Simpledb {
 			if (id->pgcateg() != BTreePageId::HEADER) {
 				throw runtime_error("header must be of type BTreePageId.HEADER");
 			}
-			_header = id->getPageNumber();
+			_header = static_cast<int>(id->getPageNumber());
 		}
 	}
 }

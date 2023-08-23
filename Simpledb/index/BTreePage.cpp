@@ -41,7 +41,7 @@ namespace Simpledb {
 			_parent = 0;
 		}
 		else {
-			_parent = id->getPageNumber();
+			_parent = static_cast<int>(id->getPageNumber());
 		}
 	}
 	void BTreePage::markDirty(bool dirty, shared_ptr<TransactionId> tid)

@@ -30,8 +30,8 @@ TEST_F(FilterTest, Rewind) {
 
 	op.rewind();
 	shared_ptr<Tuple> expected = Utility::getHeapTuple(0, _testWidth);
-	Tuple& actual = op.next();
-	EXPECT_TRUE(TestUtil::compareTuples(*expected, actual));
+	Tuple* actual = op.next();
+	EXPECT_TRUE(TestUtil::compareTuples(*expected, *actual));
 	op.close();
 }
 
@@ -57,21 +57,21 @@ TEST_F(FilterTest, FilterEqual) {
 	shared_ptr<Predicate> pred = make_shared<Predicate>(0, Predicate::Op::EQUALS, TestUtil::getField(-5));
 	shared_ptr<Filter> op = make_shared<Filter>(pred, _scan);
 	op->open();
-	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(-5, _testWidth), op->next()));
+	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(-5, _testWidth), *(op->next())));
 	op->close();
 
 	_scan = make_shared<TestUtil::MockScan>(-5, 5, _testWidth);
 	pred = make_shared<Predicate>(0, Predicate::Op::EQUALS, TestUtil::getField(0));
 	op = make_shared<Filter>(pred, _scan);
 	op->open();
-	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(0, _testWidth),op->next()));
+	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(0, _testWidth),*(op->next())));
 	op->close();
 
 	_scan = make_shared<TestUtil::MockScan>(-5, 5, _testWidth);
 	pred = make_shared<Predicate>(0, Predicate::Op::EQUALS, TestUtil::getField(4));
 	op = make_shared<Filter>(pred, _scan);
 	op->open();
-	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(4, _testWidth), op->next()));
+	EXPECT_TRUE(TestUtil::compareTuples(*Utility::getHeapTuple(4, _testWidth), *(op->next())));
 	op->close();
 }
 

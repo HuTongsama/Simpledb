@@ -78,9 +78,9 @@ TEST_F(BufferPoolWriteTest, DeleteTuple) {
 
 	vector<shared_ptr<Tuple>> tuples;
 	while (it->hasNext()) {
-		Tuple& t1 = it->next();
-		shared_ptr<Tuple> t2 = make_shared<Tuple>(t1.getTupleDesc());
-		t1.copyTo(*t2);
+		Tuple* t1 = it->next();
+		shared_ptr<Tuple> t2 = make_shared<Tuple>(t1->getTupleDesc());
+		t1->copyTo(*t2);
 		tuples.push_back(t2);
 	}
 

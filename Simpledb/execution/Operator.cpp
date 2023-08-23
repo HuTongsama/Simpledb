@@ -10,7 +10,7 @@ namespace Simpledb {
 			_next = fetchNext();
 		return _next != nullptr;
 	}
-	Tuple& Operator::next()
+	Tuple* Operator::next()
 	{
 		if (!_open)
 			throw runtime_error("Operator not yet open");
@@ -20,7 +20,7 @@ namespace Simpledb {
 				throw runtime_error("no such element");
 		}
 
-		Tuple& result = *_next;
+		Tuple* result = _next;
 		_next = nullptr;
 		return result;
 	}

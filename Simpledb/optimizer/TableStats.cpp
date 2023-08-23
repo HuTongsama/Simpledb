@@ -25,7 +25,7 @@ namespace Simpledb {
 		shared_ptr<Iterator<size_t>> tableIt = Database::getCatalog()->tableIdIterator();
 		cout << "Computing table stats." << endl;
 		while (tableIt->hasNext()) {
-			size_t tableid = tableIt->next();
+			size_t tableid = *(tableIt->next());
 			shared_ptr<TableStats> s = make_shared<TableStats>(tableid, IOCOSTPERPAGE);
 			setTableStats(Database::getCatalog()->getTableName(tableid), s);
 		}
@@ -69,10 +69,10 @@ namespace Simpledb {
 		shared_ptr<DbFileIterator> iter = dbFile->iterator(tid);
 		iter->open();
 		while (iter->hasNext()) {
-			Tuple& tuple = iter->next();
+			Tuple* tuple = iter->next();
 			_numTuples++;
 			for (size_t i = 0; i < numFields; ++i) {
-				shared_ptr<Field> f = tuple.getField(i);
+				shared_ptr<Field> f = tuple->getField(i);
 				Type::TYPE type = f->getType();
 				switch (type)
 				{

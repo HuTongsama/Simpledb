@@ -14,7 +14,7 @@ protected:
 	void SetUp()override {
 		SimpleDbTestBase::SetUp();
 
-		_r = default_random_engine(time(0));
+		_r = default_random_engine(static_cast<unsigned int>(time(0)));
 		_name = SystemTestUtil::getUUID();
 		_id1 = CatalogTest::_r();
 		_id2 = CatalogTest::_r();

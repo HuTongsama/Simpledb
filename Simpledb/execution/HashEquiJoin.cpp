@@ -42,9 +42,9 @@ namespace Simpledb {
 
 		// loop around child2
 		while (_child2->hasNext()) {
-			Tuple& t = _child2->next();
-			_t2 = make_shared<Tuple>(t.getTupleDesc());
-			t.copyTo(*_t2);
+			Tuple* t = _child2->next();
+			_t2 = make_shared<Tuple>(t->getTupleDesc());
+			t->copyTo(*_t2);
 
 			// if match, create a combined tuple and fill it with the values
 			// from both tuples
@@ -70,9 +70,9 @@ namespace Simpledb {
 		int cnt = 0;
 		_map.clear();
 		while (_child1->hasNext()) {
-			Tuple& t = _child1->next();
-			_t1 = make_shared<Tuple>(t.getTupleDesc());
-			t.copyTo(*_t1);
+			Tuple* t = _child1->next();
+			_t1 = make_shared<Tuple>(t->getTupleDesc());
+			t->copyTo(*_t1);
 			vector<shared_ptr<Tuple>>& list = _map[_t1->getField(_pred->getField1())];
 			list.push_back(_t1);
 			if (cnt == MAP_SIZE)

@@ -155,8 +155,8 @@ namespace Simpledb {
 		auto tdIter = _td->iterator();
 		while (tdIter->hasNext())
 		{
-			auto& item = tdIter->next();
-			tupleBytes += item._fieldType->getLen();
+			auto item = tdIter->next();
+			tupleBytes += item->_fieldType->getLen();
 		}
 		int pageBytes = Database::getBufferPool()->getPageSize();
 		int tupleCount = (pageBytes * 8) / (tupleBytes * 8 + 1);//floor comes for free

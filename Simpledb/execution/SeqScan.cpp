@@ -12,9 +12,9 @@ namespace Simpledb {
 			vector<shared_ptr<Type>> typeVec;
 			vector<string> nameVec;
 			while (iter->hasNext()) {
-				auto& next = iter->next();
-				typeVec.push_back(next._fieldType);
-				nameVec.push_back(_tableAlias + "." + next._fieldName);
+				auto next = iter->next();
+				typeVec.push_back(next->_fieldType);
+				nameVec.push_back(_tableAlias + "." + next->_fieldName);
 			}
 			_td = make_shared<TupleDesc>(typeVec, nameVec);
 		}
@@ -56,7 +56,7 @@ namespace Simpledb {
 	{
 		return _iter->hasNext();
 	}
-	Tuple& SeqScan::next()
+	Tuple* SeqScan::next()
 	{
 		return _iter->next();
 	}

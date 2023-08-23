@@ -12,7 +12,7 @@ namespace Simpledb {
 		 * @param tableid - the tableid of this table
 		 * @return the root pointer page id for the given table
 		 */
-		static shared_ptr<BTreePageId> getId(int tableid);
+		static shared_ptr<BTreePageId> getId(size_t tableid);
 		/**
 		 * Static method to generate a byte array corresponding to an empty
 		 * BTreeRootPtrPage.

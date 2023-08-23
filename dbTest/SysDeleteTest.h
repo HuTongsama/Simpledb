@@ -17,11 +17,11 @@ protected:
         bool hasResult = false;
         int result = -1;
         while (deleteOperator->hasNext()) {
-            Tuple& t = deleteOperator->next();
+            Tuple* t = deleteOperator->next();
             EXPECT_FALSE(hasResult);
             hasResult = true;
-            EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*t.getTupleDesc()));
-            result = dynamic_pointer_cast<IntField>(t.getField(0))->getValue();
+            EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*t->getTupleDesc()));
+            result = dynamic_pointer_cast<IntField>(t->getField(0))->getValue();
         }
         EXPECT_TRUE(hasResult);
 

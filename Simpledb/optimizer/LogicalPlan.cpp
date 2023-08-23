@@ -159,7 +159,7 @@ namespace Simpledb {
 
             //s.addSelectivityFactor(estimateFilterSelectivity(lf,statsMap));
         }
-
+        return nullptr;
         //shared_ptr<JoinOptimizer> jo = make_shared<JoinOptimizer>(this, joins);
 
         //joins = jo.orderJoins(statsMap, filterSelectivities, explain);

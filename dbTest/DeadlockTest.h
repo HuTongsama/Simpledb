@@ -28,7 +28,7 @@ protected:
         shared_ptr<PageId> p2 = make_shared<HeapPageId>(_empty->getId(), 2);
         _tid1 = make_shared<TransactionId>();
         _tid2 = make_shared<TransactionId>();
-        _rand = default_random_engine(time(0));
+        _rand = default_random_engine(static_cast<unsigned int>(time(0)));
 
         // forget about locks associated to tid, so they don't conflict with
         // test cases

@@ -117,14 +117,14 @@ public:
         iterator->open();
         size_t findCount = 0;
         while (iterator->hasNext()) {
-            Tuple& t = iterator->next();
-            vector<int> vec = tupleToVector(t);
+            Tuple* t = iterator->next();
+            vector<int> vec = tupleToVector(*t);
             auto isExpected = find_if(copy.begin(), copy.end(), [&vec](vector<int>& aim) {
                 return equal(vec.begin(), vec.end(), aim.begin());
                 }) != copy.end();
             //printf("scanned tuple: %s (%s)", t.toString().data(), isExpected ? "expected" : "not expected");
             if (!isExpected) {
-                throw runtime_error("expected tuples does not contain: " + t.toString());
+                throw runtime_error("expected tuples does not contain: " + t->toString());
             }
             else {
                 findCount++;

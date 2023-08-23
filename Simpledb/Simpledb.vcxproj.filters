@@ -251,6 +251,18 @@
     <ClInclude Include="include\BTreeFile.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\IndexPredicate.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeUtility.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BTreeFileEncoder.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\BlockingQueue.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -415,8 +427,14 @@
     <ClCompile Include="index\BTreeFile.cpp">
       <Filter>index</Filter>
     </ClCompile>
-    <ClCompile Include="IndexPredicate.cpp">
+    <ClCompile Include="execution\IndexPredicate.cpp">
       <Filter>execution</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeUtility.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeFileEncoder.cpp">
+      <Filter>index</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

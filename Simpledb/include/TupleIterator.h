@@ -20,19 +20,14 @@ namespace Simpledb {
         bool hasNext()override {
             if (!_open)
                 return false;
-            return (_position < _tuples.size()
-                && _tuples[_position] != nullptr);
+            return (_position < _items.size()
+                && _items[_position] != nullptr);
         }
-        Tuple& next()override {
+        Tuple* next()override {
             if (!_open) {
                 throw runtime_error("db not open");
             }
-            if (_position >= _tuples.size()) {
-                throw out_of_range("TupleIterator out of range");
-            }
-            shared_ptr<Tuple> t = _tuples[_position];
-            _position++;
-            return *t;
+            return Iterator<Tuple>::next();          
         }
         void rewind()override {
             _position = 0;
@@ -46,7 +41,6 @@ namespace Simpledb {
     private:
         static long _serialVersionUID;
         shared_ptr<TupleDesc> _td;
-        vector<shared_ptr<Tuple>> _tuples;
         bool _open;
 	};
 }

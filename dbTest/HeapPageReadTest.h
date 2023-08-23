@@ -12,9 +12,9 @@ TEST_F(HeapPageReadTest, TestIterator) {
 
     int row = 0;
     while (it->hasNext()) {
-        Tuple& tup = it->next();
-        shared_ptr<IntField> f0 = dynamic_pointer_cast<IntField>(tup.getField(0));
-        shared_ptr<IntField> f1 = dynamic_pointer_cast<IntField>(tup.getField(1));
+        Tuple* tup = it->next();
+        shared_ptr<IntField> f0 = dynamic_pointer_cast<IntField>(tup->getField(0));
+        shared_ptr<IntField> f1 = dynamic_pointer_cast<IntField>(tup->getField(1));
         EXPECT_EQ(EXAMPLE_VALUES[row][0], f0->getValue());
         EXPECT_EQ(EXAMPLE_VALUES[row][1], f1->getValue());
         row++;

@@ -1,6 +1,7 @@
 #pragma once
 #include"Noncopyable.h"
 #include<vector>
+#include<memory>
 #include<stdexcept>
 using namespace std;
 namespace Simpledb {
@@ -8,7 +9,12 @@ namespace Simpledb {
 	class Iterator : public Noncopyable {
 	public:
 		Iterator() :_position(0) {}
-		Iterator(const vector<T>& items) :_items(items), _position(0) {}
+		Iterator(const vector<shared_ptr<T>>& items) :_items(items), _position(0) {}
+		Iterator(const vector<T>& items) :_position(0) {
+			for (auto& item : items) {
+				_items.push_back(make_shared<T>(item));
+			}
+		}
 		virtual ~Iterator() {}
 		/*
 		* return true if there is next element
@@ -22,15 +28,15 @@ namespace Simpledb {
 		* return the pointer to next element,
 		* throw exception if there is not next element
 		*/
-		virtual T& next() {
+		virtual T* next() {
 			if (_position >= _items.size())
 				throw runtime_error("no such element");
-			T& t = _items[_position];
+			shared_ptr<T>& t = _items[_position];
 			_position++;
-			return t;
+			return t.get();
 		}
 	protected:
 		size_t _position;
-		vector<T> _items;
+		vector<shared_ptr<T>> _items;
 	};
 }

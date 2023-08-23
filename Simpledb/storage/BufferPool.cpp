@@ -104,7 +104,7 @@ namespace Simpledb
 		auto idIter = Database::getCatalog()->tableIdIterator();
 		while (idIter->hasNext())
 		{
-			size_t tableId = idIter->next();
+			size_t tableId = *(idIter->next());
 			shared_ptr<DbFile> dbFile = Database::getCatalog()->getDatabaseFile(tableId);
 			vector<shared_ptr<Page>> pages = dbFile->deleteTuple(tid, t);
 			if (!pages.empty()) {

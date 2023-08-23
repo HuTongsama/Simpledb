@@ -48,8 +48,8 @@ namespace Simpledb {
 		shared_ptr<OpIterator> child = _children[0];
 		shared_ptr<BufferPool> pBufferPool = Database::getBufferPool();
 		while (child->hasNext()) {
-			Tuple& t = child->next();
-			pBufferPool->deleteTuple(_tid, t);
+			Tuple* t = child->next();
+			pBufferPool->deleteTuple(_tid, *t);
 			count++;
 		}
 		if (nullptr == _result) {

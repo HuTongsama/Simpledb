@@ -41,10 +41,10 @@ namespace Simpledb {
 	{
 		Tuple* pNext = nullptr;
 		while (_children[0]->hasNext()) {
-			Tuple& next = _children[0]->next();
-			if (_p->filter(next))
+			Tuple* next = _children[0]->next();
+			if (_p->filter(*next))
 			{
-				pNext = &next;
+				pNext = next;
 				break;
 			}
 		}

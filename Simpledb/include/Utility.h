@@ -26,7 +26,7 @@ namespace Simpledb {
 		/**
 		* @return a TupleDesc with n fields of type Type.INT_TYPE()
 		*/
-		static shared_ptr<TupleDesc> getTupleDesc(int n);
+		static shared_ptr<TupleDesc> getTupleDesc(size_t n);
 		/**
 		* @return a Tuple with a single IntField with value n and with
 		*   RecordId(HeapPageId(1,2), 3)

@@ -61,8 +61,7 @@ namespace Simpledb {
 	{
 		Tuple* p = nullptr;
 		if (_iter->hasNext()) {
-			Tuple& t = _iter->next();
-			p = &t;
+			p = _iter->next();
 		}
 		return p;
 	}
@@ -88,7 +87,7 @@ namespace Simpledb {
 		}
 		_children[0]->open();
 		while (_children[0]->hasNext()) {
-			_aggregator->mergeTupleIntoGroup(_children[0]->next());
+			_aggregator->mergeTupleIntoGroup(*(_children[0]->next()));
 		}
 		_children[0]->close();
 		_iter = _aggregator->iterator();

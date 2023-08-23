@@ -42,4 +42,56 @@ namespace Simpledb {
 		return tmp1 == tmp2;
 	}
 
+	void Thread::run()
+	{
+        {
+            unique_lock<mutex> lock(_joinMutex);
+            _isAlive = true;
+            _isCompleted = false;
+        }
+		runInner();
+        unique_lock<mutex> lock(_joinMutex);
+		_isCompleted = true;
+        _isAlive = false;
+        _joinCond.notify_all();
+	}
+
+	bool Thread::isCompleted()
+	{
+		return _isCompleted;
+	}
+
+	const string& Thread::exception()
+	{
+		return _error;
+	}
+
+	bool Thread::isAlive()
+	{
+		return _isAlive;
+	}
+
+	void Thread::start()
+	{
+		thread t(&Thread::run, this);
+		this_thread::sleep_for(chrono::milliseconds(500));
+		t.detach();
+	}
+
+	void Thread::join(int milliseconds)
+	{
+		if (milliseconds < 0)
+			throw runtime_error("error join parameter");
+		unique_lock<mutex> lock(_joinMutex);
+		if (_isAlive) {
+			if (milliseconds == 0) {
+				_joinCond.wait(lock);
+			}
+			else {
+				_joinCond.wait_for(lock, std::chrono::milliseconds(milliseconds));
+			}
+		}
+	}
+
+
 }

@@ -58,9 +58,9 @@ protected:
         it->open();
         bool found = false;
         while (it->hasNext()) {
-            Tuple& tup = it->next();
-            shared_ptr<IntField> f0 = dynamic_pointer_cast<IntField>(tup.getField(0));
-            shared_ptr<IntField> f1 = dynamic_pointer_cast<IntField>(tup.getField(1));
+            Tuple* tup = it->next();
+            shared_ptr<IntField> f0 = dynamic_pointer_cast<IntField>(tup->getField(0));
+            shared_ptr<IntField> f1 = dynamic_pointer_cast<IntField>(tup->getField(1));
 
             if (f0->getValue() == 6 && f1->getValue() == 830) {
                 found = true;

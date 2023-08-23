@@ -23,7 +23,10 @@ namespace Simpledb {
 	{
 		if (_pFile != nullptr) {
 			fclose(_pFile);
+			_pFile = nullptr;
 		}
+		if (_deleteOnExit && _fileName != "")
+			std::remove(_fileName.c_str());
 	}
 	size_t File::length()
 	{
@@ -129,7 +132,10 @@ namespace Simpledb {
 	}
 	void File::remove()
 	{
-		fclose(_pFile);
+		if (_pFile != nullptr) {
+			fclose(_pFile);
+			_pFile = nullptr;
+		}
 		if (_fileName != "")
 			std::remove(_fileName.c_str());
 	}
@@ -149,11 +155,18 @@ namespace Simpledb {
 	{
 		fclose(_pFile);
 	}
-	shared_ptr<File> File::createTempFile()
+	shared_ptr<File> File::createTempFile(const string& fileName)
 	{
-		char nameBuf[L_tmpnam_s] = { 0 };
-		tmpnam_s(nameBuf);
-		shared_ptr<File> temp = make_shared<File>(nameBuf);
+		shared_ptr<File> temp;
+		if (fileName.empty()) {
+			char nameBuf[L_tmpnam_s] = { 0 };
+			tmpnam_s(nameBuf);
+			temp = make_shared<File>(nameBuf);
+		}
+		else {
+			temp = make_shared<File>(fileName.c_str());
+		}
+		
 		return temp;
 	}
 }

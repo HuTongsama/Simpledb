@@ -8,6 +8,7 @@
 #include"Query.h"
 #include"Delete.h"
 #include"Insert.h"
+#include"Common.h"
 #include<atomic>
 #include<vector>
 class SysTransactionTest : public SimpleDbTestBase {
@@ -82,35 +83,12 @@ protected:
         mutex _resetMutex;
     };
 
-    class XactionTester {
+    class XactionTester : public Thread {
     public:
         XactionTester(size_t tableId, shared_ptr<ModifiableCyclicBarrier> latch) :
-            _tableId(tableId), _latch(latch), _isAlive(false), _completed(false) {}
-        void start() {
-            thread t(&XactionTester::run, this);
-            this_thread::sleep_for(chrono::milliseconds(500));
-            t.detach();
-        }
-        void join(int milliseconds = 0) {
-            if (milliseconds < 0)
-                throw runtime_error("error join parameter");
-            unique_lock<mutex> lock(_joinMutex);
-            if (_isAlive) {
-                if (milliseconds == 0) {
-                    _joinCond.wait(lock);
-                }
-                else {
-                    _joinCond.wait_for(lock, std::chrono::milliseconds(milliseconds));
-                }
-            }
-            
-        }
-        void run() { 
-            {
-                unique_lock<mutex> lock(_joinMutex);
-                _isAlive = true;
-                _completed = false;
-            }        
+            _tableId(tableId), _latch(latch) {}
+
+        void runInner()override {
             try {
                 // Try to increment the value until we manage to successfully commit
                 while (true) {
@@ -125,9 +103,9 @@ protected:
                         // read the value out of the table
                         shared_ptr<Query> q1 = make_shared<Query>(ss1, tr->getId());
                         q1->start();
-                        Tuple& tup = q1->next();
-                        shared_ptr<IntField> intf = dynamic_pointer_cast<IntField>(tup.getField(0));
-                       
+                        Tuple* tup = q1->next();
+                        shared_ptr<IntField> intf = dynamic_pointer_cast<IntField>(tup->getField(0));
+
                         int i = intf->getValue();
                         //printf("i %d\n", i);
                         // create a Tuple so that Insert can insert this new value
@@ -165,7 +143,7 @@ protected:
                         tr->commit();
                         break;
                     }
-                    catch (const std::exception& e) {
+                    catch (const std::exception&) {
                         //System.out.println("thread " + tr.getId() + " killed");
                         // give someone else a chance: abort the transaction
                         tr->transactionComplete(true);
@@ -176,7 +154,7 @@ protected:
             }
             catch (const std::exception& e) {
                 // Store exception for the master thread to handle
-                _exception = e.what();
+                _error = e.what();
             }
 
             try {
@@ -185,35 +163,11 @@ protected:
             catch (const std::exception& e) {
                 throw e;
             }
-            unique_lock<mutex> lock(_joinMutex);
-            _completed = true;
-            _isAlive = false;
-            _joinCond.notify_all();
-            
         }
-        bool isCompleted() {
-            return _completed;
-        }
-
-        string exception() {
-            return _exception;
-        }
-
-        bool isAlive() {
-            return _isAlive;
-        }
-        
-        
-        
-
+                     
     private:
         size_t _tableId;
         shared_ptr<ModifiableCyclicBarrier> _latch;
-        condition_variable _joinCond;
-        mutex _joinMutex;
-        string _exception = "";
-        bool _completed = false;
-        bool _isAlive;
     };
 
 	static const int TIMEOUT_MILLIS = 10 * 60 * 1000;
@@ -259,8 +213,8 @@ protected:
         shared_ptr<TransactionId> tid = make_shared<TransactionId>();
         shared_ptr<DbFileIterator> it = table->iterator(tid);
         it->open();
-        Tuple& tup = it->next();
-        EXPECT_EQ(threads, dynamic_pointer_cast<IntField>(tup.getField(0))->getValue());
+        Tuple* tup = it->next();
+        EXPECT_EQ(threads, dynamic_pointer_cast<IntField>(tup->getField(0))->getValue());
         it->close();
         Database::getBufferPool()->transactionComplete(tid);
         Database::getBufferPool()->flushAllPages();

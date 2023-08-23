@@ -14,6 +14,7 @@ namespace Simpledb {
 	 */
 	class BTreePage : public Page {
 	public:
+		static const int INDEX_SIZE;
 		/**
 		 * Create a BTreeInternalPage from a set of bytes of data read from disk.
 		 * The format of a BTreeInternalPage is a set of header bytes indicating
@@ -80,8 +81,7 @@ namespace Simpledb {
 		 * Returns true if associated slot on this page is filled.
 		 */
 		virtual bool isSlotUsed(size_t i) = 0;
-	protected:
-		static const int INDEX_SIZE;
+	protected:		
 		bool _dirty = false;
 		shared_ptr<TransactionId> _dirtier = nullptr;
 		shared_ptr<BTreePageId> _pid;

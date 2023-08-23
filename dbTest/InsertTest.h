@@ -43,7 +43,7 @@ TEST_F(InsertTest, GetNext) {
     op.open();
     EXPECT_TRUE(TestUtil::compareTuples(
         *Utility::getHeapTuple(7, 1),// the length of scan1
-        op.next()));
+        *op.next()));
 
     // we should fit on one page
     EXPECT_EQ(1, _empty->numPages());

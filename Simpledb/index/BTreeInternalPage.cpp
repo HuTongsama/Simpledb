@@ -9,9 +9,9 @@ namespace Simpledb {
 	void BTreeInternalPage::checkRep(shared_ptr<Field> lowerBound, shared_ptr<Field> upperBound, bool checkOccupancy, int depth)
 	{
 		shared_ptr<Field> prev = lowerBound;
-		assert(this.getId().pgcateg() == BTreePageId::INTERNAL);
+		assert(dynamic_pointer_cast<BTreePageId>(this->getId())->pgcateg() == BTreePageId::INTERNAL);
 
-		shared_ptr<Iterator<shared_ptr<BTreeEntry>>> it = iterator();
+		shared_ptr<Iterator<BTreeEntry>> it = iterator();
 		while (it->hasNext()) {
 			shared_ptr<Field> f = it->next()->getKey();
 			assert(nullptr == prev || prev->compare(Predicate::Op::LESS_THAN_OR_EQ, *f));
@@ -372,11 +372,11 @@ namespace Simpledb {
 		size_t headerbyte = (i - headerbit) / 8;
 		return (_header[headerbyte] & (1 << headerbit)) != 0;
 	}
-	shared_ptr<Iterator<shared_ptr<BTreeEntry>>> BTreeInternalPage::iterator()
+	shared_ptr<Iterator<BTreeEntry>> BTreeInternalPage::iterator()
 	{
 		return make_shared<BTreeInternalPageIterator>(this);
 	}
-	shared_ptr<Iterator<shared_ptr<BTreeEntry>>> BTreeInternalPage::reverseIterator()
+	shared_ptr<Iterator<BTreeEntry>> BTreeInternalPage::reverseIterator()
 	{
 		return make_shared<BTreeInternalPageReverseIterator>(this);
 	}
@@ -534,8 +534,7 @@ namespace Simpledb {
 		else
 			_header[headerbyte] &= (0xFF ^ (1 << headerbit));
 	}
-	BTreeInternalPageIterator::BTreeInternalPageIterator(shared_ptr<BTreeInternalPage> p)
-		:_p(p)
+	BTreeInternalPageIterator::BTreeInternalPageIterator(BTreeInternalPage* p) :_p(p)
 	{
 	}
 	bool BTreeInternalPageIterator::hasNext()
@@ -556,6 +555,7 @@ namespace Simpledb {
 				shared_ptr<BTreePageId> childId = _p->getChildId(entry);
 				if (key != nullptr && childId != nullptr) {
 					_nextToReturn = make_shared<BTreeEntry>(key, _prevChildId, childId);
+					_items.push_back(_nextToReturn);
 					_nextToReturn->setRecordId(make_shared<RecordId>(_p->getId(), entry));
 					_prevChildId = childId;
 					return true;
@@ -566,26 +566,25 @@ namespace Simpledb {
 			return false;
 		}
 	}
-	shared_ptr<BTreeEntry>& BTreeInternalPageIterator::next()
+	BTreeEntry* BTreeInternalPageIterator::next()
 	{
-		shared_ptr<BTreeEntry> next = _nextToReturn;
-
-		if (next == nullptr) {
+		BTreeEntry* p = nullptr;
+		if (_nextToReturn == nullptr) {
 			if (hasNext()) {
-				next = _nextToReturn;
+				p = _nextToReturn.get();
 				_nextToReturn = nullptr;
-				return next;
+				return p;
 			}
 			else
 				throw runtime_error("BTreeInternalPageIterator::next no such element.");
 		}
 		else {
+			p = _nextToReturn.get();
 			_nextToReturn = nullptr;
-			return next;
+			return p;
 		}
 	}
-	BTreeInternalPageReverseIterator::BTreeInternalPageReverseIterator(shared_ptr<BTreeInternalPage> p)
-		:_p(p)
+	BTreeInternalPageReverseIterator::BTreeInternalPageReverseIterator(BTreeInternalPage* p) :_p(p)
 	{
 		_curEntry = p->getMaxEntries();
 		while (!p->isSlotUsed(_curEntry) && _curEntry > 0) {
@@ -610,6 +609,7 @@ namespace Simpledb {
 				shared_ptr<BTreePageId> childId = _p->getChildId(entry - 1);
 				if (key != nullptr && childId != nullptr) {
 					_nextToReturn = make_shared<BTreeEntry>(key, childId, _nextChildId);
+					_items.push_back(_nextToReturn);
 					_nextToReturn->setRecordId(make_shared<RecordId>(_p->getId(), entry));
 					_nextChildId = childId;
 					return true;
@@ -620,22 +620,22 @@ namespace Simpledb {
 			return false;
 		}
 	}
-	shared_ptr<BTreeEntry>& BTreeInternalPageReverseIterator::next()
+	BTreeEntry* BTreeInternalPageReverseIterator::next()
 	{
-		shared_ptr<BTreeEntry> next = _nextToReturn;
-
-		if (next == nullptr) {
+		BTreeEntry* p = nullptr;
+		if (_nextToReturn == nullptr) {
 			if (hasNext()) {
-				next = _nextToReturn;
+				p = _nextToReturn.get();
 				_nextToReturn = nullptr;
-				return next;
+				return p;
 			}
 			else
 				throw runtime_error("BTreeInternalPageReverseIterator::next no such element.");
 		}
 		else {
+			p = _nextToReturn.get();
 			_nextToReturn = nullptr;
-			return next;
-		}
+			return p;
+		}		
 	}
 }

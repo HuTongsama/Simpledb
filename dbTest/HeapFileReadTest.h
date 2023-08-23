@@ -7,6 +7,7 @@ using namespace Simpledb;
 class HeapFileReadTest :public SimpleDbTestBase {
 protected:
 	void SetUp()override {
+		SimpleDbTestBase::SetUp();
 		map<int, int> tempMap;
 		vector<vector<int>> tempVec;
 		_hf = SystemTestUtil::createRandomHeapFile(2, 20, tempMap, tempVec);

@@ -22,9 +22,9 @@ public:
         // Insert the row
         shared_ptr<Insert> insert = make_shared<Insert>(t->getId(), insertRow, f->getId());
         insert->open();
-        Tuple& result = insert->next();
-        EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*(result.getTupleDesc())));
-        EXPECT_EQ(1, (dynamic_pointer_cast<IntField>(result.getField(0)))->getValue());
+        Tuple* result = insert->next();
+        EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*(result->getTupleDesc())));
+        EXPECT_EQ(1, (dynamic_pointer_cast<IntField>(result->getField(0)))->getValue());
         EXPECT_FALSE(insert->hasNext());
         insert->close();
     }
@@ -35,9 +35,9 @@ public:
         bool found = false;
         ss->open();
         while (ss->hasNext()) {
-            Tuple& v = ss->next();
-            int v0 = (dynamic_pointer_cast<IntField>(v.getField(0)))->getValue();
-            int v1 = (dynamic_pointer_cast<IntField>(v.getField(1)))->getValue();
+            Tuple* v = ss->next();
+            int v0 = (dynamic_pointer_cast<IntField>(v->getField(0)))->getValue();
+            int v1 = (dynamic_pointer_cast<IntField>(v->getField(1)))->getValue();
             if (v0 == -42 && v1 == -43) {
                 EXPECT_FALSE(found);
                 found = true;

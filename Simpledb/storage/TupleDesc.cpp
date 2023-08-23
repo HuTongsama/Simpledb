@@ -112,14 +112,14 @@ namespace Simpledb {
 			return true;
 		return false;
 	}
-	TupleDesc::TDItem& TupleDesc::TupleDescIter::next()
+	TupleDesc::TDItem* TupleDesc::TupleDescIter::next()
 	{
 		if (_pTd != nullptr && _position < _pTd->_tdItems.size()) {
 			TDItem& p = _pTd->_tdItems[_position];
 			_position++;
-			return p;
+			return &p;
 		}
-		throw "no such element";
+		throw runtime_error("no such element");
 	}
 
 }

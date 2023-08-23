@@ -53,9 +53,9 @@ namespace Simpledb {
 		int count = 0;
 		shared_ptr<BufferPool> pBufferPool = Database::getBufferPool();
 		while (iter->hasNext()) {
-			Tuple& t1 = iter->next();
+			Tuple* t1 = iter->next();
 			shared_ptr<Tuple> t2 = make_shared<Tuple>(_td);
-			t1.copyTo(*t2);
+			t1->copyTo(*t2);
 			pBufferPool->insertTuple(_tid, _tableId, t2);
 			count++;
 		}

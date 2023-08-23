@@ -53,7 +53,7 @@ namespace Simpledb {
          * @return The next tuple in the iterator
          * @throws runtime error
          */
-        Tuple& next();
+        Tuple* next();
 
         void close() {
             _op->close();

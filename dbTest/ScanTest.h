@@ -19,7 +19,7 @@ public:
 class ScanTest : public SimpleDbTestBase {
 protected:
     ScanTest() {
-      _r = default_random_engine(time(0));
+      _r = default_random_engine(static_cast<unsigned int>(time(0)));
     }
 	void validateScan(const vector<int>& columnSizes,const vector<int>& rowSizes) {
         for (int columns : columnSizes) {
@@ -48,15 +48,15 @@ TEST_F(ScanTest, TestRewind) {
     scan->open();
     for (int i = 0; i < 100; ++i) {
         EXPECT_TRUE(scan->hasNext());
-        Tuple& t = scan->next();
-        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
+        Tuple* t = scan->next();
+        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(*t).begin()));
     }
 
     scan->rewind();
     for (int i = 0; i < 100; ++i) {
         EXPECT_TRUE(scan->hasNext());
-        Tuple& t = scan->next();
-        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(t).begin()));
+        Tuple* t = scan->next();
+        EXPECT_TRUE(equal(tuples[i].begin(), tuples[i].end(), SystemTestUtil::tupleToVector(*t).begin()));
     }
     scan->close();
     Database::getBufferPool()->transactionComplete(tid);

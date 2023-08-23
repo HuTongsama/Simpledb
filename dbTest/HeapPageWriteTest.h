@@ -25,7 +25,7 @@ TEST_F(HeapPageWriteTest, TestDirty) {
  */
 TEST_F(HeapPageWriteTest, AddTuple) {
     shared_ptr<HeapPage> page = make_shared<HeapPage>(_pid, EXAMPLE_DATA);
-    int free = page->getNumEmptySlots();
+    int free = static_cast<int>(page->getNumEmptySlots());
 
     for (int i = 0; i < free; ++i) {
         shared_ptr<Tuple> addition = Utility::getHeapTuple(i, 2);
@@ -38,11 +38,11 @@ TEST_F(HeapPageWriteTest, AddTuple) {
         bool found = false;
         it->open();
         while (it->hasNext()) {
-            Tuple& tup = it->next();
-            if (TestUtil::compareTuples(*addition, tup)) {
+            Tuple* tup = it->next();
+            if (TestUtil::compareTuples(*addition, *tup)) {
                 found = true;
                 // verify that the RecordId is sane
-                EXPECT_TRUE(page->getId()->equals(*tup.getRecordId()->getPageId()));
+                EXPECT_TRUE(page->getId()->equals(*tup->getRecordId()->getPageId()));
                 break;
             }
         }
@@ -66,14 +66,14 @@ TEST_F(HeapPageWriteTest, DeleteNonexistentTuple) {
  */
 TEST_F(HeapPageWriteTest, DeleteTuple) {
     shared_ptr<HeapPage> page = make_shared<HeapPage>(_pid, EXAMPLE_DATA);
-    int free = page->getNumEmptySlots();
+    int free = static_cast<int>(page->getNumEmptySlots());
 
     // first, build a list of the tuples on the page.
     shared_ptr<TupleIterator> it = page->iterator();
     vector<Tuple*> tuples;
     it->open();
     while (it->hasNext())
-        tuples.push_back(&(it->next()));
+        tuples.push_back(it->next());
     Tuple& first = *tuples.front();
 
     // now, delete them one-by-one from both the front and the end.

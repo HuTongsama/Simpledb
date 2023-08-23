@@ -25,11 +25,11 @@ protected:
         insOp->open();
         bool hasResult = false;
         while (insOp->hasNext()) {
-            Tuple& tup = insOp->next();
+            Tuple* tup = insOp->next();
             EXPECT_FALSE(hasResult);
             hasResult = true;
-            EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*tup.getTupleDesc()));
-            EXPECT_EQ(sourceRows, dynamic_pointer_cast<IntField>(tup.getField(0))->getValue());
+            EXPECT_TRUE(SystemTestUtil::SINGLE_INT_DESCRIPTOR->equals(*tup->getTupleDesc()));
+            EXPECT_EQ(sourceRows, dynamic_pointer_cast<IntField>(tup->getField(0))->getValue());
         }
         EXPECT_TRUE(hasResult);
         insOp->close();

@@ -86,6 +86,13 @@ namespace Simpledb {
 		writeCommonType(i);
 	}
 
+	std::vector<unsigned char> DataStream::toByteArray()
+	{
+		if (_byteSize == 0)
+			return vector<unsigned char>();
+		return vector<unsigned char>(_bytes, _bytes + _byteSize);
+	}
+
 	void DataStream::release()
 	{
 		if (_bytes != nullptr) {

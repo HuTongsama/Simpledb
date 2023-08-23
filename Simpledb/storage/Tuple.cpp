@@ -8,8 +8,8 @@ namespace Simpledb
 		:_pTd(td) {
 		auto iter = _pTd->iterator();
 		while(iter->hasNext()){
-			auto& item = iter->next();
-			auto type = item._fieldType->type();
+			auto item = iter->next();
+			auto type = item->_fieldType->type();
 			if (type == Int_Type::INT_TYPE()->type()){
 				_fields.push_back(make_shared<IntField>(0));
 			}

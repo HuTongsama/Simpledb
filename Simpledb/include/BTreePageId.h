@@ -19,7 +19,7 @@ namespace Simpledb {
 
 		
 
-	static string categToString(int categ) {
+	static string categToString(size_t categ) {
 		switch (categ) {
 			case ROOT_PTR:
 				return "ROOT_PTR";
@@ -67,7 +67,7 @@ namespace Simpledb {
 	/**
 	 * @return the category of this page
 	 */
-	int pgcateg() {
+	size_t pgcateg() {
 		return _pgcateg;
 	}
 
@@ -113,7 +113,7 @@ namespace Simpledb {
 	 *  number of integers that corresponds to number of args to one of the
 	 *  constructors.
 	 */
-	vector<size_t> serialize() {
+	vector<size_t> serialize()const override {
 		vector<size_t> data = {
 			_tableId,_pgNo,_pgcateg
 		};

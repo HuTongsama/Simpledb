@@ -59,9 +59,9 @@ TEST_F(JoinTest, Rewind) {
     op->rewind();
 
     _eqJoin->open();
-    Tuple& expected = _eqJoin->next();
-    Tuple& actual = op->next();
-    EXPECT_TRUE(TestUtil::compareTuples(expected, actual));
+    Tuple* expected = _eqJoin->next();
+    Tuple* actual = op->next();
+    EXPECT_TRUE(TestUtil::compareTuples(*expected, *actual));
 }
 TEST_F(JoinTest, GtJoin) {
     shared_ptr<JoinPredicate> pred = make_shared<JoinPredicate>(0, Predicate::Op::GREATER_THAN, 0);

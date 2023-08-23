@@ -122,9 +122,9 @@ public:
     while (expected.hasNext()) {
         EXPECT_TRUE(actual.hasNext());
 
-        Tuple& expectedTup = expected.next();
-        Tuple& actualTup = actual.next();
-        EXPECT_TRUE(compareTuples(expectedTup, actualTup));
+        Tuple* expectedTup = expected.next();
+        Tuple* actualTup = actual.next();
+        EXPECT_TRUE(compareTuples(*expectedTup, *actualTup));
     }
     // Both must now be exhausted
     EXPECT_FALSE(expected.hasNext());
@@ -141,20 +141,20 @@ public:
         // implemented hashCode or equals for tuples.
         bool matched = false;
         while (expected->hasNext()) {
-            Tuple& expectedTup = expected->next();
+            Tuple* expectedTup = expected->next();
             matched = false;
             actual->rewind();
 
             while (actual->hasNext()) {
-                Tuple& next = actual->next();
-                if (compareTuples(expectedTup, next)) {
+                Tuple* next = actual->next();
+                if (compareTuples(*expectedTup, *next)) {
                     matched = true;
                     break;
                 }
             }
 
             if (!matched) {
-                throw runtime_error("expected tuple not found: " + expectedTup.toString());
+                throw runtime_error("expected tuple not found: " + expectedTup->toString());
             }
         }
     }
@@ -167,8 +167,8 @@ public:
         if (it.hasNext()) return false;
         try
         {
-            Tuple& t = it.next();
-            cout << "Got unexpected tuple: " + t.toString() << endl;
+            Tuple* t = it.next();
+            cout << "Got unexpected tuple: " + t->toString() << endl;
             return false;
         }
         catch (const std::exception&)
@@ -254,14 +254,14 @@ public:
             return _cur < _high;
         }
 
-        Tuple& next()override {
+        Tuple* next()override {
             if (_cur >= _high)
                 throw runtime_error("no such element");
             _t = make_shared<Tuple>(getTupleDesc());
             for (int i = 0; i < _width; ++i)
                 _t->setField(i, make_shared<IntField>(_cur));
             _cur++;
-            return *_t;
+            return _t.get();
         }
     protected:
         Tuple* readNext() {
