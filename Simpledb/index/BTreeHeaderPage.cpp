@@ -75,8 +75,7 @@ namespace Simpledb {
 	vector<unsigned char> BTreeHeaderPage::getPageData()
 	{
 		int len = BufferPool::getPageSize();
-		unique_ptr<unsigned char[]> data(new unsigned char[len]());
-		DataStream dos((const char*)data.get(), len);
+		DataStream dos(len);
 
 		// write out the next and prev pointers
 		try
@@ -108,7 +107,7 @@ namespace Simpledb {
 		}
 
 
-		return vector<unsigned char>(data.get(), data.get() + len);
+		return dos.toByteArray();
 	}
 
 	vector<unsigned char> BTreeHeaderPage::createEmptyPageData() 

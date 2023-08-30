@@ -57,7 +57,7 @@ namespace Simpledb {
 			}
 			tempInput->writeChar('\n');
 		}
-
+		tempInput->seek(0);
 		return convert(tempInput, hFile, bFile, keyField, numFields);
 	}
 
@@ -131,6 +131,7 @@ namespace Simpledb {
 			}
 			tempInput->writeChar('\n');
 		}
+		tempInput->seek(0);
 		return convert(tempInput, hFile, bFile, npagebytes,
 			numFields, typeAr, fieldSeparator, keyField);
 	}
@@ -160,7 +161,7 @@ namespace Simpledb {
 		// add the tuples to B+ tree file
 		shared_ptr<BTreeFile> bf = BTreeUtility::openBTreeFile(numFields, bFile, keyField);
 		shared_ptr<Type> keyType = typeAr[keyField];
-		int tableid = bf->getId();
+		size_t tableid = bf->getId();
 
 		int nrecbytes = 0;
 		for (int i = 0; i < numFields; i++) {
@@ -293,8 +294,7 @@ namespace Simpledb {
 		if (nheaderbytes * 8 < nrecords)
 			nheaderbytes++;  //ceiling
 		int nheaderbits = nheaderbytes * 8;
-		vector<char> data(npagebytes, 0);
-		DataStream dos(data.data(), npagebytes);
+		DataStream dos(npagebytes);
 
 
 		// write out the pointers and the header of the page,
@@ -358,8 +358,7 @@ namespace Simpledb {
 			nheaderbytes++;  //ceiling
 		int nheaderbits = nheaderbytes * 8;
 
-		vector<char> data(npagebytes, 0);
-		DataStream dos(data.data(), npagebytes);
+		DataStream dos(npagebytes);
 
 		// write out the pointers and the header of the page,
 		// then sort the entries and write them out.
@@ -422,10 +421,8 @@ namespace Simpledb {
 
 	vector<unsigned char> BTreeFileEncoder::convertToRootPtrPage(int root, int rootCategory, int header)
 	{
-		vector<char> data(BTreeRootPtrPage::getPageSize(), 0);
-		DataStream dos(data.data(), BTreeRootPtrPage::getPageSize());
+		DataStream dos(BTreeRootPtrPage::getPageSize());
 		
-
 		dos.writeInt(root); // root pointer
 		dos.writeChar((char)rootCategory); // root page category
 

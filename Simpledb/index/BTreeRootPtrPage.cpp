@@ -34,8 +34,7 @@ namespace Simpledb {
 	}
 	vector<unsigned char> BTreeRootPtrPage::getPageData()
 	{
-		unique_ptr<unsigned char[]> data(new unsigned char[PAGE_SIZE]());
-		DataStream dos((const char *)data.get(), PAGE_SIZE);
+		DataStream dos(PAGE_SIZE);
 
 		// write out the root pointer (page number of the root page)
 		try {
@@ -62,7 +61,7 @@ namespace Simpledb {
 		}
 
 		//maybe need flush;
-		return vector<unsigned char>(data.get(), data.get() + PAGE_SIZE);
+		return dos.toByteArray();
 	}
 	void BTreeRootPtrPage::markDirty(bool dirty, shared_ptr<TransactionId> tid)
 	{

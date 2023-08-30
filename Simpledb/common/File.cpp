@@ -165,6 +165,7 @@ namespace Simpledb {
 		}
 		else {
 			temp = make_shared<File>(fileName.c_str());
+			temp->reset();
 		}
 		
 		return temp;

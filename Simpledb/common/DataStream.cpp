@@ -3,17 +3,17 @@
 #include<stdexcept>
 using namespace std;
 namespace Simpledb {
-	DataStream::DataStream()
-		:_byteSize(1024), _curPosition(0)
+
+	DataStream::DataStream(size_t byteSize) :
+		_curPosition(0), _byteSize(byteSize)
 	{
 		_bytes = new char[_byteSize]();
+
 	}
 	DataStream::DataStream(const char* bytes, size_t byteSize)
-		:_byteSize(byteSize), _curPosition(0)
+		:DataStream(byteSize)
 	{
-		_bytes = new char[_byteSize]();
 		memcpy_s(_bytes, _byteSize, bytes, _byteSize);
-
 	}
 	DataStream::~DataStream()
 	{
@@ -114,7 +114,7 @@ namespace Simpledb {
 	}
 	void DataStream::writeBytes(char* src, size_t srcSize)
 	{
-		if (_curPosition + srcSize >= _byteSize) {
+		if (_curPosition + srcSize > _byteSize) {
 			size_t newSz = 2 * _byteSize;
 			if (newSz < _byteSize) {
 				throw out_of_range("write dataStream failed");

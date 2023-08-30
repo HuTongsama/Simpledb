@@ -4,7 +4,7 @@
 namespace Simpledb {
 	class DataStream : public Noncopyable {
 	public:
-		DataStream();
+		DataStream(size_t byteSize = 1024);
 		DataStream(const char* bytes, size_t byteSize);
 		~DataStream();
 		void reset();

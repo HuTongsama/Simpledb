@@ -3,12 +3,15 @@
 #include"BTreeInternalPage.h"
 #include"Database.h"
 
+#pragma warning(disable:4996)
 namespace Simpledb {
 	BTreeFile::BTreeFile(shared_ptr<File> f, int key, shared_ptr<TupleDesc> td)
 	{
 		_f = f;
+        clock_t time = clock();
+        string str = f->fileName() + to_string(time);
 		hash<string> str_hash;
-		_tableid = str_hash(f->fileName());
+		_tableid = str_hash(str);
 		_keyField = key;
 		_td = td;
 	}
@@ -86,13 +89,18 @@ namespace Simpledb {
         vector<unsigned char> data = p->getPageData();
        
         if (id->pgcateg() == BTreePageId::ROOT_PTR) {
+            size_t oldPos = _f->position();
+            _f->seek(0);
             _f->writeBytes(data.data(), data.size());
+            if (oldPos != 0)
+                _f->seek(oldPos);
         }
         else {
             size_t pos = BTreeRootPtrPage::getPageSize() + (id->getPageNumber() - 1) * BufferPool::getPageSize();
             _f->seek(pos);            
             _f->writeBytes(data.data(), data.size());
         }
+        _f->flush();
     }
     size_t BTreeFile::numPages()
     {
@@ -568,6 +576,7 @@ namespace Simpledb {
                 _tid, BTreeRootPtrPage::getId(_f->getId()), Permissions::READ_ONLY));
         shared_ptr<BTreePageId> root = rootPtr->getRootId();
         _curp = _f->findLeafPage(_tid, root, nullptr);
+        if (_curp == nullptr)return;
         _it = _curp->iterator();
     }
 
@@ -627,6 +636,7 @@ namespace Simpledb {
         else {
             _curp = _f->findLeafPage(_tid, root, nullptr);
         }
+        if (_curp == nullptr)return;
         _it = _curp->iterator();
     }
     void BTreeSearchIterator::rewind()

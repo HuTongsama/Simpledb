@@ -23,7 +23,7 @@ protected:
 };
 
 TEST_F(BTreeFileReadTest, GetId) {
-	int id = _f->getId();
+	size_t id = _f->getId();
 
 	// NOTE(ghuo): the value could be anything. test determinism, at least.
 	EXPECT_EQ(id, _f->getId());

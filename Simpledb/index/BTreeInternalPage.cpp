@@ -97,8 +97,7 @@ namespace Simpledb {
 	vector<unsigned char> BTreeInternalPage::getPageData()
 	{
 		int len = BufferPool::getPageSize();
-		unique_ptr<char[]> data(new char[len]());
-		DataStream dos(data.get(), len);
+		DataStream dos(len);
 
 		// write out the parent pointer
 		try
@@ -203,7 +202,7 @@ namespace Simpledb {
 			throw e;
 		}
 
-		return vector<unsigned char>(data.get(), data.get() + len);
+		return dos.toByteArray();
 	}
 	void BTreeInternalPage::deleteKeyAndRightChild(shared_ptr<BTreeEntry> e)
 	{

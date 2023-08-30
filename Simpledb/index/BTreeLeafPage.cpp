@@ -175,8 +175,7 @@ namespace Simpledb {
 	vector<unsigned char> BTreeLeafPage::getPageData()
 	{
 		int len = BufferPool::getPageSize();
-		vector<unsigned char> data(len, 0);
-		DataStream dos((const char*)data.data(), len);
+		DataStream dos(len);
 		// write out the parent and sibling pointers
 		try
 		{
@@ -265,7 +264,7 @@ namespace Simpledb {
 			throw runtime_error("BTreeLeafPage::getPageData");
 		}
 	
-		return data;
+		return dos.toByteArray();
 	}
 	void BTreeLeafPage::deleteTuple(Tuple& t)
 	{
