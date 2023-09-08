@@ -408,7 +408,7 @@ namespace Simpledb {
 		try
 		{
 			if (!isSlotUsed(i)) {
-				printf("BTreeLeafPage.getTuple: slot %d in %I64u:%I64u is not used", i, _pid->getTableId(), _pid->getPageNumber());
+				printf("BTreeLeafPage.getTuple: slot %d in %I64u:%I64u is not used\n", i, _pid->getTableId(), _pid->getPageNumber());
 				return nullptr;
 			}
 
@@ -426,7 +426,7 @@ namespace Simpledb {
 	}
 	bool BTreeLeafPageIterator::hasNext()
 	{
-		if (_p->getTuple(_position + 1) != nullptr)
+		if (_p->getTuple(_position) != nullptr)
 			return true;
 		return false;
 		
@@ -445,7 +445,7 @@ namespace Simpledb {
 	}
 	bool BTreeLeafPageReverseIterator::hasNext()
 	{
-		if (_p->getTuple(_position - 1) != nullptr)
+		if (_p->getTuple(_position) != nullptr)
 			return true;
 		return false;
 	}

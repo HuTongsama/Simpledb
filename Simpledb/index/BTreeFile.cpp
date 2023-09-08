@@ -137,7 +137,8 @@ namespace Simpledb {
 
         // find and lock the left-most leaf page corresponding to the key field,
         // and split the leaf page if there are no more slots available
-        shared_ptr<BTreeLeafPage> leafPage = findLeafPage(tid, dirtypages, rootId, Permissions::READ_WRITE, t->getField(_keyField));
+        shared_ptr<BTreeLeafPage> leafPage = dynamic_pointer_cast<BTreeLeafPage>
+            (findLeafPage(tid, dirtypages, rootId, Permissions::READ_WRITE, t->getField(_keyField)));
         if (leafPage->getNumEmptySlots() == 0) {
             leafPage = splitLeafPage(tid, dirtypages, leafPage, t->getField(_keyField));
         }
@@ -165,9 +166,10 @@ namespace Simpledb {
     void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
     }
-    shared_ptr<BTreeLeafPage> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, shared_ptr<BTreePageId> pid, shared_ptr<Field> f)
+    shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, shared_ptr<BTreePageId> pid, shared_ptr<Field> f)
     {
-        return shared_ptr<BTreeLeafPage>();
+        map<shared_ptr<PageId>, shared_ptr<Page>> map;
+        return findLeafPage(tid, map, pid, Permissions::READ_ONLY, f);
     }
     vector<shared_ptr<Page>> BTreeFile::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
     {
@@ -322,9 +324,37 @@ namespace Simpledb {
     {
         return make_shared<BTreeFileIterator>(this, tid);
     }
-    shared_ptr<BTreeLeafPage> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, Permissions perm, shared_ptr<Field> f)
+    shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>,
+        shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, Permissions perm, shared_ptr<Field> f)
     {
-        return shared_ptr<BTreeLeafPage>();
+        int pgcateg = pid->pgcateg();
+        if (pgcateg == BTreePageId::LEAF) {
+            return getPage(tid, dirtypages, pid, perm);
+        }
+        else if(pgcateg == BTreePageId::INTERNAL){
+            shared_ptr<BTreeInternalPage> curPage = dynamic_pointer_cast<BTreeInternalPage>
+                (getPage(tid, dirtypages, pid, Permissions::READ_ONLY));
+            auto entryIter = curPage->iterator();
+            if (f == nullptr) {
+                if (entryIter->hasNext()) {
+                    BTreeEntry* pNext = entryIter->next();
+                    return findLeafPage(tid, dirtypages, pNext->getLeftChild(), perm, f);
+                }
+            }
+            else {
+                while (entryIter->hasNext()) {
+                    BTreeEntry* pNext = entryIter->next();
+                    shared_ptr<Field> key = pNext->getKey();
+                    if (f->compare(Predicate::Op::LESS_THAN_OR_EQ, *key)) {
+                        return findLeafPage(tid, dirtypages, pNext->getLeftChild(), perm, f);
+                    }
+                    else {
+                        return findLeafPage(tid, dirtypages, pNext->getRightChild(), perm, f);
+                    }
+                }
+            }
+        }
+        return nullptr;
     }
     shared_ptr<BTreeInternalPage> BTreeFile::getParentWithEmptySlots(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> parentId, shared_ptr<Field> field)
     {
@@ -575,7 +605,7 @@ namespace Simpledb {
             dynamic_pointer_cast<BTreeRootPtrPage>(Database::getBufferPool()->getPage(
                 _tid, BTreeRootPtrPage::getId(_f->getId()), Permissions::READ_ONLY));
         shared_ptr<BTreePageId> root = rootPtr->getRootId();
-        _curp = _f->findLeafPage(_tid, root, nullptr);
+        _curp = dynamic_pointer_cast<BTreeLeafPage>(_f->findLeafPage(_tid, root, nullptr));
         if (_curp == nullptr)return;
         _it = _curp->iterator();
     }
@@ -631,10 +661,10 @@ namespace Simpledb {
         if (_ipred.getOp() == Predicate::Op::EQUALS ||
             _ipred.getOp() == Predicate::Op::GREATER_THAN ||
             _ipred.getOp() == Predicate::Op::GREATER_THAN_OR_EQ) {
-            _curp = _f->findLeafPage(_tid, root, _ipred.getField());
+            _curp = dynamic_pointer_cast<BTreeLeafPage>(_f->findLeafPage(_tid, root, _ipred.getField()));
         }
         else {
-            _curp = _f->findLeafPage(_tid, root, nullptr);
+            _curp = dynamic_pointer_cast<BTreeLeafPage>(_f->findLeafPage(_tid, root, nullptr));
         }
         if (_curp == nullptr)return;
         _it = _curp->iterator();

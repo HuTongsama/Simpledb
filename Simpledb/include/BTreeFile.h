@@ -237,7 +237,7 @@ namespace Simpledb {
 		 * @return the left-most leaf page possibly containing the key field f
 		 *
 		 */
-		shared_ptr<BTreeLeafPage> findLeafPage(
+		shared_ptr<Page> findLeafPage(
 			shared_ptr<TransactionId> tid,
 			shared_ptr<BTreePageId> pid,
 			shared_ptr<Field> f);
@@ -313,7 +313,7 @@ namespace Simpledb {
 		 * @return the left-most leaf page possibly containing the key field f
 		 *
 		 */
-		shared_ptr<BTreeLeafPage> findLeafPage(
+		shared_ptr<Page> findLeafPage(
 			shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pid, Permissions perm,
