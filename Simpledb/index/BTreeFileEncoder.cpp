@@ -467,7 +467,7 @@ namespace Simpledb {
 	}
 
 	void BTreeFileEncoder::cleanUpEntries(vector<vector<shared_ptr<BTreeEntry>>>& entries, shared_ptr<BTreeFile> bf,
-		int nentries, int npagebytes, shared_ptr<Type> keyType, int tableid, int keyField)
+		int nentries, int npagebytes, shared_ptr<Type> keyType, size_t tableid, int keyField)
 	{
 		// As with the leaf pages, there are two options:
 		// 1. We have less than or equal to a full page of entries. Because of the way the code
@@ -509,7 +509,7 @@ namespace Simpledb {
 	}
 
 	void BTreeFileEncoder::updateEntries(vector<vector<shared_ptr<BTreeEntry>>>& entries, shared_ptr<BTreeFile> bf,
-		shared_ptr<BTreeEntry> e, int level, int nentries, int npagebytes, shared_ptr<Type> keyType, int tableid, int keyField)
+		shared_ptr<BTreeEntry> e, int level, int nentries, int npagebytes, shared_ptr<Type> keyType, size_t tableid, int keyField)
 	{
 		while (entries.size() <= level) {
 			entries.push_back(vector<shared_ptr<BTreeEntry>>());

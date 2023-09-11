@@ -150,7 +150,7 @@ namespace Simpledb {
 		 * @throws IOException
 		 */
 		static void cleanUpEntries(vector<vector<shared_ptr<BTreeEntry>>>& entries,
-			shared_ptr<BTreeFile> bf, int nentries, int npagebytes, shared_ptr<Type> keyType, int tableid,
+			shared_ptr<BTreeFile> bf, int nentries, int npagebytes, shared_ptr<Type> keyType, size_t tableid,
 			int keyField);
 		/**
 		 * Recursive function to update the entries by adding a new Entry at a particular level
@@ -168,7 +168,7 @@ namespace Simpledb {
 		 */
 		static void updateEntries(vector<vector<shared_ptr<BTreeEntry>>>& entries,
 			shared_ptr<BTreeFile> bf, shared_ptr<BTreeEntry> e, int level, int nentries, int npagebytes,
-			shared_ptr<Type> keyType, int tableid, int keyField);
+			shared_ptr<Type> keyType, size_t tableid, int keyField);
 
 	};
 }
