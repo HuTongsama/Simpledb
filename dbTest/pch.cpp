@@ -38,3 +38,4 @@
 //#include "DeadlockTest.h"
 //#include "SysTransactionTest.h"
 #include "BTreeFileReadTest.h"
+#include "SysBTreeScanTest.h"

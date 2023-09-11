@@ -180,6 +180,7 @@
     <ClInclude Include="include\BTreePage.h" />
     <ClInclude Include="include\BTreePageId.h" />
     <ClInclude Include="include\BTreeRootPtrPage.h" />
+    <ClInclude Include="include\BTreeScan.h" />
     <ClInclude Include="include\BTreeUtility.h" />
     <ClInclude Include="include\Catalog.h" />
     <ClInclude Include="include\Collection.h" />
@@ -271,6 +272,7 @@
     <ClCompile Include="execution\SeqScan.cpp" />
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
+    <ClCompile Include="include\BTreeScan.cpp" />
     <ClCompile Include="index\BTreeEntry.cpp" />
     <ClCompile Include="index\BTreeFile.cpp" />
     <ClCompile Include="index\BTreeFileEncoder.cpp" />

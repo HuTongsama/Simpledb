@@ -263,6 +263,9 @@
     <ClInclude Include="include\BlockingQueue.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\BTreeScan.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -434,6 +437,9 @@
       <Filter>index</Filter>
     </ClCompile>
     <ClCompile Include="index\BTreeFileEncoder.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="include\BTreeScan.cpp">
       <Filter>index</Filter>
     </ClCompile>
   </ItemGroup>
