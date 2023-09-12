@@ -1,5 +1,7 @@
 #include "File.h"
 #include<stdexcept>
+#include <filesystem>
+namespace fs = std::filesystem;
 #pragma warning(disable:4996)
 namespace Simpledb {
 	File::File(const string& fileName)
@@ -164,7 +166,8 @@ namespace Simpledb {
 			temp = make_shared<File>(nameBuf);
 		}
 		else {
-			temp = make_shared<File>(fileName.c_str());
+			fs::path tempPath = fs::temp_directory_path() / fileName;
+			temp = make_shared<File>(tempPath.string());
 			temp->reset();
 		}
 		

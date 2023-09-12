@@ -8,8 +8,7 @@ namespace Simpledb {
 	BTreeFile::BTreeFile(shared_ptr<File> f, int key, shared_ptr<TupleDesc> td)
 	{
 		_f = f;
-        clock_t time = clock();
-        string str = f->fileName() + to_string(time);
+        string str = f->fileName();
 		hash<string> str_hash;
 		_tableid = str_hash(str);
 		_keyField = key;
@@ -342,15 +341,16 @@ namespace Simpledb {
                 }
             }
             else {
+                BTreeEntry* pNext = nullptr;
                 while (entryIter->hasNext()) {
-                    BTreeEntry* pNext = entryIter->next();
+                    pNext = entryIter->next();
                     shared_ptr<Field> key = pNext->getKey();
                     if (f->compare(Predicate::Op::LESS_THAN_OR_EQ, *key)) {
                         return findLeafPage(tid, dirtypages, pNext->getLeftChild(), perm, f);
                     }
-                    else {
-                        return findLeafPage(tid, dirtypages, pNext->getRightChild(), perm, f);
-                    }
+                }
+                if (pNext != nullptr) {
+                    return findLeafPage(tid, dirtypages, pNext->getRightChild(), perm, f);
                 }
             }
         }

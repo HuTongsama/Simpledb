@@ -81,10 +81,10 @@ namespace Simpledb {
         generateRandomTuples(columns, rows, maxValue, columnSpecification, tuples);
 
         // Convert the tuples list to a B+ tree file
-        shared_ptr<File> hFile = File::createTempFile("table.dat");
+        shared_ptr<File> hFile = File::createTempFile();
         hFile->deleteOnExit();
 
-        shared_ptr<File> bFile = File::createTempFile("table_index.dat");
+        shared_ptr<File> bFile = File::createTempFile();
         bFile->deleteOnExit();
         vector<shared_ptr<Type>> typeAr(columns,Int_Type::INT_TYPE());
    
@@ -222,10 +222,10 @@ namespace Simpledb {
         }
 
         // Convert the tuples list to a B+ tree file
-        shared_ptr<File> hFile = File::createTempFile("table.dat");
+        shared_ptr<File> hFile = File::createTempFile();
         hFile->deleteOnExit();
 
-        shared_ptr<File> bFile = File::createTempFile("table_index.dat");
+        shared_ptr<File> bFile = File::createTempFile();
         bFile->deleteOnExit();
 
         vector<shared_ptr<Type>> typeAr(columns , Int_Type::INT_TYPE());

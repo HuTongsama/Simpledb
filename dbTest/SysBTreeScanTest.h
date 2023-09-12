@@ -36,7 +36,7 @@ protected:
 
         InstrumentedBTreeFile(shared_ptr<File> f, int keyField, shared_ptr<TupleDesc> td)
             :BTreeFile(f, keyField, td) {}
-        shared_ptr<Page> readPage(shared_ptr<PageId> pid) {
+        shared_ptr<Page> readPage(shared_ptr<PageId> pid)override {
             readCount += 1;
             return BTreeFile::readPage(pid);
         }

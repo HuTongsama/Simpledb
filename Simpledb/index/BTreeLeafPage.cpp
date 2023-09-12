@@ -408,7 +408,7 @@ namespace Simpledb {
 		try
 		{
 			if (!isSlotUsed(i)) {
-				printf("BTreeLeafPage.getTuple: slot %d in %I64u:%I64u is not used\n", i, _pid->getTableId(), _pid->getPageNumber());
+				//printf("BTreeLeafPage.getTuple: slot %d in %I64u:%I64u is not used\n", i, _pid->getTableId(), _pid->getPageNumber());
 				return nullptr;
 			}
 

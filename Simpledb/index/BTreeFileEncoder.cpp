@@ -38,7 +38,7 @@ namespace Simpledb {
 	shared_ptr<BTreeFile> BTreeFileEncoder::convert(const vector<vector<int>>& tuples, shared_ptr<File> hFile,
 		shared_ptr<File> bFile, int keyField, int numFields)
 	{
-		shared_ptr<File> tempInput = File::createTempFile("tempTable.txt");
+		shared_ptr<File> tempInput = File::createTempFile();
 		tempInput->deleteOnExit();
 		for (auto& tuple : tuples) {
 			int writtenFields = 0;
@@ -112,7 +112,7 @@ namespace Simpledb {
 	shared_ptr<BTreeFile> BTreeFileEncoder::convert(const vector<vector<int>>& tuples, shared_ptr<File> hFile,
 		shared_ptr<File> bFile, int npagebytes, int numFields, const vector<shared_ptr<Type>>& typeAr, char fieldSeparator, int keyField)
 	{
-		shared_ptr<File> tempInput = File::createTempFile("tempTable.txt");
+		shared_ptr<File> tempInput = File::createTempFile();
 		tempInput->deleteOnExit();
 		for (auto& tuple : tuples) {
 			int writtenFields = 0;
