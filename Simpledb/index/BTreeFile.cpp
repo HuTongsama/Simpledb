@@ -323,6 +323,35 @@ namespace Simpledb {
     {
         return make_shared<BTreeFileIterator>(this, tid);
     }
+    shared_ptr<BTreeRootPtrPage> BTreeFile::getRootPtrPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages)
+    {
+        lock_guard<mutex> lock(_dbfileMutex);
+        if (_f->length() == 0) {
+            // create the root pointer page and the root page
+            vector<unsigned char> emptyRootPtrData = BTreeRootPtrPage::createEmptyPageData();
+            vector<unsigned char> emptyLeafData = BTreeLeafPage::createEmptyPageData();
+            _f->writeBytes(emptyRootPtrData.data(), emptyRootPtrData.size());
+            _f->writeBytes(emptyLeafData.data(), emptyLeafData.size());
+        }
+
+        // get a read lock on the root pointer page
+        return dynamic_pointer_cast<BTreeRootPtrPage>
+            (getPage(tid, dirtypages, BTreeRootPtrPage::getId(_tableid), Permissions::READ_ONLY));
+    }
+    shared_ptr<Page> BTreeFile::getPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+        shared_ptr<BTreePageId> pid, Permissions perm)
+    {
+        if (dirtypages.find(pid) != dirtypages.end()) {
+            return dirtypages[pid];
+        }
+        else {
+            shared_ptr<Page> p = Database::getBufferPool()->getPage(tid, pid, perm);
+            if (perm == Permissions::READ_WRITE) {
+                dirtypages[pid] = p;
+            }
+            return p;
+        }
+    }
     shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>,
         shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, Permissions perm, shared_ptr<Field> f)
     {
@@ -413,20 +442,6 @@ namespace Simpledb {
         }
         if (e != nullptr) {
             updateParentPointer(tid, dirtypages, pid, e->getRightChild());
-        }
-    }
-    shared_ptr<Page> BTreeFile::getPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
-        shared_ptr<BTreePageId> pid, Permissions perm)
-    {
-        if (dirtypages.find(pid) != dirtypages.end()) {
-            return dirtypages[pid];
-        }
-        else {
-            shared_ptr<Page> p = Database::getBufferPool()->getPage(tid, pid, perm);
-            if (perm == Permissions::READ_WRITE) {
-                dirtypages[pid] = p;
-            }
-            return p;
         }
     }
     void BTreeFile::handleMinOccupancyPage(shared_ptr<TransactionId> tid,
@@ -558,21 +573,6 @@ namespace Simpledb {
         else if (parent->getNumEmptySlots() > maxEmptySlots) {
             handleMinOccupancyPage(tid, dirtypages, parent);
         }
-    }
-    shared_ptr<BTreeRootPtrPage> BTreeFile::getRootPtrPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages)
-    {
-        lock_guard<mutex> lock(_dbfileMutex);
-        if (_f->length() == 0) {
-            // create the root pointer page and the root page
-            vector<unsigned char> emptyRootPtrData = BTreeRootPtrPage::createEmptyPageData();
-            vector<unsigned char> emptyLeafData = BTreeLeafPage::createEmptyPageData();         
-            _f->writeBytes(emptyRootPtrData.data(), emptyRootPtrData.size());
-            _f->writeBytes(emptyLeafData.data(), emptyLeafData.size());
-        }
-
-        // get a read lock on the root pointer page
-        return dynamic_pointer_cast<BTreeRootPtrPage>
-            (getPage(tid, dirtypages, BTreeRootPtrPage::getId(_tableid), Permissions::READ_ONLY));
     }
     shared_ptr<Page> BTreeFile::getEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int pgcateg)
     {

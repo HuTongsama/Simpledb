@@ -172,6 +172,7 @@
     <ClInclude Include="include\Aggregate.h" />
     <ClInclude Include="include\Aggregator.h" />
     <ClInclude Include="include\BlockingQueue.h" />
+    <ClInclude Include="include\BTreeChecker.h" />
     <ClInclude Include="include\BTreeEntry.h" />
     <ClInclude Include="include\BTreeFile.h" />
     <ClInclude Include="include\BTreeFileEncoder.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="execution\Delete.cpp" />
     <ClCompile Include="execution\StringAggregator.cpp" />
     <ClCompile Include="include\BTreeScan.cpp" />
+    <ClCompile Include="index\BTreeChecker.cpp" />
     <ClCompile Include="index\BTreeEntry.cpp" />
     <ClCompile Include="index\BTreeFile.cpp" />
     <ClCompile Include="index\BTreeFileEncoder.cpp" />

@@ -266,6 +266,9 @@
     <ClInclude Include="include\BTreeScan.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="include\BTreeChecker.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -440,6 +443,9 @@
       <Filter>index</Filter>
     </ClCompile>
     <ClCompile Include="include\BTreeScan.cpp">
+      <Filter>index</Filter>
+    </ClCompile>
+    <ClCompile Include="index\BTreeChecker.cpp">
       <Filter>index</Filter>
     </ClCompile>
   </ItemGroup>

@@ -296,6 +296,39 @@ namespace Simpledb {
 		 * @return an iterator for all the tuples in this file
 		 */
 		shared_ptr<DbFileIterator> iterator(shared_ptr<TransactionId> tid)override;
+		/**
+		 * Get a read lock on the root pointer page. Create the root pointer page and root page
+		 * if necessary.
+		 *
+		 * @param tid - the transaction id
+		 * @param dirtypages - the list of dirty pages which should be updated with all new dirty pages
+		 * @return the root pointer page
+		 * @throws runtime_error
+		 */
+		shared_ptr<BTreeRootPtrPage> getRootPtrPage(
+			shared_ptr<TransactionId> tid,
+			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages);
+		/**
+		 * Method to encapsulate the process of locking/fetching a page.  First the method checks the local
+		 * cache ("dirtypages"), and if it can't find the requested page there, it fetches it from the buffer pool.
+		 * It also adds pages to the dirtypages cache if they are fetched with read-write permission, since
+		 * presumably they will soon be dirtied by this transaction.
+		 *
+		 * This method is needed to ensure that page updates are not lost if the same pages are
+		 * accessed multiple times.
+		 *
+		 * @param tid - the transaction id
+		 * @param dirtypages - the list of dirty pages which should be updated with all new dirty pages
+		 * @param pid - the id of the requested page
+		 * @param perm - the requested permissions on the page
+		 * @return the requested page
+		 *
+		 * @throws runtime_error
+		 */
+		shared_ptr<Page> getPage(
+			shared_ptr<TransactionId> tid,
+			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			shared_ptr<BTreePageId> pid, Permissions perm);
 	private:
 		/**
 		 * Recursive function which finds and locks the leaf page in the B+ tree corresponding to
@@ -366,27 +399,6 @@ namespace Simpledb {
 			shared_ptr<TransactionId> tid,
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page);
-		/**
-		 * Method to encapsulate the process of locking/fetching a page.  First the method checks the local
-		 * cache ("dirtypages"), and if it can't find the requested page there, it fetches it from the buffer pool.
-		 * It also adds pages to the dirtypages cache if they are fetched with read-write permission, since
-		 * presumably they will soon be dirtied by this transaction.
-		 *
-		 * This method is needed to ensure that page updates are not lost if the same pages are
-		 * accessed multiple times.
-		 *
-		 * @param tid - the transaction id
-		 * @param dirtypages - the list of dirty pages which should be updated with all new dirty pages
-		 * @param pid - the id of the requested page
-		 * @param perm - the requested permissions on the page
-		 * @return the requested page
-		 *
-		 * @throws runtime_error
-		 */
-		shared_ptr<Page> getPage(
-			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
-			shared_ptr<BTreePageId> pid, Permissions perm);
 		/**
 		 * Handle the case when a B+ tree page becomes less than half full due to deletions.
 		 * If one of its siblings has extra tuples/entries, redistribute those tuples/entries.
@@ -464,18 +476,6 @@ namespace Simpledb {
 			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent,
 			shared_ptr<BTreeEntry> parentEntry);
-		/**
-		 * Get a read lock on the root pointer page. Create the root pointer page and root page
-		 * if necessary.
-		 *
-		 * @param tid - the transaction id
-		 * @param dirtypages - the list of dirty pages which should be updated with all new dirty pages
-		 * @return the root pointer page
-		 * @throws runtime_error
-		 */
-		shared_ptr<BTreeRootPtrPage> getRootPtrPage(
-			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages);
 		/**
 		 * Method to encapsulate the process of creating a new page.  It reuses old pages if possible,
 		 * and creates a new page if none are available.  It wipes the page on disk and in the cache and
