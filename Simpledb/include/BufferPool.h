@@ -37,12 +37,12 @@ namespace Simpledb {
 			return _pageSize;
 		}
 		// THIS FUNCTION SHOULD ONLY BE USED FOR TESTING!!
-		void setPageSize(int pageSize) {
+		static void setPageSize(int pageSize) {
 			_pageSize = pageSize;
 		}
 
 		// THIS FUNCTION SHOULD ONLY BE USED FOR TESTING!!
-		void resetPageSize() {
+		static void resetPageSize() {
 			_pageSize = DEFAULT_PAGE_SIZE;
 		}
 		void lockBufferPool() {

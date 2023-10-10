@@ -18,7 +18,7 @@ protected:
 		Database::getBufferPool()->transactionComplete(_tid);
 
 		// set the page size back to the default
-		//Database::getBufferPool()->resetPageSize();
+		BufferPool::resetPageSize();
 		Database::reset();
 	}
 };
