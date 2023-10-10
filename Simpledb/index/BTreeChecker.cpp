@@ -98,8 +98,8 @@ namespace Simpledb {
 			shared_ptr<SubtreeSummary> res = checkSubTree(bt, tid, dirtypages,
 				rtptr->getRootId(), nullptr, nullptr, dynamic_pointer_cast<BTreePageId>(rtptr->getId()),
 				checkOccupancy, 0);
-			assert(res.ptrLeft == null);
-			assert(res.ptrRight == null);
+			assert(res->_ptrLeft == nullptr);
+			assert(res->_ptrRight == nullptr);
 		}
 	}
 }

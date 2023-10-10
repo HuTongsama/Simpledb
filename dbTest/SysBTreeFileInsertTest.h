@@ -199,7 +199,8 @@ TEST_F(SysBTreeFileInsertTest, TestSplitRootPage) {
 	EXPECT_TRUE(rightChild->getNumEmptySlots() <= 252);
 
 	// now insert some random tuples and make sure we can find them
-	std::default_random_engine randomEngine(std::random_device());
+	std::random_device randomDevice;
+	std::default_random_engine randomEngine(randomDevice());
 	std::uniform_int_distribution<int> uniform_dist(0, BTreeUtility::MAX_RAND_VALUE);
 	for (int i = 0; i < 100; i++) {
 		int item = uniform_dist(randomEngine);
@@ -240,7 +241,8 @@ TEST_F(SysBTreeFileInsertTest, TestSplitInternalPage) {
 	EXPECT_EQ(253, bigFile->numPages());
 
 	// now insert some random tuples and make sure we can find them
-	std::default_random_engine randomEngine(std::random_device());
+	std::random_device randomDevice;
+	std::default_random_engine randomEngine(randomDevice());
 	std::uniform_int_distribution<int> uniform_dist(0, BTreeUtility::MAX_RAND_VALUE);
 	for (int i = 0; i < 100; i++) {
 		int item = uniform_dist(randomEngine);
