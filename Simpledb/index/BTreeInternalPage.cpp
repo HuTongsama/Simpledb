@@ -204,15 +204,15 @@ namespace Simpledb {
 
 		return dos.toByteArray();
 	}
-	void BTreeInternalPage::deleteKeyAndRightChild(shared_ptr<BTreeEntry> e)
+	void BTreeInternalPage::deleteKeyAndRightChild(BTreeEntry* e)
 	{
 		deleteEntry(e, true);
 	}
-	void BTreeInternalPage::deleteKeyAndLeftChild(shared_ptr<BTreeEntry> e)
+	void BTreeInternalPage::deleteKeyAndLeftChild(BTreeEntry* e)
 	{
 		deleteEntry(e, false);
 	}
-	void BTreeInternalPage::updateEntry(shared_ptr<BTreeEntry> e)
+	void BTreeInternalPage::updateEntry(BTreeEntry* e)
 	{
 		shared_ptr<RecordId> rid = e->getRecordId();
 		if (rid == nullptr)
@@ -246,7 +246,7 @@ namespace Simpledb {
 		_children[tCount] = e->getRightChild()->getPageNumber();
 		_keys[tCount] = e->getKey();
 	}
-	void BTreeInternalPage::insertEntry(shared_ptr<BTreeEntry> e)
+	void BTreeInternalPage::insertEntry(BTreeEntry* e)
 	{
 		if (e->getKey()->getType() != _td->getFieldType(_keyField)->type())
 			throw runtime_error("key field type mismatch, in insertEntry");
@@ -488,7 +488,7 @@ namespace Simpledb {
 		}
 		return child;
 	}
-	void BTreeInternalPage::deleteEntry(shared_ptr<BTreeEntry> e, bool deleteRightChild)
+	void BTreeInternalPage::deleteEntry(BTreeEntry* e, bool deleteRightChild)
 	{
 		shared_ptr<RecordId> rid = e->getRecordId();
 		if (rid == nullptr)

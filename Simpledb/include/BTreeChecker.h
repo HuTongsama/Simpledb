@@ -22,7 +22,7 @@ namespace Simpledb {
 
 		};
 		static shared_ptr<SubtreeSummary> checkSubTree(shared_ptr<BTreeFile> bt,
-			shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pageId, shared_ptr<Field> lowerBound, shared_ptr<Field> upperBound,
 			shared_ptr<BTreePageId> parentId, bool checkOccupancy, int depth);
 	public:
@@ -35,7 +35,7 @@ namespace Simpledb {
 		 * 5) occupancy invariants. (if enabled)
 		 */
 		static void checkRep(shared_ptr<BTreeFile> bt, shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, bool checkOccupancy);
+			map<BTreePageId, shared_ptr<Page>>& dirtypages, bool checkOccupancy);
 
 	};
 }

@@ -71,7 +71,7 @@ namespace Simpledb {
 		 *         already empty.
 		 * @param e The entry to delete
 		 */
-		void deleteKeyAndRightChild(shared_ptr<BTreeEntry> e);
+		void deleteKeyAndRightChild(BTreeEntry* e);
 		/**
 		 * Delete the specified entry (key + left child pointer) from the page. The recordId
 		 * is used to find the specified entry, so it must not be null. After deletion, the
@@ -81,7 +81,7 @@ namespace Simpledb {
 		 *         already empty.
 		 * @param e The entry to delete
 		 */
-		void deleteKeyAndLeftChild(shared_ptr<BTreeEntry> e);
+		void deleteKeyAndLeftChild(BTreeEntry* e);
 		/**
 		 * Update the key and/or child pointers of an entry at the location specified by its
 		 * record id.
@@ -90,7 +90,7 @@ namespace Simpledb {
 		 *         already empty, or updating this key would put the entry out of
 		 *         order on the page
 		 */
-		void updateEntry(shared_ptr<BTreeEntry> e);
+		void updateEntry(BTreeEntry* e);
 		/**
 		 * Adds the specified entry to the page; the entry's recordId should be updated to
 		 * reflect that it is now stored on this page.
@@ -98,7 +98,7 @@ namespace Simpledb {
 		 *         table id, or child page category is a mismatch, or the entry is invalid
 		 * @param e The entry to add.
 		 */
-		void insertEntry(shared_ptr<BTreeEntry> e);
+		void insertEntry(BTreeEntry* e);
 		/**
 		 * Returns the number of entries (keys) currently stored on this page
 		 */
@@ -156,7 +156,7 @@ namespace Simpledb {
 		 * @param deleteRightChild - if true, delete the right child. Otherwise
 		 *        delete the left child
 		 */
-		void deleteEntry(shared_ptr<BTreeEntry> e, bool deleteRightChild);
+		void deleteEntry(BTreeEntry* e, bool deleteRightChild);
 		/**
 		 * Move an entry from one slot to another slot, and update the corresponding
 		 * headers

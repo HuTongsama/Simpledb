@@ -77,7 +77,7 @@ namespace Simpledb {
         if (!tuples.empty()) {
             tuples.clear();
         }
-
+        tuples.resize(rows);
         generateRandomTuples(columns, rows, maxValue, columnSpecification, tuples);
 
         // Convert the tuples list to a B+ tree file
@@ -116,12 +116,11 @@ namespace Simpledb {
 
                 tuple.push_back(columnValue);
             }
-            tuples.push_back(tuple);
+            tuples[i] = tuple;
         }
     }
     void BTreeUtility::generateRandomEntries(int numKeys, int minKey, int maxKey, int minChildPtr, vector<int>& childPointers, vector<int>& keys)
-    {
-        
+    {       
         // Seed with a real random value, if available
         std::random_device r;
 
@@ -130,14 +129,15 @@ namespace Simpledb {
 
         // Fill the keys and childPointers lists with generated values
         int child = minChildPtr;
-        for (int i = 0; i < numKeys; ++i) {
-            keys.push_back(uniform_dist(e1));
-            childPointers.push_back(child);
+        int i = 0;
+        for (i = 0; i < numKeys; ++i) {
+            keys[i] = uniform_dist(e1);
+            childPointers[i] = child;
             ++child;
         }
 
         // one extra child pointer
-        childPointers.push_back(child);
+        childPointers[i] = child;
     }
     vector<shared_ptr<Tuple>> BTreeUtility::generateRandomTuples(int columns, int rows, int min, int max)
     {

@@ -38,8 +38,10 @@ namespace Simpledb {
             if (id->pgcateg() == BTreePageId::ROOT_PTR) {
 
                 int pageSize = BTreeRootPtrPage::getPageSize();
+                auto oldPos = _f->position();
                 _f->seek(0);
-                vector<unsigned char> pageData = _f->readBytes(pageSize);               
+                vector<unsigned char> pageData = _f->readBytes(pageSize);
+                _f->seek(oldPos);
                 if (pageData.empty()) {
                     throw runtime_error("Read past end of table");
                 }
@@ -51,11 +53,13 @@ namespace Simpledb {
             else {
                 int pageSize = BufferPool::getPageSize();
                 size_t skipSz = BTreeRootPtrPage::getPageSize() + (id->getPageNumber() - 1) * pageSize;
+                auto oldPos = _f->position();
                 int retVal = _f->seek(skipSz);
                 if (retVal != 0) {
                     throw runtime_error("Unable to seek to correct place in BTreeFile");
                 }
                 vector<unsigned char> pageData = _f->readBytes(pageSize);
+                _f->seek(oldPos);
                 if (pageData.empty()) {
                     throw runtime_error("Read past end of table");
                 }
@@ -111,17 +115,90 @@ namespace Simpledb {
     {
         return _keyField;
     }
-    shared_ptr<BTreeLeafPage> BTreeFile::splitLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> page, shared_ptr<Field> field)
+    shared_ptr<BTreeLeafPage> BTreeFile::splitLeafPage(shared_ptr<TransactionId> tid, map<BTreePageId,
+        shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> page, shared_ptr<Field> field)
     {
-        return shared_ptr<BTreeLeafPage>();
+        shared_ptr<BTreeLeafPage> rightPage =
+            dynamic_pointer_cast<BTreeLeafPage>(getEmptyPage(tid, dirtypages, BTreePageId::LEAF));
+        size_t rightCount = page->getNumTuples() / 2;
+        auto rIt = page->reverseIterator();
+        shared_ptr<Tuple> firstRightPageTuple;
+        while (rightCount > 0) {
+            rightCount--;
+            Tuple* pNext = rIt->next();
+            page->deleteTuple(*pNext);
+            firstRightPageTuple = make_shared<Tuple>(pNext->getTupleDesc());
+            pNext->copyTo(*firstRightPageTuple);
+            rightPage->insertTuple(firstRightPageTuple);
+        }
+        shared_ptr<BTreePageId> rSiblingId = page->getRightSiblingId();
+        if (rSiblingId != nullptr) {
+            shared_ptr<BTreeLeafPage> oldRightPage =
+                dynamic_pointer_cast<BTreeLeafPage>(getPage(tid, dirtypages, rSiblingId, Permissions::READ_WRITE));
+            oldRightPage->setLeftSiblingId(dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+            rightPage->setRightSiblingId(dynamic_pointer_cast<BTreePageId>(oldRightPage->getId()));
+            dirtypages[*dynamic_pointer_cast<BTreePageId>(oldRightPage->getId())] = oldRightPage;
+        }
+        page->setRightSiblingId(dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+        rightPage->setLeftSiblingId(dynamic_pointer_cast<BTreePageId>(page->getId()));
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(page->getId())] = page;
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(rightPage->getId())] = rightPage;    
+
+        shared_ptr<BTreeInternalPage> parent = getParentWithEmptySlots(tid, dirtypages, page->getParentId(), firstRightPageTuple->getField(_keyField));
+        shared_ptr<BTreeEntry> entry = make_shared<BTreeEntry>(
+            firstRightPageTuple->getField(_keyField),
+            dynamic_pointer_cast<BTreePageId>(page->getId()),
+            dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+        parent->insertEntry(entry.get());
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(parent->getId())] = parent;
+
+        updateParentPointer(tid, dirtypages,
+            dynamic_pointer_cast<BTreePageId>(parent->getId()),
+            dynamic_pointer_cast<BTreePageId>(page->getId()));
+        updateParentPointer(tid, dirtypages,
+            dynamic_pointer_cast<BTreePageId>(parent->getId()),
+            dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+        shared_ptr<Field> leftLast = rIt->next()->getField(_keyField);
+        if (field->compare(Predicate::Op::GREATER_THAN, *leftLast))return rightPage;
+        return page;
     }
-    shared_ptr<BTreeInternalPage> BTreeFile::splitInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<Field> field)
+    shared_ptr<BTreeInternalPage> BTreeFile::splitInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId,
+        shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<Field> field)
     {
-        return shared_ptr<BTreeInternalPage>();
+        shared_ptr<BTreeInternalPage> rightPage =
+            dynamic_pointer_cast<BTreeInternalPage>(getEmptyPage(tid, dirtypages, BTreePageId::INTERNAL));
+        size_t rightCount = (page->getNumEntries() + 1) / 2;
+        auto rIt = page->reverseIterator();
+        BTreeEntry* firstRightPageEntry = nullptr;
+        while (rightCount > 0) {
+            rightCount--;
+            firstRightPageEntry = rIt->next();
+            page->deleteKeyAndRightChild(firstRightPageEntry);
+            rightPage->insertEntry(firstRightPageEntry);
+            rightPage->updateEntry(firstRightPageEntry);
+        }
+        rightPage->deleteKeyAndLeftChild(firstRightPageEntry);
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(page->getId())] = page;
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(rightPage->getId())] = rightPage;
+
+        firstRightPageEntry->setLeftChild(dynamic_pointer_cast<BTreePageId>(page->getId()));
+        firstRightPageEntry->setRightChild(dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+        updateParentPointers(tid, dirtypages, page);
+        updateParentPointers(tid, dirtypages, rightPage);
+
+        shared_ptr<BTreeInternalPage> parent = getParentWithEmptySlots(
+            tid, dirtypages, page->getParentId(), firstRightPageEntry->getKey());
+        parent->insertEntry(firstRightPageEntry);
+        dirtypages[*dynamic_pointer_cast<BTreePageId>(parent->getId())] = parent;
+        updateParentPointers(tid, dirtypages, parent);
+
+        shared_ptr<Field> leftLast = rIt->next()->getKey();
+        if (field->compare(Predicate::Op::GREATER_THAN_OR_EQ, *leftLast))return rightPage;
+        return page;
     }
     vector<shared_ptr<Page>> BTreeFile::insertTuple(shared_ptr<TransactionId> tid, shared_ptr<Tuple> t)
     {
-        map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
+        map<BTreePageId, shared_ptr<Page>> dirtypages;
 
         // get a read lock on the root pointer page and use it to locate the root page
         shared_ptr<BTreeRootPtrPage> rootPtr = getRootPtrPage(tid, dirtypages);
@@ -153,26 +230,26 @@ namespace Simpledb {
     void BTreeFile::stealFromLeafPage(shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeLeafPage> sibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* entry, bool isRightSibling)
     {
     }
-    void BTreeFile::stealFromLeftInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::stealFromLeftInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
     }
-    void BTreeFile::stealFromRightInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::stealFromRightInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
     }
-    void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
     }
-    void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
     }
     shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, shared_ptr<BTreePageId> pid, shared_ptr<Field> f)
     {
-        map<shared_ptr<PageId>, shared_ptr<Page>> map;
+        map<BTreePageId, shared_ptr<Page>> map;
         return findLeafPage(tid, map, pid, Permissions::READ_ONLY, f);
     }
     vector<shared_ptr<Page>> BTreeFile::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
     {
-        map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
+        map<BTreePageId, shared_ptr<Page>> dirtypages;
 
         shared_ptr<BTreePageId> pageId = make_shared<BTreePageId>(
             _tableid, t.getRecordId()->getPageId()->getPageNumber(), BTreePageId::LEAF);
@@ -192,7 +269,7 @@ namespace Simpledb {
         }
         return result;        
     }
-    int BTreeFile::getEmptyPageNo(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages)
+    int BTreeFile::getEmptyPageNo(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages)
     {
         // get a read lock on the root pointer page and use it to locate the first header page
         shared_ptr<BTreeRootPtrPage> rootPtr = getRootPtrPage(tid, dirtypages);
@@ -238,7 +315,7 @@ namespace Simpledb {
 
         return emptyPageNo;
     }
-    void BTreeFile::setEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int emptyPageNo)
+    void BTreeFile::setEmptyPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, int emptyPageNo)
     {
         // if this is the last page in the file (and not the only page), just 
         // truncate the file
@@ -323,7 +400,7 @@ namespace Simpledb {
     {
         return make_shared<BTreeFileIterator>(this, tid);
     }
-    shared_ptr<BTreeRootPtrPage> BTreeFile::getRootPtrPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages)
+    shared_ptr<BTreeRootPtrPage> BTreeFile::getRootPtrPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages)
     {
         lock_guard<mutex> lock(_dbfileMutex);
         if (_f->length() == 0) {
@@ -338,21 +415,21 @@ namespace Simpledb {
         return dynamic_pointer_cast<BTreeRootPtrPage>
             (getPage(tid, dirtypages, BTreeRootPtrPage::getId(_tableid), Permissions::READ_ONLY));
     }
-    shared_ptr<Page> BTreeFile::getPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+    shared_ptr<Page> BTreeFile::getPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
         shared_ptr<BTreePageId> pid, Permissions perm)
     {
-        if (dirtypages.find(pid) != dirtypages.end()) {
-            return dirtypages[pid];
+        if (dirtypages.find(*pid) != dirtypages.end()) {
+            return dirtypages[*pid];
         }
         else {
             shared_ptr<Page> p = Database::getBufferPool()->getPage(tid, pid, perm);
             if (perm == Permissions::READ_WRITE) {
-                dirtypages[pid] = p;
+                dirtypages[*pid] = p;
             }
             return p;
         }
     }
-    shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>,
+    shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, map<BTreePageId,
         shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, Permissions perm, shared_ptr<Field> f)
     {
         int pgcateg = pid->pgcateg();
@@ -385,7 +462,7 @@ namespace Simpledb {
         }
         return nullptr;
     }
-    shared_ptr<BTreeInternalPage> BTreeFile::getParentWithEmptySlots(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> parentId, shared_ptr<Field> field)
+    shared_ptr<BTreeInternalPage> BTreeFile::getParentWithEmptySlots(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> parentId, shared_ptr<Field> field)
     {
         shared_ptr<BTreeInternalPage> parent = nullptr;
 
@@ -419,7 +496,7 @@ namespace Simpledb {
 
         return parent;
     }
-    void BTreeFile::updateParentPointer(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>,
+    void BTreeFile::updateParentPointer(shared_ptr<TransactionId> tid, map<BTreePageId,
         shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pid, shared_ptr<BTreePageId> child)
     {
         shared_ptr<BTreePage> p = 
@@ -430,7 +507,7 @@ namespace Simpledb {
             p->setParentId(pid);
         }
     }
-    void BTreeFile::updateParentPointers(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, 
+    void BTreeFile::updateParentPointers(shared_ptr<TransactionId> tid, map<BTreePageId,
         shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page)
     {
         shared_ptr<Iterator<BTreeEntry>> it = page->iterator();
@@ -445,7 +522,7 @@ namespace Simpledb {
         }
     }
     void BTreeFile::handleMinOccupancyPage(shared_ptr<TransactionId> tid,
-        map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePage> page)
+        map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePage> page)
     {
         shared_ptr<BTreePageId> parentId = page->getParentId();
         BTreeEntry* leftEntry = nullptr;
@@ -478,7 +555,7 @@ namespace Simpledb {
             handleMinOccupancyInternalPage(tid, dirtypages, dynamic_pointer_cast<BTreeInternalPage>(page), parent, leftEntry, rightEntry);
         }
     }
-    void BTreeFile::handleMinOccupancyLeafPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+    void BTreeFile::handleMinOccupancyLeafPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
         shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeInternalPage> parent, BTreeEntry* leftEntry, BTreeEntry* rightEntry)
     {
         shared_ptr<BTreePageId> leftSiblingId = nullptr;
@@ -512,7 +589,7 @@ namespace Simpledb {
             }
         }
     }
-    void BTreeFile::handleMinOccupancyInternalPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+    void BTreeFile::handleMinOccupancyInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
         shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> parent, BTreeEntry* leftEntry, BTreeEntry* rightEntry)
     {
         shared_ptr<BTreePageId> leftSiblingId = nullptr;
@@ -546,13 +623,13 @@ namespace Simpledb {
             }
         }
     }
-    void BTreeFile::deleteParentEntry(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+    void BTreeFile::deleteParentEntry(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
         shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry)
     {
         // delete the entry in the parent.  If
         // the parent is below minimum occupancy, get some tuples from its siblings
         // or merge with one of the siblings
-        parent->deleteKeyAndRightChild(parentEntry);
+        parent->deleteKeyAndRightChild(parentEntry.get());
         int maxEmptySlots = parent->getMaxEntries() - parent->getMaxEntries() / 2; // ceiling
         if (parent->getNumEmptySlots() == parent->getMaxEntries()) {
             // This was the last entry in the parent.
@@ -574,7 +651,7 @@ namespace Simpledb {
             handleMinOccupancyPage(tid, dirtypages, parent);
         }
     }
-    shared_ptr<Page> BTreeFile::getEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int pgcateg)
+    shared_ptr<Page> BTreeFile::getEmptyPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, int pgcateg)
     {
         // create the new page
         int emptyPageNo = getEmptyPageNo(tid, dirtypages);
@@ -588,7 +665,7 @@ namespace Simpledb {
 
         // make sure the page is not in the buffer pool	or in the local cache		
         Database::getBufferPool()->discardPage(newPageId);
-        dirtypages.erase(newPageId);
+        dirtypages.erase(*newPageId);
 
         return getPage(tid, dirtypages, newPageId, Permissions::READ_WRITE);
     }

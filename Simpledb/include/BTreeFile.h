@@ -90,7 +90,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<BTreeLeafPage> splitLeafPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeLeafPage> page, shared_ptr<Field> field);
 		/**
 		 * Split an internal page to make room for new entries and recursively split its parent page
@@ -114,7 +114,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<BTreeInternalPage> splitInternalPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<Field> field);
 		/**
 		 * Insert a tuple into this BTreeFile, keeping the tuples in sorted order.
@@ -160,7 +160,7 @@ namespace Simpledb {
 		 * @throws TransactionAbortedException
 		 */
 		void stealFromLeftInternalPage(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling,
 			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
@@ -180,7 +180,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void stealFromRightInternalPage(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling,
 			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
@@ -200,7 +200,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void mergeLeafPages(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage,
 			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 		/**
@@ -222,7 +222,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void mergeInternalPages(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage,
 			shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry);
 
@@ -263,7 +263,7 @@ namespace Simpledb {
 		 *
 		 * @throws runtime_error
 		 */
-		int getEmptyPageNo(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages);
+		int getEmptyPageNo(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages);
 		/**
 		 * Mark a page in this BTreeFile as empty. Find the corresponding header page
 		 * (create it if needed), and mark the corresponding slot in the header page as empty.
@@ -275,7 +275,7 @@ namespace Simpledb {
 		 *
 		 * @throws runtime_error
 		 */
-		void setEmptyPage(shared_ptr<TransactionId> tid, map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int emptyPageNo);
+		void setEmptyPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, int emptyPageNo);
 		/**
 		 * get the specified tuples from the file based on its IndexPredicate value on
 		 * behalf of the specified transaction. This method will acquire a read lock on
@@ -307,7 +307,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<BTreeRootPtrPage> getRootPtrPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages);
+			map<BTreePageId, shared_ptr<Page>>& dirtypages);
 		/**
 		 * Method to encapsulate the process of locking/fetching a page.  First the method checks the local
 		 * cache ("dirtypages"), and if it can't find the requested page there, it fetches it from the buffer pool.
@@ -327,7 +327,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<Page> getPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pid, Permissions perm);
 	private:
 		/**
@@ -348,7 +348,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<Page> findLeafPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pid, Permissions perm,
 			shared_ptr<Field> f);
 		/**
@@ -368,7 +368,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<BTreeInternalPage> getParentWithEmptySlots(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> parentId, shared_ptr<Field> field);
 
 		/**
@@ -382,7 +382,7 @@ namespace Simpledb {
 		 */
 		void updateParentPointer(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pid, shared_ptr<BTreePageId> child);
 		/**
 		 * Update the parent pointer of every child of the given page so that it correctly points to
@@ -397,7 +397,7 @@ namespace Simpledb {
 		 */
 		void updateParentPointers(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page);
 		/**
 		 * Handle the case when a B+ tree page becomes less than half full due to deletions.
@@ -413,7 +413,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void handleMinOccupancyPage(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePage> page);
 		/**
 		 * Handle the case when a leaf page becomes less than half full due to deletions.
@@ -432,7 +432,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void handleMinOccupancyLeafPage(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeInternalPage> parent,
 			BTreeEntry* leftEntry, BTreeEntry* rightEntry);
 		/**
@@ -453,7 +453,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void handleMinOccupancyInternalPage(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> parent,
 			BTreeEntry* leftEntry, BTreeEntry* rightEntry);
 		/**
@@ -473,7 +473,7 @@ namespace Simpledb {
 		 * @throws runtime_error
 		 */
 		void deleteParentEntry(shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages,
+			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent,
 			shared_ptr<BTreeEntry> parentEntry);
 		/**
@@ -494,7 +494,7 @@ namespace Simpledb {
 		 */
 		shared_ptr<Page> getEmptyPage(
 			shared_ptr<TransactionId> tid,
-			map<shared_ptr<PageId>, shared_ptr<Page>>& dirtypages, int pgcateg);
+			map<BTreePageId, shared_ptr<Page>>& dirtypages, int pgcateg);
 	};
 
 	/**

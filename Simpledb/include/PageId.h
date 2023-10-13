@@ -33,6 +33,10 @@ namespace Simpledb
 		* @return true if the objects are equal (e.g., page numbers and table
 		*   ids are the same)
 		*/
-		virtual bool equals(const PageId& pId)const = 0;	
+		virtual bool equals(const PageId& pId)const = 0;
+
+		bool operator<(const PageId& other)const {
+			return hashCode() < other.hashCode();
+		}
 	};
 }

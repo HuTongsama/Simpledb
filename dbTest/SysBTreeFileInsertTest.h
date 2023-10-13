@@ -74,7 +74,7 @@ TEST_F(SysBTreeFileInsertTest, AddDuplicateTuples) {
 	shared_ptr<BTreeFile> empty = BTreeUtility::createEmptyBTreeFile(emptyFile->fileName(), 2, 1);
 
 	shared_ptr<Tuple> tup;
-	map<shared_ptr<PageId>, shared_ptr<Page>> tmpMap;
+	map<BTreePageId, shared_ptr<Page>> tmpMap;
 	BTreeChecker::checkRep(empty, _tid, tmpMap, true);
 
 	// add a bunch of identical tuples
@@ -166,7 +166,7 @@ TEST_F(SysBTreeFileInsertTest, TestSplitRootPage) {
 		map<int, int>(), tuples, 0);
 
 	// we will need more room in the buffer pool for this test
-	Database::resetBufferPool(500);
+	Database::resetBufferPool(512);
 
 	// there should be 504 leaf pages + 1 internal node
 	EXPECT_EQ(505, bigFile->numPages());

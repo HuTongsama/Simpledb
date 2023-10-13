@@ -39,5 +39,5 @@
 //#include "SysTransactionTest.h"
 //#include "BTreeFileReadTest.h"
 //#include "SysBTreeScanTest.h"
-#include "BTreeFileInsertTest.h"
+//#include "BTreeFileInsertTest.h"
 #include "SysBTreeFileInsertTest.h"

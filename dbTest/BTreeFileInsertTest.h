@@ -45,19 +45,19 @@ TEST_F(BTreeFileInsertTest, TestSplitLeafPages) {
 	leftPage->setParentId(parentId);
 
 	shared_ptr<Field> field = make_shared<IntField>(BTreeUtility::MAX_RAND_VALUE / 2);
-	map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
-	dirtypages[leftPageId] = leftPage;
-	dirtypages[parentId] =  parent;
+	map<BTreePageId, shared_ptr<Page>> dirtypages;
+	dirtypages[*leftPageId] = leftPage;
+	dirtypages[*parentId] =  parent;
 	shared_ptr<BTreeLeafPage> page = empty->splitLeafPage(_tid, dirtypages, leftPage, field);
 	EXPECT_TRUE(page->getLeftSiblingId() != nullptr || page->getRightSiblingId() != nullptr);
 	shared_ptr<BTreeLeafPage> otherPage;
 	if (page->getLeftSiblingId() != nullptr) {
-		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[page->getLeftSiblingId()]);
+		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[*page->getLeftSiblingId()]);
 		EXPECT_TRUE(field->compare(Predicate::Op::GREATER_THAN_OR_EQ,
 			*(otherPage->reverseIterator()->next()->getField(keyField))));
 	}
 	else { // page.getRightSiblingId() != null
-		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[page->getRightSiblingId()]);
+		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[*page->getRightSiblingId()]);
 		EXPECT_TRUE(field->compare(Predicate::Op::LESS_THAN_OR_EQ,
 			*(otherPage->iterator()->next()->getField(keyField))));
 	}
@@ -94,20 +94,21 @@ TEST_F(BTreeFileInsertTest, TestSplitInternalPages) {
 	leftPage->setParentId(parentId);
 
 	shared_ptr<Field> field = make_shared<IntField>(BTreeUtility::MAX_RAND_VALUE / 2);
-	map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
-	dirtypages[leftPageId] = leftPage;
-	dirtypages[parentId] = parent;
+	map<BTreePageId, shared_ptr<Page>> dirtypages;
+	dirtypages[*leftPageId] = leftPage;
+	dirtypages[*parentId] = parent;
 	shared_ptr<BTreeInternalPage> page = empty->splitInternalPage(_tid, dirtypages, leftPage, field);
 	shared_ptr<BTreeInternalPage> otherPage;
 	EXPECT_EQ(1, parent->getNumEntries());
-	BTreeEntry* parentEntry = parent->iterator()->next();
+	auto iter = parent->iterator();
+	BTreeEntry* parentEntry = iter->next();
 	if (parentEntry->getLeftChild()->equals(*page->getId())) {
-		otherPage = dynamic_pointer_cast<BTreeInternalPage>(dirtypages[parentEntry->getRightChild()]);
+		otherPage = dynamic_pointer_cast<BTreeInternalPage>(dirtypages[*parentEntry->getRightChild()]);
 		EXPECT_TRUE(field->compare(Predicate::Op::LESS_THAN_OR_EQ,
 			*(otherPage->iterator()->next()->getKey())));
 	}
 	else { // parentEntry.getRightChild().equals(page.getId())
-		otherPage = dynamic_pointer_cast<BTreeInternalPage>(dirtypages[parentEntry->getLeftChild()]);
+		otherPage = dynamic_pointer_cast<BTreeInternalPage>(dirtypages[*parentEntry->getLeftChild()]);
 		EXPECT_TRUE(field->compare(Predicate::Op::GREATER_THAN_OR_EQ,
 			*(otherPage->reverseIterator()->next()->getKey())));
 	}
@@ -129,7 +130,7 @@ TEST_F(BTreeFileInsertTest, TestReusePage) {
 	int keyField = 0;
 
 	// create the leaf page
-	map<shared_ptr<PageId>, shared_ptr<Page>> dirtypages;
+	map<BTreePageId, shared_ptr<Page>> dirtypages;
 	empty->setEmptyPage(_tid, dirtypages, 2);
 	shared_ptr<BTreePageId> leftPageId = make_shared<BTreePageId>(tableid, 3, BTreePageId::LEAF);
 	shared_ptr<BTreeLeafPage> leftPage = BTreeUtility::createRandomLeafPage(leftPageId, 2, keyField,
@@ -144,16 +145,16 @@ TEST_F(BTreeFileInsertTest, TestReusePage) {
 	leftPage->setParentId(parentId);
 
 	shared_ptr<Field> field = make_shared<IntField>(BTreeUtility::MAX_RAND_VALUE / 2);
-	dirtypages[leftPageId] = leftPage;
-	dirtypages[parentId] = parent;
+	dirtypages[*leftPageId] = leftPage;
+	dirtypages[*parentId] = parent;
 	shared_ptr<BTreeLeafPage> page = empty->splitLeafPage(_tid, dirtypages, leftPage, field);
 	EXPECT_TRUE(page->getLeftSiblingId() != nullptr || page->getRightSiblingId() != nullptr);
 	shared_ptr<BTreeLeafPage> otherPage;
 	if (page->getLeftSiblingId() != nullptr) {
-		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[page->getLeftSiblingId()]);
+		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[*page->getLeftSiblingId()]);
 	}
 	else { // page.getRightSiblingId() != null
-		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[page->getRightSiblingId()]);
+		otherPage = dynamic_pointer_cast<BTreeLeafPage>(dirtypages[*page->getRightSiblingId()]);
 	}
 
 	EXPECT_TRUE(page->getId()->getPageNumber() == 2 || otherPage->getId()->getPageNumber() == 2);

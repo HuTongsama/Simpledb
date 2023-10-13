@@ -441,7 +441,7 @@ namespace Simpledb {
 	}
 	BTreeLeafPageReverseIterator::BTreeLeafPageReverseIterator(BTreeLeafPage* p) :_p(p)
 	{
-		_position = _p->getMaxTuples() - 1;
+		_position = _p->getNumTuples() - 1;
 	}
 	bool BTreeLeafPageReverseIterator::hasNext()
 	{
