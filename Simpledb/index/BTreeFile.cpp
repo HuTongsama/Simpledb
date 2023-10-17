@@ -309,6 +309,7 @@ namespace Simpledb {
             lock_guard<mutex> lock(_dbfileMutex);
             // create the new page
             vector<unsigned char> emptyData = BTreeInternalPage::createEmptyPageData();
+            _f->seek(_f->length());
             _f->writeBytes(emptyData.data(), emptyData.size());
             emptyPageNo = static_cast<int>(numPages());
         }

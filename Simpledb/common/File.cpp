@@ -79,7 +79,7 @@ namespace Simpledb {
 	void File::writeBytes(const unsigned char* bytes, size_t byteCount)
 	{
 		lock_guard<mutex> lock(_fileMutex);
-		size_t w = fwrite(bytes, 1, byteCount, _pFile);		
+		size_t w = fwrite(bytes, 1, byteCount, _pFile);
 	}
 	char File::readChar()
 	{
