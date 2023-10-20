@@ -36,6 +36,7 @@
     <ClInclude Include="AbortEvictionTest.h" />
     <ClInclude Include="AbortEvictionTestBase.h" />
     <ClInclude Include="AggregateTest.h" />
+    <ClInclude Include="BTreeFileDeleteTest.h" />
     <ClInclude Include="BTreeFileInsertTest.h" />
     <ClInclude Include="BTreeFileReadTest.h" />
     <ClInclude Include="BufferPoolWriteTest.h" />
@@ -64,6 +65,7 @@
     <ClInclude Include="SimpleDbTestBase.h" />
     <ClInclude Include="StringAggregatorTest.h" />
     <ClInclude Include="SysAggregateTest.h" />
+    <ClInclude Include="SysBTreeFileDeleteTest.h" />
     <ClInclude Include="SysBTreeFileInsertTest.h" />
     <ClInclude Include="SysBTreeScanTest.h" />
     <ClInclude Include="SysDeleteTest.h" />

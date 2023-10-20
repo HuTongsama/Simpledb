@@ -41,3 +41,5 @@
 #include "SysBTreeScanTest.h"
 #include "BTreeFileInsertTest.h"
 #include "SysBTreeFileInsertTest.h"
+#include "BTreeFileDeleteTest.h"
+#include "SysBTreeFileDeleteTest.h"
