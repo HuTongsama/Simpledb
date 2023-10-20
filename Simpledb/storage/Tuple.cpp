@@ -4,6 +4,13 @@
 namespace Simpledb 
 {
 	long Tuple::_serialVersionUID = 1l;
+	Tuple::Tuple()
+	{
+	}
+	Tuple::Tuple(Tuple* p)
+	{
+		p->copyTo(*this);
+	}
 	Tuple::Tuple(shared_ptr<TupleDesc> td)
 		:_pTd(td) {
 		auto iter = _pTd->iterator();

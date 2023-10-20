@@ -227,14 +227,79 @@ namespace Simpledb {
         }
         return result;
     }
-    void BTreeFile::stealFromLeafPage(shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeLeafPage> sibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* entry, bool isRightSibling)
+    void BTreeFile::stealFromLeafPage(shared_ptr<BTreeLeafPage> page, shared_ptr<BTreeLeafPage> sibling,
+        shared_ptr<BTreeInternalPage> parent, BTreeEntry* entry, bool isRightSibling)
     {
+        size_t tupleNum1 = page->getNumTuples();
+        size_t tupleNum2 = sibling->getNumTuples();
+        size_t target = (tupleNum1 + tupleNum2) >> 1;
+        Tuple* pMid = nullptr;
+        auto it = isRightSibling ? sibling->iterator() : sibling->reverseIterator();
+
+        while (tupleNum1 < target && it->hasNext()) {
+            tupleNum1++;
+            Tuple* pNext = it->next();
+            shared_ptr<Tuple> tmp = make_shared<Tuple>(pNext);
+            sibling->deleteTuple(*pNext);
+            page->insertTuple(tmp);
+        }
+        Tuple* pMid = isRightSibling ? it->next() : page->iterator()->next();
+        entry->setKey(pMid->getField(_keyField));
+        parent->updateEntry(entry);
+
     }
-    void BTreeFile::stealFromLeftInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::stealFromLeftInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
+        shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> leftSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
+        size_t entryNum1 = page->getNumEntries();
+        size_t entryNum2 = leftSibling->getNumEntries();
+        size_t target = (entryNum1 + entryNum2) >> 2;
+        auto it = leftSibling->reverseIterator();
+        
+        BTreeEntry left = *it->next();
+        BTreeEntry right = *page->iterator()->next();
+        BTreeEntry newEntry(parentEntry->getKey(), left.getRightChild(), right.getLeftChild());
+        leftSibling->deleteKeyAndRightChild(&left);
+        page->insertEntry(&newEntry);
+        page->insertEntry(&right);
+        entryNum1 += 2;
+        while (entryNum1 < target && it->hasNext()) {
+            entryNum1++;
+            BTreeEntry* pNext = it->next();
+            leftSibling->deleteKeyAndRightChild(pNext);
+            page->insertEntry(pNext);
+        }
+        BTreeEntry* pNext = it->next();
+        leftSibling->deleteKeyAndRightChild(pNext);
+        parentEntry->setKey(pNext->getKey());
+        parent->updateEntry(parentEntry);
+        updateParentPointers(tid, dirtypages, page);
     }
-    void BTreeFile::stealFromRightInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::stealFromRightInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
+        shared_ptr<BTreeInternalPage> page, shared_ptr<BTreeInternalPage> rightSibling, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
+        size_t entryNum1 = page->getNumEntries();
+        size_t entryNum2 = rightSibling->getNumEntries();
+        size_t target = (entryNum1 + entryNum2) >> 2;
+        auto it = rightSibling->iterator();
+
+        BTreeEntry left = *page->reverseIterator()->next();
+        BTreeEntry right = *it->next();
+        BTreeEntry newEntry(parentEntry->getKey(), left.getRightChild(), right.getLeftChild());
+        rightSibling->deleteKeyAndLeftChild(&left);
+        page->insertEntry(&newEntry);
+        page->insertEntry(&right);
+        entryNum1 += 2;
+        while (entryNum1 < target && it->hasNext()) {
+            entryNum1++;
+            BTreeEntry* pNext = it->next();
+            rightSibling->deleteKeyAndLeftChild(pNext);
+            page->insertEntry(pNext);
+        }
+        BTreeEntry* pNext = it->next();
+        rightSibling->deleteKeyAndLeftChild(pNext);
+        parentEntry->setKey(pNext->getKey());
+        parent->updateEntry(parentEntry);
     }
     void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {

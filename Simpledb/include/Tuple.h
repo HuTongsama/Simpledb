@@ -6,6 +6,8 @@ namespace Simpledb {
 	
 	class Tuple : public Noncopyable {
 	public:
+		Tuple();
+		Tuple(Tuple* p);
 		/**
 		* Create a new tuple with the specified schema (type).
 		*
