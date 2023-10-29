@@ -142,7 +142,8 @@ namespace Simpledb {
 		 * @throws runtimeError
 		 */
 		shared_ptr<Tuple> getTuple(int i);
-
+		int getFirstTupleIndex();
+		int getLastTupleIndex();
 	};
 
 	class BTreeLeafPageIterator :public Iterator<Tuple> {

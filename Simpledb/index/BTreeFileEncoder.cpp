@@ -523,7 +523,7 @@ namespace Simpledb {
 			entries[level][size - 1] = make_shared<BTreeEntry>(prev->getKey(), prev->getLeftChild(), e->getLeftChild());
 			if (size == nentries * 2 + 1) {
 				// write out a page of entries
-				vector<shared_ptr<BTreeEntry>> pageEntries(entries[level].begin(), entries[level].begin());
+				vector<shared_ptr<BTreeEntry>> pageEntries(entries[level].begin(), entries[level].end());
 				vector<unsigned char> internalPageBytes = convertToInternalPage(pageEntries, npagebytes, keyType, childPageCategory);
 				shared_ptr<BTreePageId> internalPid = make_shared<BTreePageId>(tableid, bf->numPages() + 1, BTreePageId::INTERNAL);
 				bf->writePage(make_shared<BTreeInternalPage>(internalPid, internalPageBytes, keyField));

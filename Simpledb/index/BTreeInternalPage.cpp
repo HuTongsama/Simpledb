@@ -297,7 +297,7 @@ namespace Simpledb {
 							to_string(e->getRightChild()->getPageNumber()) + " and key " + e->getKey()->toString() +
 							" HINT: one of these children must match an existing child on the page" +
 							" and this key must be correctly ordered in between that child's" +
-							" left and right keys");
+							" left and right keys" + ", slot i:" + to_string(i));
 					}
 					lessOrEqKey = i;
 					if (_children[i] == e->getRightChild()->getPageNumber()) {
@@ -312,7 +312,7 @@ namespace Simpledb {
 							to_string(e->getRightChild()->getPageNumber()) + " and key " + e->getKey()->toString() +
 							" HINT: one of these children must match an existing child on the page" +
 							" and this key must be correctly ordered in between that child's" +
-							" left and right keys");
+							" left and right keys" + ", slot i:" + to_string(i));
 					}
 					break;
 				}

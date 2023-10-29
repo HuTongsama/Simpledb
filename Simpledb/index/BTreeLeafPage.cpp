@@ -136,6 +136,10 @@ namespace Simpledb {
 		
 		while (it->hasNext()) {
 			Tuple* t = it->next();
+			//if (nullptr != prev && !prev->compare(Predicate::Op::LESS_THAN_OR_EQ, *(t->getField(fieldid))))
+			//{
+			//	cout << "prev: " << prev->hashCode() << ", cmp: " << t->getField(fieldid)->hashCode() << endl;
+			//}
 			assert(nullptr == prev || prev->compare(Predicate::Op::LESS_THAN_OR_EQ, *(t->getField(fieldid))));
 			prev = t->getField(fieldid);
 			assert(t->getRecordId()->getPageId()->equals(*(this->getId())));
@@ -421,8 +425,25 @@ namespace Simpledb {
 		}
 
 	}
+	int BTreeLeafPage::getFirstTupleIndex()
+	{
+		size_t sz = getMaxTuples();
+		for (int i = 0; i < sz; ++i) {
+			if (isSlotUsed(i))return i;
+		}
+		return 0;
+	}
+	int BTreeLeafPage::getLastTupleIndex()
+	{
+		size_t sz = getMaxTuples();
+		for (int i = sz; i >= 0; --i) {
+			if (isSlotUsed(i))return i;
+		}
+		return 0;
+	}
 	BTreeLeafPageIterator::BTreeLeafPageIterator(BTreeLeafPage* p) :_p(p)
 	{
+		_position = _p->getFirstTupleIndex();
 	}
 	bool BTreeLeafPageIterator::hasNext()
 	{
@@ -441,7 +462,7 @@ namespace Simpledb {
 	}
 	BTreeLeafPageReverseIterator::BTreeLeafPageReverseIterator(BTreeLeafPage* p) :_p(p)
 	{
-		_position = _p->getNumTuples() - 1;
+		_position = _p->getLastTupleIndex();
 	}
 	bool BTreeLeafPageReverseIterator::hasNext()
 	{

@@ -243,7 +243,7 @@ namespace Simpledb {
             sibling->deleteTuple(*pNext);
             page->insertTuple(tmp);
         }
-        Tuple* pMid = isRightSibling ? it->next() : page->iterator()->next();
+        pMid = isRightSibling ? it->next() : page->iterator()->next();
         entry->setKey(pMid->getField(_keyField));
         parent->updateEntry(entry);
 
@@ -253,7 +253,7 @@ namespace Simpledb {
     {
         size_t entryNum1 = page->getNumEntries();
         size_t entryNum2 = leftSibling->getNumEntries();
-        size_t target = (entryNum1 + entryNum2) >> 2;
+        size_t target = (entryNum1 + entryNum2) >> 1;
         auto it = leftSibling->reverseIterator();
         
         BTreeEntry left = *it->next();
@@ -261,7 +261,7 @@ namespace Simpledb {
         BTreeEntry newEntry(parentEntry->getKey(), left.getRightChild(), right.getLeftChild());
         leftSibling->deleteKeyAndRightChild(&left);
         page->insertEntry(&newEntry);
-        page->insertEntry(&right);
+        page->insertEntry(&left);
         entryNum1 += 2;
         while (entryNum1 < target && it->hasNext()) {
             entryNum1++;
@@ -280,13 +280,13 @@ namespace Simpledb {
     {
         size_t entryNum1 = page->getNumEntries();
         size_t entryNum2 = rightSibling->getNumEntries();
-        size_t target = (entryNum1 + entryNum2) >> 2;
+        size_t target = (entryNum1 + entryNum2) >> 1;
         auto it = rightSibling->iterator();
 
         BTreeEntry left = *page->reverseIterator()->next();
         BTreeEntry right = *it->next();
         BTreeEntry newEntry(parentEntry->getKey(), left.getRightChild(), right.getLeftChild());
-        rightSibling->deleteKeyAndLeftChild(&left);
+        rightSibling->deleteKeyAndLeftChild(&right);
         page->insertEntry(&newEntry);
         page->insertEntry(&right);
         entryNum1 += 2;
@@ -300,12 +300,45 @@ namespace Simpledb {
         rightSibling->deleteKeyAndLeftChild(pNext);
         parentEntry->setKey(pNext->getKey());
         parent->updateEntry(parentEntry);
+        updateParentPointers(tid, dirtypages, page);
     }
-    void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::mergeLeafPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, 
+        shared_ptr<BTreeLeafPage> leftPage, shared_ptr<BTreeLeafPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
+        auto iter = rightPage->iterator();
+        while (iter->hasNext()) {
+            Tuple* pNext = iter->next();
+            leftPage->insertTuple(make_shared<Tuple>(pNext));
+            rightPage->deleteTuple(*pNext);
+        }
+        auto rightSiblingId = rightPage->getRightSiblingId();
+        if (rightSiblingId != nullptr)
+        {
+            shared_ptr<BTreeLeafPage> rightSibling = dynamic_pointer_cast<BTreeLeafPage>(
+                getPage(tid, dirtypages, rightSiblingId, Permissions::READ_WRITE));
+            rightSibling->setLeftSiblingId(dynamic_pointer_cast<BTreePageId>(leftPage->getId()));
+        }
+        leftPage->setRightSiblingId(rightSiblingId);
+        setEmptyPage(tid, dirtypages, rightPage->getId()->getPageNumber());
+        deleteParentEntry(tid, dirtypages, leftPage, parent, parentEntry);
     }
-    void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
+    void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
+        shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
+        BTreeEntry entry(parentEntry->getKey(),
+            leftPage->reverseIterator()->next()->getRightChild(),
+            rightPage->iterator()->next()->getLeftChild());
+        leftPage->insertEntry(&entry);
+        auto iter = rightPage->iterator();
+        while (iter->hasNext())
+        {
+            BTreeEntry* pNext = iter->next();
+            rightPage->deleteKeyAndLeftChild(pNext);
+            leftPage->insertEntry(pNext);
+        }
+        setEmptyPage(tid, dirtypages, rightPage->getId()->getPageNumber());
+        updateParentPointers(tid, dirtypages, leftPage);
+        deleteParentEntry(tid, dirtypages, leftPage, parent, parentEntry);
     }
     shared_ptr<Page> BTreeFile::findLeafPage(shared_ptr<TransactionId> tid, shared_ptr<BTreePageId> pid, shared_ptr<Field> f)
     {
@@ -591,8 +624,8 @@ namespace Simpledb {
         map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePage> page)
     {
         shared_ptr<BTreePageId> parentId = page->getParentId();
-        BTreeEntry* leftEntry = nullptr;
-        BTreeEntry* rightEntry = nullptr;
+        shared_ptr<BTreeEntry> leftEntry = nullptr;
+        shared_ptr<BTreeEntry> rightEntry = nullptr;
         shared_ptr<BTreeInternalPage> parent = nullptr;
 
         // find the left and right siblings through the parent so we make sure they have
@@ -605,20 +638,20 @@ namespace Simpledb {
             while (ite->hasNext()) {
                 BTreeEntry* e = ite->next();
                 if (e->getLeftChild()->equals(*(page->getId()))) {
-                    rightEntry = e;
+                    rightEntry = make_shared<BTreeEntry>(*e);
                     break;
                 }
                 else if (e->getRightChild()->equals(*(page->getId()))) {
-                    leftEntry = e;
+                    leftEntry = make_shared<BTreeEntry>(*e);
                 }
             }
         }
 
         if (dynamic_pointer_cast<BTreePageId>(page->getId())->pgcateg() == BTreePageId::LEAF) {
-            handleMinOccupancyLeafPage(tid, dirtypages, dynamic_pointer_cast<BTreeLeafPage>(page), parent, leftEntry, rightEntry);
+            handleMinOccupancyLeafPage(tid, dirtypages, dynamic_pointer_cast<BTreeLeafPage>(page), parent, leftEntry.get(), rightEntry.get());
         }
         else { // BTreePageId.INTERNAL
-            handleMinOccupancyInternalPage(tid, dirtypages, dynamic_pointer_cast<BTreeInternalPage>(page), parent, leftEntry, rightEntry);
+            handleMinOccupancyInternalPage(tid, dirtypages, dynamic_pointer_cast<BTreeInternalPage>(page), parent, leftEntry.get(), rightEntry.get());
         }
     }
     void BTreeFile::handleMinOccupancyLeafPage(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
@@ -690,12 +723,12 @@ namespace Simpledb {
         }
     }
     void BTreeFile::deleteParentEntry(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
-        shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent, shared_ptr<BTreeEntry> parentEntry)
+        shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
         // delete the entry in the parent.  If
         // the parent is below minimum occupancy, get some tuples from its siblings
         // or merge with one of the siblings
-        parent->deleteKeyAndRightChild(parentEntry.get());
+        parent->deleteKeyAndRightChild(parentEntry);
         int maxEmptySlots = parent->getMaxEntries() - parent->getMaxEntries() / 2; // ceiling
         if (parent->getNumEmptySlots() == parent->getMaxEntries()) {
             // This was the last entry in the parent.

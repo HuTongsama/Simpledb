@@ -103,7 +103,7 @@ TEST_F(SysBTreeFileDeleteTest, TestMergeLeafPages) {
 		_tid, e.getRightChild(), Permissions::READ_ONLY));
 	EXPECT_EQ(0, leftChild->getNumEmptySlots());
 	EXPECT_EQ(1, rightChild->getNumEmptySlots());
-	EXPECT_EQ(e.getKey(), rightChild->iterator()->next()->getField(0));
+	EXPECT_EQ(e.getKey()->hashCode(), rightChild->iterator()->next()->getField(0)->hashCode());
 }
 
 TEST_F(SysBTreeFileDeleteTest, TestDeleteRootPage) {
@@ -166,8 +166,9 @@ TEST_F(SysBTreeFileDeleteTest, TestReuseDeletedPages) {
 	for (int i = 0; i < 502; ++i) {
 		Database::getBufferPool()->insertTuple(_tid, threeLeafPageFile->getId(),
 			BTreeUtility::getBTreeTuple(i, 2));
-	}
-
+		if (i == 501)
+			cout << threeLeafPageFile->getFile()->length() << endl;
+	}	
 	// now there should be 3 leaf pages, 1 internal page, and 1 header page
 	EXPECT_EQ(5, threeLeafPageFile->numPages());
 	BTreeChecker::checkRep(threeLeafPageFile, _tid, dirtyPages, true);
@@ -182,7 +183,7 @@ TEST_F(SysBTreeFileDeleteTest, TestRedistributeInternalPages) {
 		map<int, int>(), tuples, 0);
 	BTreeChecker::checkRep(bf, _tid, dirtyPages, true);
 
-	Database::resetBufferPool(500); // we need more pages for this test
+	Database::resetBufferPool(512); // we need more pages for this test
 
 	shared_ptr<BTreeRootPtrPage> rootPtr = dynamic_pointer_cast<BTreeRootPtrPage>(Database::getBufferPool()->getPage(
 		_tid, BTreeRootPtrPage::getId(bf->getId()), Permissions::READ_ONLY));

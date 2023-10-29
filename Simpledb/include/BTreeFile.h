@@ -475,7 +475,7 @@ namespace Simpledb {
 		void deleteParentEntry(shared_ptr<TransactionId> tid,
 			map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePage> leftPage, shared_ptr<BTreeInternalPage> parent,
-			shared_ptr<BTreeEntry> parentEntry);
+			BTreeEntry* parentEntry);
 		/**
 		 * Method to encapsulate the process of creating a new page.  It reuses old pages if possible,
 		 * and creates a new page if none are available.  It wipes the page on disk and in the cache and

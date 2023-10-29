@@ -138,12 +138,12 @@ TEST_F(BTreeFileDeleteTest, TestMergeLeafPages) {
 	shared_ptr<BTreePageId> parentId = make_shared<BTreePageId>(tableid, 1, BTreePageId::INTERNAL);
 	shared_ptr<BTreeInternalPage> parent = BTreeUtility::createRandomInternalPage(parentId, keyField,
 		BTreePageId::LEAF, BTreeUtility::MAX_RAND_VALUE / 2, BTreeUtility::MAX_RAND_VALUE, 2);
-	BTreeEntry* entry = parent->iterator()->next();
+	BTreeEntry entry = *parent->iterator()->next();
 	shared_ptr<Field> siblingKey = rightPage->iterator()->next()->getField(keyField);
-	shared_ptr<Field> parentKey = entry->getKey();
+	shared_ptr<Field> parentKey = entry.getKey();
 	shared_ptr<Field> minKey = (siblingKey->compare(Predicate::Op::LESS_THAN, *parentKey) ? siblingKey : parentKey);
-	entry->setKey(minKey);
-	parent->updateEntry(entry);
+	entry.setKey(minKey);
+	parent->updateEntry(&entry);
 	int numEntries = parent->getNumEntries();
 
 	// set all the pointers
@@ -158,7 +158,7 @@ TEST_F(BTreeFileDeleteTest, TestMergeLeafPages) {
 	dirtypages[*leftPageId] = leftPage;
 	dirtypages[*rightPageId] = rightPage;
 	dirtypages[*parentId] = parent;
-	empty->mergeLeafPages(_tid, dirtypages, leftPage, rightPage, parent, entry);
+	empty->mergeLeafPages(_tid, dirtypages, leftPage, rightPage, parent, &entry);
 	EXPECT_EQ(totalTuples, leftPage->getNumTuples());
 	EXPECT_EQ(0, rightPage->getNumTuples());
 	EXPECT_EQ(nullptr, leftPage->getRightSiblingId());
