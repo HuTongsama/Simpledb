@@ -29,7 +29,7 @@ TEST_F(SysBTreeFileDeleteTest, TestRedistributeLeafPages) {
 	// This should create a B+ tree with two partially full leaf pages
 	shared_ptr<BTreeFile> twoLeafPageFile = BTreeUtility::createRandomBTreeFile(2, 600,
 		map<int, int>(), tuples, 0);	
-	BTreeChecker::checkRep(twoLeafPageFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(twoLeafPageFile.get(), _tid, dirtyPages, true);
 
 	// Delete some tuples from the first page until it gets to minimum occupancy
 	shared_ptr<DbFileIterator> it = twoLeafPageFile->iterator(_tid);
@@ -44,7 +44,7 @@ TEST_F(SysBTreeFileDeleteTest, TestRedistributeLeafPages) {
 		twoLeafPageFile->deleteTuple(_tid, *t);
 		count++;
 	}
-	BTreeChecker::checkRep(twoLeafPageFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(twoLeafPageFile.get(), _tid, dirtyPages, true);
 
 	// deleting a tuple now should bring the page below minimum occupancy and cause 
 	// the tuples to be redistributed
@@ -70,7 +70,7 @@ TEST_F(SysBTreeFileDeleteTest, TestMergeLeafPages) {
 	shared_ptr<BTreeFile> threeLeafPageFile = BTreeUtility::createRandomBTreeFile(2, 1005,
 		map<int, int>(), tuples, 0);
 
-	BTreeChecker::checkRep(threeLeafPageFile,
+	BTreeChecker::checkRep(threeLeafPageFile.get(),
 		_tid, dirtyPages, true);
 	// there should be one internal node and 3 leaf nodes
 	EXPECT_EQ(4, threeLeafPageFile->numPages());
@@ -87,7 +87,7 @@ TEST_F(SysBTreeFileDeleteTest, TestMergeLeafPages) {
 	it->close();
 	threeLeafPageFile->deleteTuple(_tid, *secondToLast);
 	threeLeafPageFile->deleteTuple(_tid, *last);
-	BTreeChecker::checkRep(threeLeafPageFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(threeLeafPageFile.get(), _tid, dirtyPages, true);
 
 	// confirm that the last two pages have merged successfully
 	shared_ptr<BTreePageId> rootPtrId = BTreeRootPtrPage::getId(threeLeafPageFile->getId());
@@ -114,7 +114,7 @@ TEST_F(SysBTreeFileDeleteTest, TestDeleteRootPage) {
 		map<int,int>(), tuples, 0);
 	// there should be one internal node and 2 leaf nodes
 	EXPECT_EQ(3, twoLeafPageFile->numPages());
-	BTreeChecker::checkRep(twoLeafPageFile,
+	BTreeChecker::checkRep(twoLeafPageFile.get(),
 		_tid, dirtyPages, true);
 
 	// delete the first two tuples
@@ -124,9 +124,9 @@ TEST_F(SysBTreeFileDeleteTest, TestDeleteRootPage) {
 	Tuple* second = it->next();
 	it->close();
 	twoLeafPageFile->deleteTuple(_tid, *first);
-	BTreeChecker::checkRep(twoLeafPageFile, _tid, dirtyPages, false);
+	BTreeChecker::checkRep(twoLeafPageFile.get(), _tid, dirtyPages, false);
 	twoLeafPageFile->deleteTuple(_tid, *second);
-	BTreeChecker::checkRep(twoLeafPageFile, _tid, dirtyPages, false);
+	BTreeChecker::checkRep(twoLeafPageFile.get(), _tid, dirtyPages, false);
 
 	// confirm that the last two pages have merged successfully and replaced the root
 	shared_ptr<BTreePageId> rootPtrId = BTreeRootPtrPage::getId(twoLeafPageFile->getId());
@@ -145,7 +145,7 @@ TEST_F(SysBTreeFileDeleteTest, TestReuseDeletedPages) {
 	// this should create a B+ tree with 3 leaf nodes
 	shared_ptr<BTreeFile> threeLeafPageFile = BTreeUtility::createRandomBTreeFile(2, 1005,
 		map<int, int>(), tuples, 0);
-	BTreeChecker::checkRep(threeLeafPageFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(threeLeafPageFile.get(), _tid, dirtyPages, true);
 
 	// 3 leaf pages, 1 internal page
 	EXPECT_EQ(4, threeLeafPageFile->numPages());
@@ -161,17 +161,15 @@ TEST_F(SysBTreeFileDeleteTest, TestReuseDeletedPages) {
 
 	// now there should be 2 leaf pages, 1 internal page, 1 unused leaf page, 1 header page
 	EXPECT_EQ(5, threeLeafPageFile->numPages());
-
 	// insert enough tuples to ensure one of the leaf pages splits
 	for (int i = 0; i < 502; ++i) {
 		Database::getBufferPool()->insertTuple(_tid, threeLeafPageFile->getId(),
 			BTreeUtility::getBTreeTuple(i, 2));
-		if (i == 501)
-			cout << threeLeafPageFile->getFile()->length() << endl;
+		BTreeChecker::checkRep(threeLeafPageFile.get(), _tid, dirtyPages, true);
 	}	
 	// now there should be 3 leaf pages, 1 internal page, and 1 header page
 	EXPECT_EQ(5, threeLeafPageFile->numPages());
-	BTreeChecker::checkRep(threeLeafPageFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(threeLeafPageFile.get(), _tid, dirtyPages, true);
 }
 
 TEST_F(SysBTreeFileDeleteTest, TestRedistributeInternalPages) {
@@ -181,7 +179,7 @@ TEST_F(SysBTreeFileDeleteTest, TestRedistributeInternalPages) {
 	// and 602 nodes in the third tier
 	shared_ptr<BTreeFile> bf = BTreeUtility::createRandomBTreeFile(2, 302204,
 		map<int, int>(), tuples, 0);
-	BTreeChecker::checkRep(bf, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(bf.get(), _tid, dirtyPages, true);
 
 	Database::resetBufferPool(512); // we need more pages for this test
 
@@ -224,7 +222,7 @@ TEST_F(SysBTreeFileDeleteTest, TestRedistributeInternalPages) {
 	}
 	EXPECT_TRUE(leftChild->getNumEmptySlots() > 203);
 	EXPECT_TRUE(rightChild->getNumEmptySlots() <= 252);
-	BTreeChecker::checkRep(bf, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(bf.get(), _tid, dirtyPages, true);
 
 	// sanity check that the entries make sense
 	BTreeEntry* lastLeftEntry = nullptr;
@@ -251,7 +249,7 @@ TEST_F(SysBTreeFileDeleteTest, TestDeleteInternalPages) {
 	shared_ptr<BTreeFile> bigFile = BTreeUtility::createRandomBTreeFile(2, 31125,
 		map<int,int>(), tuples, 0);
 
-	BTreeChecker::checkRep(bigFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(bigFile.get(), _tid, dirtyPages, true);
 
 	Database::resetBufferPool(500); // we need more pages for this test
 
@@ -283,7 +281,7 @@ TEST_F(SysBTreeFileDeleteTest, TestDeleteInternalPages) {
 		count++;
 	}
 
-	BTreeChecker::checkRep(bigFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(bigFile.get(), _tid, dirtyPages, true);
 
 	// deleting a page of tuples should bring the internal page below minimum 
 	// occupancy and cause the entries to be redistributed
@@ -293,7 +291,7 @@ TEST_F(SysBTreeFileDeleteTest, TestDeleteInternalPages) {
 		it->rewind();
 	}
 
-	BTreeChecker::checkRep(bigFile, _tid, dirtyPages, true);
+	BTreeChecker::checkRep(bigFile.get(), _tid, dirtyPages, true);
 
 	EXPECT_EQ(62, leftChild->getNumEmptySlots());
 	EXPECT_EQ(62, rightChild->getNumEmptySlots());

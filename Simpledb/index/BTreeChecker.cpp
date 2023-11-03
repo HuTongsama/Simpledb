@@ -32,7 +32,7 @@ namespace Simpledb {
 		ans->_rightmostId = right->_rightmostId;
 		return ans;
 	}
-	shared_ptr<BTreeChecker::SubtreeSummary> BTreeChecker::checkSubTree(shared_ptr<BTreeFile> bt, shared_ptr<TransactionId> tid,
+	shared_ptr<BTreeChecker::SubtreeSummary> BTreeChecker::checkSubTree(BTreeFile* bt, shared_ptr<TransactionId> tid,
 		map<BTreePageId, shared_ptr<Page>>& dirtypages, shared_ptr<BTreePageId> pageId, shared_ptr<Field> lowerBound,
 		shared_ptr<Field> upperBound, shared_ptr<BTreePageId> parentId, bool checkOccupancy, int depth)
 	{
@@ -86,7 +86,7 @@ namespace Simpledb {
 			return nullptr;
 		}
 	}
-	void BTreeChecker::checkRep(shared_ptr<BTreeFile> bt, shared_ptr<TransactionId> tid,
+	void BTreeChecker::checkRep(BTreeFile* bt, shared_ptr<TransactionId> tid,
 		map<BTreePageId, shared_ptr<Page>>& dirtypages, bool checkOccupancy)
 	{
 		shared_ptr<BTreeRootPtrPage> rtptr = dynamic_pointer_cast<BTreeRootPtrPage>

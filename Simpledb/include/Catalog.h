@@ -48,6 +48,8 @@ namespace Simpledb {
 		*    this file/tupledesc param for the calls getTupleDesc and getFile
 		*/
 		void addTable(shared_ptr<DbFile> file);
+		void removeTable(const string& name);
+		void removeTable(shared_ptr<DbFile> file);
 		/**
 		* Return the id of the table with a specified name,
 		* @throws Exception if the table doesn't exist

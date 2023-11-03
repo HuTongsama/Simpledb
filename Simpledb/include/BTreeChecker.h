@@ -21,7 +21,7 @@ namespace Simpledb {
 				shared_ptr<SubtreeSummary> accleft, shared_ptr<SubtreeSummary> right);
 
 		};
-		static shared_ptr<SubtreeSummary> checkSubTree(shared_ptr<BTreeFile> bt,
+		static shared_ptr<SubtreeSummary> checkSubTree(BTreeFile* bt,
 			shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
 			shared_ptr<BTreePageId> pageId, shared_ptr<Field> lowerBound, shared_ptr<Field> upperBound,
 			shared_ptr<BTreePageId> parentId, bool checkOccupancy, int depth);
@@ -34,7 +34,7 @@ namespace Simpledb {
 		 * 4) record to page pointers.
 		 * 5) occupancy invariants. (if enabled)
 		 */
-		static void checkRep(shared_ptr<BTreeFile> bt, shared_ptr<TransactionId> tid,
+		static void checkRep(BTreeFile* bt, shared_ptr<TransactionId> tid,
 			map<BTreePageId, shared_ptr<Page>>& dirtypages, bool checkOccupancy);
 
 	};

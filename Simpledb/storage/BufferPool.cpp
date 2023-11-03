@@ -114,7 +114,7 @@ namespace Simpledb
 				for (auto& page : pages) {
 					_lockManager.unlockPage(tid, page->getId());
 				}
-				break;
+				//break;
 			}
 		}
 	}

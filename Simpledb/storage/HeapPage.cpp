@@ -87,6 +87,7 @@ namespace Simpledb {
 	void HeapPage::deleteTuple(Tuple& t)
 	{
 		shared_ptr<RecordId> record = t.getRecordId();
+		if (record == nullptr)return;
 		int slotId = record->getTupleNumber();
 		if (!isSlotUsed(slotId)) {
 			throw runtime_error("page slot is already empty");

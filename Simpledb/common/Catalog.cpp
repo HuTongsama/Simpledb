@@ -23,6 +23,22 @@ namespace Simpledb {
 	{
         addTable(file, "", "");
 	}
+    void Catalog::removeTable(const string& name)
+    {
+        _nameToTable.erase(name);
+    }
+    void Catalog::removeTable(shared_ptr<DbFile> file)
+    {
+        if (file == nullptr)return;
+        string name;
+        for (auto& iter : _nameToTable) {
+            if (iter.second._file->getId() == file->getId()) {
+                name = iter.first;
+                break;
+            }
+        }
+        if (name != "")removeTable(name);
+    }
     size_t Catalog::getTableId(const string& name)
 	{
         Table* pTable = getTable(name);

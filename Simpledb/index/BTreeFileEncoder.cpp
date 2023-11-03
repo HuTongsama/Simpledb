@@ -274,6 +274,7 @@ namespace Simpledb {
 		setRightSiblingPtrs(bf, lastPid, nullptr);
 
 		Database::resetBufferPool(BufferPool::DEFAULT_PAGES);
+		Database::getCatalog()->removeTable(heapf);
 		return bf;
 	}
 

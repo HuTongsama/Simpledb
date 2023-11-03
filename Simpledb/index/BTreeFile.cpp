@@ -2,7 +2,7 @@
 #include"BTreeHeaderPage.h"
 #include"BTreeInternalPage.h"
 #include"Database.h"
-
+#include"BTreeChecker.h"
 #pragma warning(disable:4996)
 namespace Simpledb {
 	BTreeFile::BTreeFile(shared_ptr<File> f, int key, shared_ptr<TupleDesc> td)
@@ -132,6 +132,7 @@ namespace Simpledb {
             rightPage->insertTuple(firstRightPageTuple);
         }
         shared_ptr<BTreePageId> rSiblingId = page->getRightSiblingId();
+        BTreeChecker::checkRep(this, tid, dirtypages, true);
         if (rSiblingId != nullptr) {
             shared_ptr<BTreeLeafPage> oldRightPage =
                 dynamic_pointer_cast<BTreeLeafPage>(getPage(tid, dirtypages, rSiblingId, Permissions::READ_WRITE));
@@ -143,13 +144,15 @@ namespace Simpledb {
         rightPage->setLeftSiblingId(dynamic_pointer_cast<BTreePageId>(page->getId()));
         dirtypages[*dynamic_pointer_cast<BTreePageId>(page->getId())] = page;
         dirtypages[*dynamic_pointer_cast<BTreePageId>(rightPage->getId())] = rightPage;    
-
-        shared_ptr<BTreeInternalPage> parent = getParentWithEmptySlots(tid, dirtypages, page->getParentId(), firstRightPageTuple->getField(_keyField));
+        shared_ptr<Field> midField = firstRightPageTuple->getField(_keyField);
+        shared_ptr<BTreeInternalPage> parent = getParentWithEmptySlots(tid, dirtypages, page->getParentId(), midField);
         shared_ptr<BTreeEntry> entry = make_shared<BTreeEntry>(
-            firstRightPageTuple->getField(_keyField),
+            midField,
             dynamic_pointer_cast<BTreePageId>(page->getId()),
             dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
+        
         parent->insertEntry(entry.get());
+        
         dirtypages[*dynamic_pointer_cast<BTreePageId>(parent->getId())] = parent;
 
         updateParentPointer(tid, dirtypages,
@@ -158,8 +161,7 @@ namespace Simpledb {
         updateParentPointer(tid, dirtypages,
             dynamic_pointer_cast<BTreePageId>(parent->getId()),
             dynamic_pointer_cast<BTreePageId>(rightPage->getId()));
-        shared_ptr<Field> leftLast = rIt->next()->getField(_keyField);
-        if (field->compare(Predicate::Op::GREATER_THAN, *leftLast))return rightPage;
+        if (field->compare(Predicate::Op::GREATER_THAN_OR_EQ, *midField))return rightPage;
         return page;
     }
     shared_ptr<BTreeInternalPage> BTreeFile::splitInternalPage(shared_ptr<TransactionId> tid, map<BTreePageId,
