@@ -75,7 +75,7 @@ TEST_F(SysBTreeFileInsertTest, AddDuplicateTuples) {
 
 	shared_ptr<Tuple> tup;
 	map<BTreePageId, shared_ptr<Page>> tmpMap;
-	BTreeChecker::checkRep(empty, _tid, tmpMap, true);
+	BTreeChecker::checkRep(empty.get(), _tid, tmpMap, true);
 
 	// add a bunch of identical tuples
 	for (int i = 0; i < 5; ++i) {
@@ -86,7 +86,7 @@ TEST_F(SysBTreeFileInsertTest, AddDuplicateTuples) {
 
 	}
 
-	BTreeChecker::checkRep(empty, _tid, tmpMap, true);
+	BTreeChecker::checkRep(empty.get(), _tid, tmpMap, true);
 
 	// now search for some ranges and make sure we find all the tuples
 	IndexPredicate ipred(Predicate::Op::EQUALS, make_shared<IntField>(3));
@@ -166,7 +166,7 @@ TEST_F(SysBTreeFileInsertTest, TestSplitRootPage) {
 		map<int, int>(), tuples, 0);
 
 	// we will need more room in the buffer pool for this test
-	Database::resetBufferPool(512);
+	Database::resetBufferPool(1024);
 
 	// there should be 504 leaf pages + 1 internal node
 	EXPECT_EQ(505, bigFile->numPages());
