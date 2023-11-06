@@ -292,15 +292,15 @@ namespace Simpledb {
         page->insertEntry(&newEntry);
         page->insertEntry(&right);
         entryNum1 += 2;
-        while (entryNum1 < target && it->hasNext()) {
+        while (entryNum1 <= target && it->hasNext()) {
             entryNum1++;
             BTreeEntry* pNext = it->next();
             rightSibling->deleteKeyAndLeftChild(pNext);
             page->insertEntry(pNext);
         }
-        BTreeEntry* pNext = it->next();
-        rightSibling->deleteKeyAndLeftChild(pNext);
-        parentEntry->setKey(pNext->getKey());
+        BTreeEntry next = *page->reverseIterator()->next();
+        page->deleteKeyAndRightChild(&next);
+        parentEntry->setKey(next.getKey());
         parent->updateEntry(parentEntry);
         updateParentPointers(tid, dirtypages, page);
     }

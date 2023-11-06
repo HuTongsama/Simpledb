@@ -76,7 +76,8 @@ namespace Simpledb {
 		// extraBits are: one parent pointer, 1 byte for child page category, 
 		// one extra child pointer (node with m entries has m+1 pointers to children), 1 bit for extra header
 		int extraBits = 2 * INDEX_SIZE * 8 + 8 + 1;
-		return (BufferPool::getPageSize() * 8 - extraBits) / bitsPerEntryIncludingHeader;
+		int ret = (BufferPool::getPageSize() * 8 - extraBits) / bitsPerEntryIncludingHeader;
+		return ret;
 	}
 	shared_ptr<Page> BTreeInternalPage::getBeforeImage()
 	{
