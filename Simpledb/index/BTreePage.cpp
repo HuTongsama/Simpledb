@@ -32,7 +32,7 @@ namespace Simpledb {
 			throw runtime_error("parent id must not be null");
 		}
 		if (id->getTableId() != _pid->getTableId()) {
-			throw new runtime_error("table id mismatch in setParentId");
+			throw runtime_error("table id mismatch in setParentId");
 		}
 		if (id->pgcateg() != BTreePageId::INTERNAL && id->pgcateg() != BTreePageId::ROOT_PTR) {
 			throw runtime_error("parent must be an internal node or root pointer");

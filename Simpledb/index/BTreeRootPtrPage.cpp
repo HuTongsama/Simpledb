@@ -100,10 +100,10 @@ namespace Simpledb {
 		}
 		else {
 			if (id->getTableId() != _pid->getTableId()) {
-				throw new runtime_error("table id mismatch in setRootId");
+				throw runtime_error("table id mismatch in setRootId");
 			}
 			if (id->pgcateg() != BTreePageId::INTERNAL && id->pgcateg() != BTreePageId::LEAF) {
-				throw new runtime_error("root must be an internal node or leaf node");
+				throw runtime_error("root must be an internal node or leaf node");
 			}
 			_root = static_cast<int>(id->getPageNumber());
 			_rootCategory = static_cast<int>(id->pgcateg());
