@@ -42,6 +42,7 @@
     <ClInclude Include="BTreeHeaderPageTest.h" />
     <ClInclude Include="BTreeInternalPageTest.h" />
     <ClInclude Include="BTreeLeafPageTest.h" />
+    <ClInclude Include="BTreeNextKeyLockingTest.h" />
     <ClInclude Include="BTreePageIdTest.h" />
     <ClInclude Include="BTreeRootPtrPageTest.h" />
     <ClInclude Include="BufferPoolWriteTest.h" />

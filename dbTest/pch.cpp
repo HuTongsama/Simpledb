@@ -48,3 +48,4 @@
 #include "SysBTreeFileInsertTest.h"
 #include "BTreeFileDeleteTest.h"
 #include "SysBTreeFileDeleteTest.h"
+#include "BTreeNextKeyLockingTest.h"
