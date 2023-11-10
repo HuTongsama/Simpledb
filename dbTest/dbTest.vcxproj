@@ -36,6 +36,7 @@
     <ClInclude Include="AbortEvictionTest.h" />
     <ClInclude Include="AbortEvictionTestBase.h" />
     <ClInclude Include="AggregateTest.h" />
+    <ClInclude Include="BTreeDeadlockTest.h" />
     <ClInclude Include="BTreeFileDeleteTest.h" />
     <ClInclude Include="BTreeFileInsertTest.h" />
     <ClInclude Include="BTreeFileReadTest.h" />

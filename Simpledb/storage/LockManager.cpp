@@ -158,11 +158,11 @@ namespace Simpledb {
 		}
 		else
 		{
-			/*string s("graph: \n");
-			for (auto p : _waitforGraph._indegreeMap) {
-				s += to_string(p.first) + " : " + to_string(p.second) + "\n";
-			}
-			printf("%s", s.c_str());*/
+			//string s("graph: \n");
+			//for (auto p : _waitforGraph._indegreeMap) {
+			//	s += to_string(p.first) + " : " + to_string(p.second) + "\n";
+			//}
+			//printf("%s", s.c_str());
 		}
 	}
 
