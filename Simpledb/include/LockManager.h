@@ -59,6 +59,5 @@ namespace Simpledb {
 		mutex _waitLock;
 		condition_variable _waitCond;
 		DirectedGraph _waitforGraph;
-		vector<size_t> _waitingQueue;
 	};
 }

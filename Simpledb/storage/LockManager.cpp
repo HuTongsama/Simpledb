@@ -37,54 +37,38 @@ namespace Simpledb {
 			pInfo = make_shared<TransactionLockInfo>();
 			_tidToInfo[tCode] = pInfo;
 		}
-		bool needWait = false;
+		if (isLocked(pCode, tCode, p)
+			|| (p == Permissions::READ_ONLY && isLocked(pCode, tCode, Permissions::READ_WRITE)))
+			return;
 		
-		if (isLocked(pCode,tCode, Permissions::READ_WRITE)) {
-			needWait = true;
-		}
-		else {
+		updateWaitforGraph(p, tid, pid);
+		_waitCond.wait(guard, [this, tCode, pCode, p]() {
+			int writeLockCount = countLock(pCode, Permissions::READ_WRITE);
+			int readLockCount = countLock(pCode, Permissions::READ_ONLY);
 			if (p == Permissions::READ_ONLY) {
-				if (pInfo->isLocked(pCode, Permissions::READ_WRITE))
-					return;
-			}
-			else if (p == Permissions::READ_WRITE) {
-				int readlockCount = countLock(pCode, Permissions::READ_ONLY);
-				int waitingCount = countWaiting(pCode);
-				if (readlockCount > 0 || waitingCount > 0) {
-					needWait = true;
-					pInfo->setWaitWriting(pCode, true);
+				if (writeLockCount > 0) {
+					return false;
 				}
 			}
-		}
-		
-		if (needWait) {
-			_waitingQueue.push_back(tCode);
-			updateWaitforGraph(p, tid, pid);
-			bool isReadlock = pInfo->isLocked(pCode, Permissions::READ_ONLY);
-			guard.unlock();
-			unique_lock<mutex> lock(_waitLock);
-			_waitCond.wait(lock, [this, pCode, tCode, isReadlock]() {
-				lock_guard<mutex> lock(_managerLock);
-				size_t code = _waitingQueue.front();
-				if (code != tCode)
-					return false;
-				int writelockCount = countLock(pCode, Permissions::READ_WRITE);
-				if (writelockCount > 0)
-					return false;
-				int readlockCount = countLock(pCode, Permissions::READ_ONLY);
-				if (readlockCount > 1 || (readlockCount == 1 && !isReadlock))
-					return false;
-				return true;
-				});
-			guard.lock();
-			if (isReadlock && p == Permissions::READ_WRITE) {
-				pInfo->unlock(pCode, Permissions::READ_ONLY);
+			else {//Permissions::READ_WRITE
+				if (isLocked(pCode, tCode, Permissions::READ_ONLY) &&
+					readLockCount == 1) {
+					return true;
+				}
+				else {
+					if (readLockCount > 0 || writeLockCount > 0) {
+						return false;
+					}
+				}
 			}
-			pInfo->setWaitWriting(pCode, false);
-			_waitingQueue.erase(_waitingQueue.begin());
+
+			return true;
+			});
+		if (p == Permissions::READ_WRITE && isLocked(pCode, tCode, Permissions::READ_ONLY)) {
+			int readLockCount = countLock(pCode, Permissions::READ_ONLY);
+			if (readLockCount == 1)pInfo->unlock(pCode, Permissions::READ_ONLY);
 		}
 		pInfo->lock(pCode, p);
-		updateWaitforGraph(p, tid, pid);
 	}
 	
 	void LockManager::transactionComplete(shared_ptr<TransactionId> tid)
@@ -94,13 +78,6 @@ namespace Simpledb {
 		if (!pInfo)
 			return;
 		auto tCode = tid->getId();
-		for (auto it = _waitingQueue.begin(); it != _waitingQueue.end();)
-		{
-			if (*it == tCode)
-				it = _waitingQueue.erase(it);
-			else
-				++it;
-		}
 		_tidToInfo.erase(tCode);
 		_waitforGraph.deleteVertex(tid->getId());
 		_waitCond.notify_all();
@@ -146,7 +123,7 @@ namespace Simpledb {
 			}
 
 			if (info->isLocked(p1, Permissions::READ_WRITE)
-				|| info->getWaitWriting(p1)) {
+				/* || info->getWaitWriting(p1)*/) {
 				_waitforGraph.addEdge(t2, t1);
 			}
 			if (p == Permissions::READ_WRITE) {
@@ -176,9 +153,8 @@ namespace Simpledb {
 
 	bool LockManager::isLocked(size_t pid, size_t tid, Permissions perm)
 	{
-		for (auto& idToInfo : _tidToInfo) {
-			if (idToInfo.first == tid)continue;
-			auto& info = idToInfo.second;
+		if (_tidToInfo.find(tid) != _tidToInfo.end()) {
+			auto& info = _tidToInfo[tid];
 			if (info->isLocked(pid, perm))
 				return true;
 		}

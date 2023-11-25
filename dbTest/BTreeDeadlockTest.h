@@ -64,6 +64,7 @@ protected:
 
 		// clear all state from the buffer pool, increase the number of pages
 		_bp->flushAllPages();
+		BufferPool::setPageSize(1024);
 	}
 
 	shared_ptr<BTreeUtility::BTreeWriter> startWriter(

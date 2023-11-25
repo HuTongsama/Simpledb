@@ -16,10 +16,10 @@ namespace Simpledb
 	shared_ptr<Page> BufferPool::getPage(shared_ptr<TransactionId> tid, shared_ptr<PageId> pid, Permissions perm)
 	{
 		{
-			/*lock_guard<mutex> lock(printMutex);
-			string s = string("tid: ") + to_string(tid->getId()) + " pid: " + to_string(pid->hashCode()) + " " + 
-				(perm == Permissions::READ_ONLY ? "read" : "write");
-			printf("%s\n", s.c_str());*/
+			//lock_guard<mutex> lock(printMutex);
+			//string s = string("tid: ") + to_string(tid->getId()) + " pid: " + to_string(pid->hashCode()) + " " + 
+			//	(perm == Permissions::READ_ONLY ? "read" : "write");
+			//printf("%s\n", s.c_str());
 		}
 		_lockManager.accessPermission(perm, tid, pid);
 		lock_guard<mutex> lock(_mutex);
