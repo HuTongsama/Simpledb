@@ -29,7 +29,7 @@ protected:
 		std::uniform_int_distribution<int> uniform_dist(0, BTreeUtility::MAX_RAND_VALUE);
 		_item1 = uniform_dist(_randomEngine);
 		_item2 = uniform_dist(_randomEngine);
-		_bp = Database::resetBufferPool(BufferPool::DEFAULT_PAGES);
+		_bp = Database::resetBufferPool(512);
 
 		// first make sure that item1 is not contained in our B+ tree
 		shared_ptr<TransactionId> tid = make_shared<TransactionId>();
@@ -64,7 +64,7 @@ protected:
 
 		// clear all state from the buffer pool, increase the number of pages
 		_bp->flushAllPages();
-		BufferPool::setPageSize(1024);
+		Database::getBufferPool()->transactionComplete(tid);
 	}
 
 	shared_ptr<BTreeUtility::BTreeWriter> startWriter(

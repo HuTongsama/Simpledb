@@ -132,7 +132,6 @@ namespace Simpledb {
             rightPage->insertTuple(firstRightPageTuple);
         }
         shared_ptr<BTreePageId> rSiblingId = page->getRightSiblingId();
-        BTreeChecker::checkRep(this, tid, dirtypages, true);
         if (rSiblingId != nullptr) {
             shared_ptr<BTreeLeafPage> oldRightPage =
                 dynamic_pointer_cast<BTreeLeafPage>(getPage(tid, dirtypages, rSiblingId, Permissions::READ_WRITE));
@@ -217,6 +216,7 @@ namespace Simpledb {
         // and split the leaf page if there are no more slots available
         shared_ptr<BTreeLeafPage> leafPage = dynamic_pointer_cast<BTreeLeafPage>
             (findLeafPage(tid, dirtypages, rootId, Permissions::READ_WRITE, t->getField(_keyField)));
+        //cout << "page num:"<< leafPage->getId()->getPageNumber() << endl;
         if (leafPage->getNumEmptySlots() == 0) {
             leafPage = splitLeafPage(tid, dirtypages, leafPage, t->getField(_keyField));
         }

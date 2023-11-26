@@ -49,4 +49,4 @@
 #include "BTreeFileDeleteTest.h"
 #include "SysBTreeFileDeleteTest.h"
 #include "BTreeNextKeyLockingTest.h"
-//#include "BTreeDeadlockTest.h"
+#include "BTreeDeadlockTest.h"

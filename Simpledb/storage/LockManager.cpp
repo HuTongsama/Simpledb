@@ -116,18 +116,19 @@ namespace Simpledb {
 			auto& info = iter.second;
 			auto pids = info->getAllPageIds();
 			auto findIter = find(pids.begin(), pids.end(), p1);
+			bool t2ReadLock = info->isLocked(p1, Permissions::READ_ONLY);
+			bool t2WriteLock = info->isLocked(p1, Permissions::READ_WRITE);
 			if (findIter == pids.end()
-				|| (!info->isLocked(p1,Permissions::READ_ONLY) &&
-					!info->isLocked(p1,Permissions::READ_WRITE))) {
+				|| (!t2ReadLock && !t2WriteLock)) {
 				continue;
 			}
-
-			if (info->isLocked(p1, Permissions::READ_WRITE)
-				/* || info->getWaitWriting(p1)*/) {
+			if (t2WriteLock) {
 				_waitforGraph.addEdge(t2, t1);
 			}
-			if (p == Permissions::READ_WRITE) {
-				_waitforGraph.addEdge(t1, t2);
+			else if (t2ReadLock) {
+				if (p == Permissions::READ_WRITE) {
+					_waitforGraph.addEdge(t2, t1);
+				}
 			}
 		}
 		if (!_waitforGraph.isAcyclic()) {
@@ -172,18 +173,6 @@ namespace Simpledb {
 		return count;
 	}
 
-	int LockManager::countWaiting(size_t pid)
-	{
-		int count = 0;
-		for (auto& idToInfo : _tidToInfo) {
-			auto& info = idToInfo.second;
-			if (info->getWaitWriting(pid))
-				count++;
-		}
-		return count;
-	}
-
-
 	void TransactionLockInfo::lock(size_t pid, Permissions perm)
 	{
 		if (_lockMap.find(pid) == _lockMap.end()) {
@@ -213,22 +202,6 @@ namespace Simpledb {
 		if (_lockMap.find(pid) != _lockMap.end()) {
 			_lockMap.erase(pid);
 		}
-	}
-
-	void TransactionLockInfo::setWaitWriting(size_t pid, bool flag)
-	{
-		if (_lockMap.find(pid) == _lockMap.end()) {
-			_lockMap[pid] = make_shared<PageLock>(pid);
-		}
-		_lockMap[pid]->setWaitWriting(flag);		
-	}
-
-	bool TransactionLockInfo::getWaitWriting(size_t pid)
-	{
-		if (_lockMap.find(pid) != _lockMap.end()) {
-			return _lockMap[pid]->getWaitWriting();
-		}
-		return false;
 	}
 
 	vector<size_t> TransactionLockInfo::getAllPageIds()

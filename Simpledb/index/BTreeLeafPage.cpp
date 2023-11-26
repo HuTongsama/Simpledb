@@ -297,8 +297,11 @@ namespace Simpledb {
 			}
 		}
 
-		if (emptySlot == -1)
+		if (emptySlot == -1) {
+			cout << "page num:" << _pid->getPageNumber() << endl;
 			throw runtime_error("called addTuple on page with no empty slots.");
+		}
+			
 
 		// find the last key less than or equal to the key being inserted
 		int lessOrEqKey = -1;
@@ -435,7 +438,7 @@ namespace Simpledb {
 	}
 	int BTreeLeafPage::getLastTupleIndex()
 	{
-		size_t sz = getMaxTuples();
+		size_t sz = getMaxTuples() - 1;
 		for (int i = sz; i >= 0; --i) {
 			if (isSlotUsed(i))return i;
 		}
