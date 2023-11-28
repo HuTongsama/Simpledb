@@ -75,6 +75,7 @@
     <ClInclude Include="SysBTreeFileDeleteTest.h" />
     <ClInclude Include="SysBTreeFileInsertTest.h" />
     <ClInclude Include="SysBTreeScanTest.h" />
+    <ClInclude Include="SysBTreeTest.h" />
     <ClInclude Include="SysDeleteTest.h" />
     <ClInclude Include="SysFilterTest.h" />
     <ClInclude Include="SysInsertTest.h" />

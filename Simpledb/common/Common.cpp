@@ -74,7 +74,7 @@ namespace Simpledb {
 	void Thread::start()
 	{
 		thread t(&Thread::run, this);
-		this_thread::sleep_for(chrono::milliseconds(500));
+		this_thread::sleep_for(chrono::milliseconds(100));
 		t.detach();
 	}
 

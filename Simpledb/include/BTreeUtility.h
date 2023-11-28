@@ -278,6 +278,7 @@ namespace Simpledb {
 			mutex _elock;
 
 			void runInner()override;
+			void init(shared_ptr<BTreeFile> bf, const vector<int>& tupdata, shared_ptr<BlockingQueue<vector<int>>> insertedTuples);
 		public:
 			/**
 			 * @param bf the B+ tree file into which we want to insert the tuple
@@ -293,6 +294,8 @@ namespace Simpledb {
 			 * @return an error instance if one occurred while inserting the tuple;
 			 */
 			const string& getError();
+
+			void rerun(shared_ptr<BTreeFile> bf, const vector<int>& tupdata, shared_ptr<BlockingQueue<vector<int>>> insertedTuples);
 		};
 
 		class BTreeDeleter : public Thread {
@@ -306,6 +309,7 @@ namespace Simpledb {
 			mutex _elock;
 
 			void runInner()override;
+			void init(shared_ptr<BTreeFile> bf, shared_ptr<BlockingQueue<vector<int>>> insertedTuples);
 		public:
 			/**
 			 * @param bf the B+ tree file from which we want to delete the tuple(s)
@@ -320,6 +324,8 @@ namespace Simpledb {
 			 * @return an error instance if one occurred while deleting the tuple;
 			 */
 			const string& getError();
+
+			void rerun(shared_ptr<BTreeFile> bf, shared_ptr<BlockingQueue<vector<int>>> insertedTuples);
 		};
 	};
 }

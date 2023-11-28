@@ -25,6 +25,11 @@ namespace Simpledb {
             return (_end + 1) % _sz == _start;
         }
 
+        size_t size() {
+            size_t sz = (_end + _capacity - _start) % _capacity;
+            return sz;
+        }
+
         void push(const T& e) {
             std::unique_lock<std::mutex> lock(_mutex);
             while (isFull()) {

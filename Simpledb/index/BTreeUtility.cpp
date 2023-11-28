@@ -359,11 +359,22 @@ namespace Simpledb {
             Database::getBufferPool()->transactionComplete(_tid, false);
         }
     }
-    BTreeUtility::BTreeInserter::BTreeInserter(shared_ptr<BTreeFile> bf, const vector<int>& tupdata,
+    
+    void BTreeUtility::BTreeInserter::init(shared_ptr<BTreeFile> bf, const vector<int>& tupdata,
         shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
-        :_bf(bf), _tupdata(tupdata), _insertedTuples(insertedTuples)
     {
         _tid = make_shared<TransactionId>();
+        _bf = bf;
+        _tupdata = tupdata;
+        _insertedTuples = insertedTuples;
+        _success = false;
+        _error = "";
+    }
+
+    BTreeUtility::BTreeInserter::BTreeInserter(shared_ptr<BTreeFile> bf, const vector<int>& tupdata,
+        shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
+    {
+        init(bf, tupdata, insertedTuples);
     }
     bool BTreeUtility::BTreeInserter::succeeded()
     {
@@ -374,6 +385,12 @@ namespace Simpledb {
     {
         lock_guard<mutex> lock(_elock);
         return _error;
+    }
+    void BTreeUtility::BTreeInserter::rerun(shared_ptr<BTreeFile> bf, const vector<int>& tupdata,
+        shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
+    {
+        init(bf, tupdata, insertedTuples);
+        runInner();
     }
     void BTreeUtility::BTreeDeleter::runInner()
     {
@@ -427,6 +444,14 @@ namespace Simpledb {
            
         }
     }
+    void BTreeUtility::BTreeDeleter::init(shared_ptr<BTreeFile> bf, shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
+    {
+        _tid = make_shared<TransactionId>();
+        _bf = bf;
+        _insertedTuples = insertedTuples;
+        _success = false;
+        _error = "";
+    }
     BTreeUtility::BTreeDeleter::BTreeDeleter(shared_ptr<BTreeFile> bf, shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
         :_bf(bf), _insertedTuples(insertedTuples)
     {
@@ -441,5 +466,10 @@ namespace Simpledb {
     {
         lock_guard<mutex> lock(_elock);
         return _error;
+    }
+    void BTreeUtility::BTreeDeleter::rerun(shared_ptr<BTreeFile> bf, shared_ptr<BlockingQueue<vector<int>>> insertedTuples)
+    {
+        init(bf, insertedTuples);
+        runInner();
     }
 }
