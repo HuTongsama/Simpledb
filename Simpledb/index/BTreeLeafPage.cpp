@@ -452,6 +452,16 @@ namespace Simpledb {
 	{
 		if (_p->getTuple(_position) != nullptr)
 			return true;
+		else {
+			auto sz = _p->getMaxTuples();
+			do
+			{
+				_position++;
+				if (_p->getTuple(_position) != nullptr)
+					return true;
+
+			} while (_position < sz);
+		}
 		return false;
 		
 
@@ -471,6 +481,15 @@ namespace Simpledb {
 	{
 		if (_p->getTuple(_position) != nullptr)
 			return true;
+		else {
+			do
+			{
+				_position--;
+				if (_p->getTuple(_position) != nullptr)
+					return true;
+
+			} while (_position >= 0);
+		}
 		return false;
 	}
 	Tuple* BTreeLeafPageReverseIterator::next()

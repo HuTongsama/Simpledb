@@ -95,9 +95,9 @@ namespace Simpledb
 		for (auto& page : pages) {
 			page->markDirty(true, tid);
 		}
-		for (auto& page : pages) {
+		/*for (auto& page : pages) {
 			_lockManager.unlockPage(tid, page->getId());
-		}
+		}*/
 	}
 	void BufferPool::deleteTuple(shared_ptr<TransactionId> tid, Tuple& t)
 	{
@@ -111,9 +111,9 @@ namespace Simpledb
 				for (auto& page : pages) {
 					page->markDirty(true, tid);
 				}
-				for (auto& page : pages) {
+				/*for (auto& page : pages) {
 					_lockManager.unlockPage(tid, page->getId());
-				}
+				}*/
 				//break;
 			}
 		}

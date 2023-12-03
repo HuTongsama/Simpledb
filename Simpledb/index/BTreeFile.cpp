@@ -245,7 +245,13 @@ namespace Simpledb {
             sibling->deleteTuple(*pNext);
             page->insertTuple(tmp);
         }
-        pMid = isRightSibling ? it->next() : page->iterator()->next();
+        if (isRightSibling) {
+            if (it->hasNext())pMid = it->next();
+            else throw runtime_error("null pMid");
+        }
+        else {
+            pMid = page->iterator()->next();
+        }
         entry->setKey(pMid->getField(_keyField));
         parent->updateEntry(entry);
 
@@ -322,14 +328,22 @@ namespace Simpledb {
         }
         leftPage->setRightSiblingId(rightSiblingId);
         setEmptyPage(tid, dirtypages, rightPage->getId()->getPageNumber());
+        rightPage->setLeftSiblingId(nullptr);
+        rightPage->setRightSiblingId(nullptr);
         deleteParentEntry(tid, dirtypages, leftPage, parent, parentEntry);
     }
     void BTreeFile::mergeInternalPages(shared_ptr<TransactionId> tid, map<BTreePageId, shared_ptr<Page>>& dirtypages,
         shared_ptr<BTreeInternalPage> leftPage, shared_ptr<BTreeInternalPage> rightPage, shared_ptr<BTreeInternalPage> parent, BTreeEntry* parentEntry)
     {
+        auto leftIter = leftPage->reverseIterator();
+        auto rightIter = rightPage->iterator();
+        
+        auto leftNext = leftIter->next();
+        auto rightNext = rightIter->next();
+
         BTreeEntry entry(parentEntry->getKey(),
-            leftPage->reverseIterator()->next()->getRightChild(),
-            rightPage->iterator()->next()->getLeftChild());
+            leftNext->getRightChild(),
+            rightNext->getLeftChild());
         leftPage->insertEntry(&entry);
         auto iter = rightPage->iterator();
         while (iter->hasNext())

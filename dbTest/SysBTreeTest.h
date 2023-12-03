@@ -159,7 +159,7 @@ TEST_F(SysBTreeTest, TestBigFile) {
 	shared_ptr<TransactionId> tid = make_shared<TransactionId>();
 
 	// First look for random tuples and make sure we can find them
-	std::uniform_int_distribution<int> uniform_dist1(0, sz);
+	std::uniform_int_distribution<int> uniform_dist1(0, sz - 1);
 	printf("Searching for tuples...\n");
 	for (int i = 0; i < 10000; i++) {
 		int rand = uniform_dist1(_randomEngine);
